@@ -42,6 +42,13 @@ class RoleSeeder extends Seeder
             'users.delete',
         ];
 
+        $productPermissions = [
+            'products.view_any',
+            'products.create',
+            'products.update',
+            'products.delete',
+        ];
+
         $categoryPermissions = [
             'categories.view_any',
             'categories.create',
@@ -73,7 +80,8 @@ class RoleSeeder extends Seeder
             $userPermissions,
             $categoryPermissions,
             $attributePermissions,
-            $storePermissions
+            $productPermissions,
+            $storePermissions,
         );
 
         foreach ($allPermissions as $permission) {
@@ -90,7 +98,8 @@ class RoleSeeder extends Seeder
             ['users.view_any'],
             $rolePermissions,
             $categoryPermissions,
-            $attributePermissions
+            $attributePermissions,
+            $productPermissions,
         ));
 
         $tenantOwner = Role::firstOrCreate(['name' => 'Tenant Owner', config('permission.column_names.team_foreign_key') => null]);

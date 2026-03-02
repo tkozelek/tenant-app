@@ -11,8 +11,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 class GlobalProduct extends Model implements HasMedia
 {
-    /** @use HasFactory<\Database\Factories\GlobalProductFactory> */
-    use HasFactory, InteractsWithMedia;
+    use InteractsWithMedia;
 
     protected $fillable = [
         'category_id',

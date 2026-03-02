@@ -79,11 +79,11 @@ class User extends Authenticatable implements FilamentUser, HasName
             ->exists();
     }
 
-    public function hasPermissionToOnTenant(string $permission, Tenant $tenant): bool
+    public function hasPermissionToOnTenant(string $permission, $tenant): bool
     {
         $currentTeamId = getPermissionsTeamId();
 
-        setPermissionsTeamId($tenant->id);
+        is_numeric($tenant) ? setPermissionsTeamId($tenant) : setPermissionsTeamId($tenant->id);
 
         try {
             return $this->hasPermissionTo($permission);

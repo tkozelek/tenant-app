@@ -17,7 +17,6 @@ class GlobalProductFactory extends Factory
     public function definition(): array
     {
         return [
-            //
         ];
     }
 }
