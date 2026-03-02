@@ -13,12 +13,10 @@ class GlobalProductRequestPolicy
      */
     public function viewAny(User $user): bool
     {
-        // Platform admins can view all requests
         if ($user->hasPermissionTo('catalog.manage')) {
             return true;
         }
 
-        // Tenant users can view their own requests
         return $user->hasPermissionTo('store.products.manage');
     }
 
@@ -31,7 +29,6 @@ class GlobalProductRequestPolicy
             return true;
         }
 
-        // Check if user belongs to the tenant that made the request AND has permission for THAT tenant
         return $user->hasPermissionToOnTenant('store.products.manage', $globalProductRequest->tenant_id);
     }
 
@@ -48,12 +45,10 @@ class GlobalProductRequestPolicy
      */
     public function update(User $user, GlobalProductRequest $globalProductRequest): bool
     {
-        // Platform admins can update (approve/reject)
         if ($user->hasPermissionTo('catalog.manage')) {
             return true;
         }
 
-        // Tenant users can update their own pending requests
         return $user->hasPermissionToOnTenant('store.products.manage', $globalProductRequest->tenant_id);
     }
 

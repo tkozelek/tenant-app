@@ -21,7 +21,7 @@ class CategoryResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
-    protected static ?int $navigationSort = 4;
+    protected static ?int $navigationSort = 70;
 
     protected static ?string $recordTitleAttribute = 'name';
 

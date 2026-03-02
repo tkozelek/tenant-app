@@ -19,6 +19,7 @@ class RoleSeeder extends Seeder
 
         $platformPermissions = [
             'platform.access',
+            'catalog.manage'
         ];
 
         $tenantPermissions = [
