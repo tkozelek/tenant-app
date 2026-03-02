@@ -5,6 +5,7 @@ namespace App\Filament\Resources\TenantProducts;
 use App\Filament\Resources\TenantProducts\Pages\CreateTenantProduct;
 use App\Filament\Resources\TenantProducts\Pages\EditTenantProduct;
 use App\Filament\Resources\TenantProducts\Pages\ListTenantProducts;
+use App\Filament\Resources\TenantProducts\RelationManagers\VariantsRelationManager;
 use App\Filament\Resources\TenantProducts\Schemas\TenantProductForm;
 use App\Filament\Resources\TenantProducts\Tables\TenantProductsTable;
 use App\Models\TenantProduct;
@@ -37,7 +38,7 @@ class TenantProductResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            VariantsRelationManager::class,
         ];
     }
 
