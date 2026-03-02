@@ -32,8 +32,13 @@ class Attribute extends Model
         return $this->hasMany(AttributeValue::class);
     }
 
+    public function attributeValues(): HasMany
+    {
+        return $this->hasMany(AttributeValue::class)->orderBy('sort_order');
+    }
+
     public function categories(): BelongsToMany
     {
-        return $this->belongsToMany(Category::class);
+        return $this->belongsToMany(Category::class, 'category_attribute');
     }
 }

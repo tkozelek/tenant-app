@@ -1,4 +1,4 @@
-<x-layouts.admin>
+<x-app-layout>
     @if(isset($tenant))
         <x-header>
             Správa roli - {{ $tenant->name }}
@@ -10,7 +10,6 @@
         <livewire:tenant-user-table :tenant="$tenant"/>
 
     </div>
-
-</x-layouts.admin>
+</x-app-layout>
 
 

@@ -5,10 +5,7 @@ namespace App\Models;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
@@ -61,7 +58,8 @@ class User extends Authenticatable implements FilamentUser, HasName
         );
     }
 
-    public function ownedTenants() {
+    public function ownedTenants()
+    {
         return $this->hasMany(Tenant::class, 'owner_id');
     }
 
@@ -114,7 +112,15 @@ class User extends Authenticatable implements FilamentUser, HasName
 
     public function canAccessPanel(Panel $panel): bool
     {
-        return $this->can('platform.access');
+        if ($panel->getId() === 'admin') {
+            return $this->can('platform.access');
+        }
+
+        if ($panel->getId() === 'tenant') {
+            return $this->can('store.access');
+        }
+
+        return false;
     }
 
     public function getFilamentName(): string

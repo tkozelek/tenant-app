@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Category;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class CategoryPolicy
 {
@@ -13,8 +12,7 @@ class CategoryPolicy
      */
     public function viewAny(User $user): bool
     {
-        // Everyone can view categories
-        return true;
+        return $user->can('categories.view_any');
     }
 
     /**
@@ -22,7 +20,7 @@ class CategoryPolicy
      */
     public function view(User $user, Category $category): bool
     {
-        return true;
+        return $user->can('categories.view_any');
     }
 
     /**
@@ -30,7 +28,7 @@ class CategoryPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('catalog.manage');
+        return $user->can('categories.create');
     }
 
     /**
@@ -38,7 +36,7 @@ class CategoryPolicy
      */
     public function update(User $user, Category $category): bool
     {
-        return $user->hasPermissionTo('catalog.manage');
+        return $user->can('categories.update');
     }
 
     /**
@@ -46,6 +44,22 @@ class CategoryPolicy
      */
     public function delete(User $user, Category $category): bool
     {
-        return $user->hasPermissionTo('catalog.manage');
+        return $user->can('categories.delete');
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(User $user, Category $category): bool
+    {
+        return $user->can('categories.delete');
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     */
+    public function forceDelete(User $user, Category $category): bool
+    {
+        return $user->can('categories.delete');
     }
 }

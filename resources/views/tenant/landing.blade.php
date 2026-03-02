@@ -1,4 +1,4 @@
-<x-layouts.admin>
+<x-app-layout>
 @section('meta.description', $tenant->short_description ?? null)
     @section('og.title', $tenant->name ?? null)
     @section('og.description', $tenant->short_description ?? null)
@@ -26,4 +26,4 @@
             </div>
         </div>
     </div>
-</x-layouts.admin>
+</x-app-layout>

@@ -1,4 +1,4 @@
-<x-layouts.admin>
+<x-app-layout>
     @section('title', $title)
 
     <div class="py-10 sm:py-12">
@@ -77,4 +77,4 @@
             </div>
         </div>
     </div>
-</x-layouts.admin>
+</x-app-layout>

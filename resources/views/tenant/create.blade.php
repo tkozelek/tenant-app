@@ -1,4 +1,4 @@
-<x-layouts.admin>
+<x-app-layout>
     @section('head')
         <x-head.tinymce-config/>
     @endsection
@@ -13,4 +13,4 @@
             </div>
         </div>
     </div>
-</x-layouts.admin>
+</x-app-layout>

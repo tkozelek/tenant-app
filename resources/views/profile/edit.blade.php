@@ -1,4 +1,4 @@
-<x-layouts.admin>
+<x-app-layout>
     <x-header>
         {{ __('Profile') }}
     </x-header>
@@ -18,4 +18,4 @@
             </x-profile_wrapper>
         </div>
     </div>
-</x-layouts.admin>
+</x-app-layout>

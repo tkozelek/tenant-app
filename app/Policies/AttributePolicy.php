@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\Attribute;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class AttributePolicy
 {
@@ -13,7 +12,7 @@ class AttributePolicy
      */
     public function viewAny(User $user): bool
     {
-        return true;
+        return $user->can('attributes.view_any');
     }
 
     /**
@@ -21,7 +20,7 @@ class AttributePolicy
      */
     public function view(User $user, Attribute $attribute): bool
     {
-        return true;
+        return $user->can('attributes.view_any');
     }
 
     /**
@@ -29,7 +28,7 @@ class AttributePolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('catalog.manage');
+        return $user->can('attributes.create');
     }
 
     /**
@@ -37,7 +36,7 @@ class AttributePolicy
      */
     public function update(User $user, Attribute $attribute): bool
     {
-        return $user->hasPermissionTo('catalog.manage');
+        return $user->can('attributes.update');
     }
 
     /**
@@ -45,6 +44,22 @@ class AttributePolicy
      */
     public function delete(User $user, Attribute $attribute): bool
     {
-        return $user->hasPermissionTo('catalog.manage');
+        return $user->can('attributes.delete');
+    }
+
+    /**
+     * Determine whether the user can restore the model.
+     */
+    public function restore(User $user, Attribute $attribute): bool
+    {
+        return $user->can('attributes.delete');
+    }
+
+    /**
+     * Determine whether the user can permanently delete the model.
+     */
+    public function forceDelete(User $user, Attribute $attribute): bool
+    {
+        return $user->can('attributes.delete');
     }
 }
