@@ -1,0 +1,50 @@
+<?php
+
+use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\TenantController;
+use App\Http\Controllers\TenantUserController;
+use Illuminate\Support\Facades\Route;
+
+Route::get('/', function () {
+    return view('welcome');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
+});
+
+Route::middleware(['auth'])->group(function () {
+    Route::get('/obchod/{tenant:slug}/role', [TenantUserController::class, 'show'])->name('tenant-user.index');
+
+    Route::post('/obchod/{tenant:slug}/pridat', [TenantUserController::class, 'store'])->name('tenant-user.store');
+});
+
+// tenant CRUD
+Route::middleware(['auth'])->group(function () {
+    Route::get('/obchod/vytvorit', [TenantController::class, 'create'])->name('tenant.create');
+    Route::get('/obchod/{tenant:slug}/upravit', [TenantController::class, 'edit'])->name('tenant.edit');
+
+    Route::post('/obchod/vytvorit', [TenantController::class, 'store'])->name('tenant.store');
+    Route::patch('/obchod/{tenant:slug}/upravit', [TenantController::class, 'update'])->name('tenant.update');
+    Route::patch('/obchod/{tenant:slug}/zmenit-majitela', [TenantController::class, 'changeOwner'])->name('tenant.change-owner');
+    Route::delete('/obchod/{tenant}/vymazat/obrazok/{title:bool}', [TenantController::class, 'deleteImage'])->name('tenant.image');
+
+    Route::delete('/obchod/{tenant:slug}/vymazat', [TenantController::class, 'destroy'])->name('tenant.destroy');
+});
+
+Route::middleware('auth')->group(function () {
+    Route::get('/nastavenia', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/nastavenia', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/nastavenia', [ProfileController::class, 'destroy'])->name('profile.destroy');
+});
+
+Route::get('/obchod/{tenant:slug}', [TenantController::class, 'show'])->name('tenant.show');
+
+//Route::can('platform.access')->prefix('/admin')->name('admin.')->group(function () {
+//    Route::get('/', [AdminController::class, 'index'])->name('index');
+//});
+
+
+require __DIR__.'/auth.php';
