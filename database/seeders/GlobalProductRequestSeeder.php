@@ -12,8 +12,8 @@ class GlobalProductRequestSeeder extends Seeder
 {
     public function run(): void
     {
-        $user = User::first();
-        $tenant = Tenant::first() ?? Tenant::create(['name' => 'Test Tenant', 'owner_id' => $user->id, 'slug' => 'test-tenant']);
+        $user = User::all()->random();
+        $tenant = Tenant::all()?->random() ?? Tenant::create(['name' => 'Test Tenant', 'owner_id' => $user->id, 'slug' => 'test-tenant']);
         $category = Category::first() ?? Category::create([
             'name' => 'Mobily',
             'slug' => 'mobily'

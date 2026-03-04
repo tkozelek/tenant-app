@@ -2,6 +2,8 @@
 
 namespace Database\Seeders;
 
+use App\Models\Tenant;
+use App\Models\User;
 use Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
@@ -13,10 +15,14 @@ class DatabaseSeeder extends Seeder
     {
         $this->call([
             RoleSeeder::class,
+
+            TenantSeeder::class,
+
             CategorySeeder::class,
             AttributeSeeder::class,
             GlobalProductSeeder::class,
             GlobalProductRequestSeeder::class,
+            TenantProductSeeder::class,
         ]);
     }
 }

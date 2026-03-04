@@ -23,8 +23,14 @@ class TenantsTable
                     ->searchable(),
                 TextColumn::make('slug')
                     ->searchable(),
-                TextColumn::make('short_description')
-                    ->searchable(),
+                IconColumn::make('has_short_description')
+                    ->label('Ma kr. popis')
+                    ->boolean()
+                    ->state(fn ($record) => filled($record->description)),
+                IconColumn::make('has_description')
+                    ->label('Ma popis')
+                    ->boolean()
+                    ->state(fn ($record) => filled($record->description)),
                 IconColumn::make('is_public')
                     ->boolean(),
                 TextColumn::make('created_at')

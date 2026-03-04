@@ -13,21 +13,21 @@ class RoleForm
     {
         return $schema
             ->components([
-                Section::make('Information')
+                Section::make('Informácie')
                     ->schema([
                         TextInput::make('name')
-                            ->label('Role name')
+                            ->label('Názov')
                             ->required()
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
 
-                        // TextInput::make('guard_name')
-                        //     ->default('web')
-                        //     ->required(),
+                         TextInput::make('guard_name')
+                             ->default('web')
+                             ->required(),
                     ])->columns(1),
 
                 Section::make('Permissions')
-                    ->description('Select permissions for this role.')
+                    ->description('Právemoci pre danú rolu')
                     ->schema([
                         CheckboxList::make('permissions')
                             ->relationship(name: 'permissions', titleAttribute: 'name')

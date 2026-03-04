@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\TenantProducts\RelationManagers;
 
+use App\Models\TenantProductVariant;
+use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -10,13 +12,16 @@ use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\DB;
 
 class VariantsRelationManager extends RelationManager
 {
@@ -30,6 +35,12 @@ class VariantsRelationManager extends RelationManager
             ->components([
                 Section::make('Detail a zasoby')
                     ->schema([
+                        TextInput::make('name')
+                            ->label('Názov variantu')
+                            ->required()
+                            ->maxLength(255)
+                            ->columnSpan(1),
+
                         TextInput::make('sku')
                             ->label('SKU (Skladové číslo)')
                             ->required()
@@ -49,6 +60,11 @@ class VariantsRelationManager extends RelationManager
                             ->numeric()
                             ->default(0)
                             ->minValue(0)
+                            ->disabledOn('edit')
+                            ->dehydrated()
+                            ->helperText(fn (string $operation): string => $operation === 'edit'
+                                ? 'Pre upravu skladu stlacte tlacidlo uprava skladu.'
+                                : '')
                             ->columnSpan(1),
                     ]),
                 Section::make('Cenotvorba')
@@ -79,7 +95,7 @@ class VariantsRelationManager extends RelationManager
                             ->columnSpanFull(),
 
                         SpatieMediaLibraryFileUpload::make('media')
-                            ->collection('variants')
+                            ->collection('tenant_product_variants')
                             ->multiple()
                             ->reorderable()
                             ->panelLayout('grid')
@@ -87,7 +103,6 @@ class VariantsRelationManager extends RelationManager
                             ->columnSpanFull(),
                     ])
             ]);
-
     }
 
     public function table(Table $table): Table
@@ -101,6 +116,13 @@ class VariantsRelationManager extends RelationManager
                     ->square()
                     ->limit(3),
 
+                TextColumn::make('name')
+                    ->label('Nazov')
+                    ->searchable()
+                    ->sortable()
+                    ->copyable()
+                    ->weight('bold'),
+
                 TextColumn::make('sku')
                     ->label('SKU')
                     ->searchable()
@@ -111,7 +133,9 @@ class VariantsRelationManager extends RelationManager
                 TextColumn::make('attributeValues.value')
                     ->label('Atribúty')
                     ->badge()
-                    ->searchable(),
+                    ->searchable()
+                    ->limitList(4)
+                    ->tooltip(fn ($record): string => $record->attributeValues->pluck('value')->join(', ')),
 
                 TextColumn::make('price')
                     ->label('Cena')
@@ -146,6 +170,55 @@ class VariantsRelationManager extends RelationManager
             ->recordActions([
                 EditAction::make(),
                 DeleteAction::make(),
+                Action::make('adjust_stock')
+                    ->label('Sklad')
+                    ->icon('heroicon-o-circle-stack')
+                    ->color('warning')
+                    ->schema([
+                        Select::make('type')
+                            ->label('Zmenit typ')
+                            ->options([
+                                'purchase' => 'Nákup',
+                                'sale' => 'Predaj',
+                                'adjustment' => 'Oprava',
+                                'return' => 'Vrátenie',
+                                'transfer' => 'Prevod',
+                            ])
+                            ->required(),
+                        TextInput::make('quantity')
+                            ->label('Zmena skladu')
+                            ->numeric()
+                            ->required()
+                            ->rules([
+                                fn ($record) => function (string $attribute, $value, \Closure $fail) use ($record) {
+                                    $currentStock = $record->stock_quantity;
+
+                                    if ($value < 0 && ($currentStock + $value) < 0) {
+                                        $fail("Nedostatok zasob. Nemozete odobrat viac ako je aktuálny stav ({$currentStock}).");
+                                    }
+                                },
+                            ])
+                            ->helperText('Pozitívne na pridanie kusov, negatívne na odobratie.'),
+                        Textarea::make('note')
+                            ->label('Note')
+                            ->columnSpanFull(),
+                    ])
+                ->action(function (array $data, $record) {
+                    // transakcia, keby nejaké zlyha
+                    try {
+                        DB::transaction(function () use ($record, $data) {
+                            $record->stockHistories()->create([
+                                'type' => $data['type'],
+                                'quantity' => $data['quantity'],
+                                'note' => $data['note'],
+                            ]);
+
+                            $record->increment('stock_quantity', $data['quantity']);
+                        });
+                    } catch (\Exception $e) {
+                        Notification::make()->title('Nastala chyba.')->danger()->send();
+                    }
+                })->successNotificationTitle("Stav skladu zmenený úspešne.")
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

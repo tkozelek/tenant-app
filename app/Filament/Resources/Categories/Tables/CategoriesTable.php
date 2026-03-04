@@ -22,7 +22,7 @@ class CategoriesTable
                     ->searchable(),
 
                 TextColumn::make('parent.name')
-                    ->label('Parent Category')
+                    ->label('Rodičovská kategória')
                     ->sortable()
                     ->searchable(),
 
