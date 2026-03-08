@@ -4,7 +4,6 @@ namespace App\Policies;
 
 use App\Models\GlobalProduct;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class GlobalProductPolicy
 {
@@ -31,5 +30,15 @@ class GlobalProductPolicy
     public function delete(User $user, GlobalProduct $globalProduct): bool
     {
         return $user->hasPermissionTo('products.delete');
+    }
+
+    public function exportAny(User $user): bool
+    {
+        return $user->hasPermissionTo('products.export');
+    }
+
+    public function importAny(User $user): bool
+    {
+        return $user->hasPermissionTo('products.import');
     }
 }

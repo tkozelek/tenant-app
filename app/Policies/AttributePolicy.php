@@ -62,4 +62,20 @@ class AttributePolicy
     {
         return $user->can('attributes.delete');
     }
+
+    /**
+     * Determine whether the user can export any models.
+     */
+    public function exportAny(User $user): bool
+    {
+        return $user->can('attributes.export');
+    }
+
+    /**
+     * Determine whether the user can import any models.
+     */
+    public function importAny(User $user): bool
+    {
+        return $user->can('attributes.import');
+    }
 }

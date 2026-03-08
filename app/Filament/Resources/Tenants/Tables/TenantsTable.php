@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\Tenants\Tables;
 
+use App\Filament\Exports\TenantExporter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportBulkAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -52,6 +54,9 @@ class TenantsTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+                    ExportBulkAction::make()
+                        ->exporter(TenantExporter::class)
+                        ->authorize('exportAny'),
                 ]),
             ]);
     }

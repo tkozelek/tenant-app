@@ -12,7 +12,7 @@ class CategoryPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->can('categories.view_any');
+        return $user->hasPermissionTo('categories.view_any');
     }
 
     /**
@@ -20,7 +20,7 @@ class CategoryPolicy
      */
     public function view(User $user, Category $category): bool
     {
-        return $user->can('categories.view_any');
+        return $user->hasPermissionTo('categories.view_any');
     }
 
     /**
@@ -28,7 +28,7 @@ class CategoryPolicy
      */
     public function create(User $user): bool
     {
-        return $user->can('categories.create');
+        return $user->hasPermissionTo('categories.create');
     }
 
     /**
@@ -36,7 +36,7 @@ class CategoryPolicy
      */
     public function update(User $user, Category $category): bool
     {
-        return $user->can('categories.update');
+        return $user->hasPermissionTo('categories.update');
     }
 
     /**
@@ -44,7 +44,7 @@ class CategoryPolicy
      */
     public function delete(User $user, Category $category): bool
     {
-        return $user->can('categories.delete');
+        return $user->hasPermissionTo('categories.delete');
     }
 
     /**
@@ -52,7 +52,7 @@ class CategoryPolicy
      */
     public function restore(User $user, Category $category): bool
     {
-        return $user->can('categories.delete');
+        return $user->hasPermissionTo('categories.delete');
     }
 
     /**
@@ -60,6 +60,22 @@ class CategoryPolicy
      */
     public function forceDelete(User $user, Category $category): bool
     {
-        return $user->can('categories.delete');
+        return $user->hasPermissionTo('categories.delete');
+    }
+
+    /**
+     * Determine whether the user can export the model.
+     */
+    public function exportAny(User $user): bool
+    {
+        return $user->hasPermissionTo('categories.export');
+    }
+
+    /**
+     * Determine whether the user can import the model.
+     */
+    public function importAny(User $user): bool
+    {
+        return $user->hasPermissionTo('categories.import');
     }
 }

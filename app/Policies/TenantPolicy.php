@@ -9,6 +9,7 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 class TenantPolicy
 {
     use HandlesAuthorization;
+
     /**
      * Determine whether the user can view any models.
      */
@@ -45,6 +46,7 @@ class TenantPolicy
         if ($user->hasPermissionTo('tenants.create')) {
             return true;
         }
+
         return false;
     }
 
@@ -118,5 +120,21 @@ class TenantPolicy
         }
 
         return $user->hasPermissionToOnTenant('store.users.manage', $tenant);
+    }
+
+    /**
+     * Determine whether the user can export any models.
+     */
+    public function exportAny(User $user): bool
+    {
+        return $user->hasPermissionTo('tenants.export');
+    }
+
+    /**
+     * Determine whether the user can import any models.
+     */
+    public function importAny(User $user): bool
+    {
+        return $user->hasPermissionTo('tenants.import');
     }
 }

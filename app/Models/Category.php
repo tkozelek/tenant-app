@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Query\Builder;
 
 class Category extends Model
 {
@@ -30,18 +29,8 @@ class Category extends Model
         return $this->hasMany(Category::class, 'parent_id');
     }
 
-    public function globalProducts(): HasMany
-    {
-        return $this->hasMany(GlobalProduct::class);
-    }
-
     public function attributes(): BelongsToMany
     {
         return $this->belongsToMany(Attribute::class, 'category_attribute');
-    }
-
-    public function ancestors(): Builder|HasMany
-    {
-        return $this->children()->with('ancestors');
     }
 }

@@ -68,6 +68,9 @@ class TenantProductsTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+                    ExportBulkAction::make()
+                        ->exporter(TenantProductExporter::class)
+                        ->authorize('exportAny'),
                 ]),
             ]);
     }

@@ -3,7 +3,6 @@
 namespace App\Policies;
 
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class UserPolicy
 {
@@ -56,6 +55,23 @@ class UserPolicy
         if ($user->hasPermissionTo('users.delete')) {
             return true;
         }
+
         return $user->id === $model->id;
+    }
+
+    /**
+     * Determine whether the user can export any models.
+     */
+    public function exportAny(User $user): bool
+    {
+        return $user->hasPermissionTo('users.export');
+    }
+
+    /**
+     * Determine whether the user can import any models.
+     */
+    public function importAny(User $user): bool
+    {
+        return $user->hasPermissionTo('users.import');
     }
 }

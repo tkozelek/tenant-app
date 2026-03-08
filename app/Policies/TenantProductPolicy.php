@@ -5,7 +5,6 @@ namespace App\Policies;
 use App\Models\Tenant;
 use App\Models\TenantProduct;
 use App\Models\User;
-use Illuminate\Auth\Access\Response;
 
 class TenantProductPolicy
 {
@@ -27,7 +26,7 @@ class TenantProductPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('tenant.products.manage')  || $user->hasPermissionTo('products.create');
+        return $user->hasPermissionTo('tenant.products.manage') || $user->hasPermissionTo('products.create');
     }
 
     public function createForTenant(User $user, Tenant $tenant): bool
@@ -48,6 +47,16 @@ class TenantProductPolicy
      */
     public function delete(User $user, TenantProduct $tenantProduct): bool
     {
-        return $user->hasPermissionToOnTenant('tenant.products.manage', $tenantProduct->tenant_id)  || $user->hasPermissionTo('products.delete');
+        return $user->hasPermissionToOnTenant('tenant.products.manage', $tenantProduct->tenant_id) || $user->hasPermissionTo('products.delete');
+    }
+
+    public function exportAny(User $user): bool
+    {
+        return $user->hasPermissionTo('products.export');
+    }
+
+    public function importAny(User $user): bool
+    {
+        return $user->hasPermissionTo('products.import');
     }
 }

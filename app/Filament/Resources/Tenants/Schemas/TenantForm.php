@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Tenants\Schemas;
 
+use App\Filament\Actions\GenerateDescipritonAction;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -39,6 +40,12 @@ class TenantForm
 
                     RichEditor::make('description')
                         ->label('Description')
+                        ->hintAction(
+                            GenerateDescipritonAction::make()
+                                ->references('description')
+                                ->title('name')
+                                ->context('tenant popis'),
+                        )
                         ->toolbarButtons([
                             'attachFiles',
                             'blockquote',

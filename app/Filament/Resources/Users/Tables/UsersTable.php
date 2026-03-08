@@ -2,10 +2,14 @@
 
 namespace App\Filament\Resources\Users\Tables;
 
+use App\Filament\Exports\UserExporter;
+use App\Filament\Imports\UserImporter;
 use App\Models\Role;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportBulkAction;
+use Filament\Actions\ImportAction;
 use Filament\Actions\ViewAction;
 use Filament\Forms\Components\Select;
 use Filament\Tables\Columns\TextColumn;
@@ -56,9 +60,17 @@ class UsersTable
                 ViewAction::make(),
                 EditAction::make(),
             ])
+            ->headerActions([
+                ImportAction::make()
+                    ->importer(UserImporter::class)
+                    ->authorize('importAny'),
+            ])
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+                    ExportBulkAction::make()
+                        ->authorize('exportAny')
+                        ->exporter(UserExporter::class),
                 ]),
             ]);
     }

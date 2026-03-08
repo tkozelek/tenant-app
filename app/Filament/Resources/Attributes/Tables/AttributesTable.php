@@ -2,10 +2,12 @@
 
 namespace App\Filament\Resources\Attributes\Tables;
 
+use App\Filament\Exports\AttributeExporter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -55,6 +57,9 @@ class AttributesTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+                    ExportBulkAction::make()
+                        ->exporter(AttributeExporter::class)
+                        ->authorize('exportAny'),
                 ]),
             ]);
     }

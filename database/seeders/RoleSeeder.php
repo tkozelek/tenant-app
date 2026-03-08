@@ -19,7 +19,7 @@ class RoleSeeder extends Seeder
 
         $platformPermissions = [
             'platform.access',
-            'catalog.manage'
+            'catalog.manage',
         ];
 
         $tenantsPermissions = [
@@ -27,6 +27,8 @@ class RoleSeeder extends Seeder
             'tenants.create',
             'tenants.update',
             'tenants.delete',
+            'tenants.export',
+            'tenants.import',
         ];
 
         $rolePermissions = [
@@ -34,6 +36,8 @@ class RoleSeeder extends Seeder
             'roles.create',
             'roles.update',
             'roles.delete',
+            'roles.export',
+            'roles.import',
         ];
 
         $userPermissions = [
@@ -41,6 +45,8 @@ class RoleSeeder extends Seeder
             'users.create',
             'users.update',
             'users.delete',
+            'users.export',
+            'users.import',
         ];
 
         $productPermissions = [
@@ -48,6 +54,8 @@ class RoleSeeder extends Seeder
             'products.create',
             'products.update',
             'products.delete',
+            'products.export',
+            'products.import',
         ];
 
         $categoryPermissions = [
@@ -55,6 +63,8 @@ class RoleSeeder extends Seeder
             'categories.create',
             'categories.update',
             'categories.delete',
+            'categories.export',
+            'categories.import',
         ];
 
         $attributePermissions = [
@@ -62,6 +72,8 @@ class RoleSeeder extends Seeder
             'attributes.create',
             'attributes.update',
             'attributes.delete',
+            'attributes.export',
+            'attributes.import',
         ];
 
         $tenantPermissions = [
@@ -90,10 +102,10 @@ class RoleSeeder extends Seeder
         $superAdmin = Role::firstOrCreate(
             [
                 'name' => 'Super Administrátor',
-                config('permission.column_names.team_foreign_key') => null
+                config('permission.column_names.team_foreign_key') => null,
             ],
             [
-                'description' => 'Má absolútny prístup ku všetkým funkciám a nastaveniam celého systému.'
+                'description' => 'Má absolútny prístup ku všetkým funkciám a nastaveniam celého systému.',
             ]
         );
         $superAdmin->syncPermissions(Permission::all());
@@ -101,10 +113,10 @@ class RoleSeeder extends Seeder
         $platformAdmin = Role::firstOrCreate(
             [
                 'name' => 'Administrátor platformy',
-                config('permission.column_names.team_foreign_key') => null
+                config('permission.column_names.team_foreign_key') => null,
             ],
             [
-                'description' => 'Spravuje celú platformu, jednotlivé prevádzky (nájomcov), používateľov a globálny katalóg produktov. Nemá prístup k použivateľom.'
+                'description' => 'Spravuje celú platformu, jednotlivé prevádzky (nájomcov), používateľov a globálny katalóg produktov. Nemá prístup k použivateľom.',
             ]
         );
         $platformAdmin->syncPermissions(array_merge(
@@ -120,10 +132,10 @@ class RoleSeeder extends Seeder
         $tenantOwner = Role::firstOrCreate(
             [
                 'name' => 'Majiteľ prevádzky',
-                config('permission.column_names.team_foreign_key') => null
+                config('permission.column_names.team_foreign_key') => null,
             ],
             [
-                'description' => 'Hlavný správca konkrétnej prevádzky s plným prístupom k jej nastaveniam, používateľom a skladovým zásobám.'
+                'description' => 'Hlavný správca konkrétnej prevádzky s plným prístupom k jej nastaveniam, používateľom a skladovým zásobám.',
             ]
         );
         $tenantOwner->syncPermissions($tenantPermissions);
@@ -131,10 +143,10 @@ class RoleSeeder extends Seeder
         $shopManager = Role::firstOrCreate(
             [
                 'name' => 'Manažér prevádzky',
-                config('permission.column_names.team_foreign_key') => null
+                config('permission.column_names.team_foreign_key') => null,
             ],
             [
-                'description' => 'Zabezpečuje organizáciu prevádzky, kompletne spravuje produkty, kategórie a prezerá štatistiky skladu.'
+                'description' => 'Zabezpečuje organizáciu prevádzky, kompletne spravuje produkty, kategórie a prezerá štatistiky skladu.',
             ]
         );
         $shopManager->syncPermissions([
@@ -146,10 +158,10 @@ class RoleSeeder extends Seeder
         $productStaff = Role::firstOrCreate(
             [
                 'name' => 'Správca produktov',
-                config('permission.column_names.team_foreign_key') => null
+                config('permission.column_names.team_foreign_key') => null,
             ],
             [
-                'description' => 'Zodpovedá za evidenciu, pridávanie a aktualizáciu informácií o produktoch v systéme.'
+                'description' => 'Zodpovedá za evidenciu, pridávanie a aktualizáciu informácií o produktoch v systéme.',
             ]
         );
         $productStaff->syncPermissions([
@@ -160,10 +172,10 @@ class RoleSeeder extends Seeder
         $warehouseStaff = Role::firstOrCreate(
             [
                 'name' => 'Pracovník skladu',
-                config('permission.column_names.team_foreign_key') => null
+                config('permission.column_names.team_foreign_key') => null,
             ],
             [
-                'description' => 'Má na starosti fyzickú kontrolu a dennú aktualizáciu skladových zásob produktov.'
+                'description' => 'Má na starosti fyzickú kontrolu a dennú aktualizáciu skladových zásob produktov.',
             ]
         );
         $warehouseStaff->syncPermissions([

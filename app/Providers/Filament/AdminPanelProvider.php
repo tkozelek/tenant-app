@@ -2,7 +2,6 @@
 
 namespace App\Providers\Filament;
 
-use App\Models\Tenant;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -29,6 +28,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->databaseNotifications()
             ->login()
             ->colors([
                 'primary' => Color::Amber,
@@ -40,7 +40,7 @@ class AdminPanelProvider extends PanelProvider
                 NavigationGroup::make()
                     ->label('Produkty')
                     ->icon('heroicon-o-shopping-bag')
-                    ->collapsed()
+                    ->collapsed(),
             ])
             ->discoverResources(in: app_path('Filament/Resources'), for: 'App\Filament\Resources')
             ->discoverPages(in: app_path('Filament/Pages'), for: 'App\Filament\Pages')
