@@ -22,7 +22,7 @@ class RoleSeeder extends Seeder
             'catalog.manage'
         ];
 
-        $tenantPermissions = [
+        $tenantsPermissions = [
             'tenants.view_any',
             'tenants.create',
             'tenants.update',
@@ -64,35 +64,49 @@ class RoleSeeder extends Seeder
             'attributes.delete',
         ];
 
-        $storePermissions = [
-            'store.access',
-            'store.settings',
-            'store.users.manage',
-            'store.products.manage',
-            'store.orders.view',
-            'store.orders.manage',
-            'store.reports.view',
+        $tenantPermissions = [
+            'tenant.access',
+            'tenant.settings',
+            'tenant.users.manage',
+            'tenant.products.manage',
+            'tenant.reports.view',
         ];
 
         $allPermissions = array_merge(
             $platformPermissions,
+            $tenantsPermissions,
             $tenantPermissions,
             $rolePermissions,
             $userPermissions,
             $categoryPermissions,
             $attributePermissions,
             $productPermissions,
-            $storePermissions,
         );
 
         foreach ($allPermissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        $superAdmin = Role::firstOrCreate(['name' => 'Super Admin', config('permission.column_names.team_foreign_key') => null]);
+        $superAdmin = Role::firstOrCreate(
+            [
+                'name' => 'Super Administrátor',
+                config('permission.column_names.team_foreign_key') => null
+            ],
+            [
+                'description' => 'Má absolútny prístup ku všetkým funkciám a nastaveniam celého systému.'
+            ]
+        );
         $superAdmin->syncPermissions(Permission::all());
 
-        $platformAdmin = Role::firstOrCreate(['name' => 'Platform Admin', config('permission.column_names.team_foreign_key') => null]);
+        $platformAdmin = Role::firstOrCreate(
+            [
+                'name' => 'Administrátor platformy',
+                config('permission.column_names.team_foreign_key') => null
+            ],
+            [
+                'description' => 'Spravuje celú platformu, jednotlivé prevádzky (nájomcov), používateľov a globálny katalóg produktov. Nemá prístup k použivateľom.'
+            ]
+        );
         $platformAdmin->syncPermissions(array_merge(
             $platformPermissions,
             $tenantPermissions,
@@ -103,37 +117,58 @@ class RoleSeeder extends Seeder
             $productPermissions,
         ));
 
-        $tenantOwner = Role::firstOrCreate(['name' => 'Tenant Owner', config('permission.column_names.team_foreign_key') => null]);
-        $tenantOwner->syncPermissions($storePermissions);
+        $tenantOwner = Role::firstOrCreate(
+            [
+                'name' => 'Majiteľ prevádzky',
+                config('permission.column_names.team_foreign_key') => null
+            ],
+            [
+                'description' => 'Hlavný správca konkrétnej prevádzky s plným prístupom k jej nastaveniam, používateľom a skladovým zásobám.'
+            ]
+        );
+        $tenantOwner->syncPermissions($tenantPermissions);
 
-        $shopManager = Role::firstOrCreate(['name' => 'Shop Manager', config('permission.column_names.team_foreign_key') => null]);
+        $shopManager = Role::firstOrCreate(
+            [
+                'name' => 'Manažér prevádzky',
+                config('permission.column_names.team_foreign_key') => null
+            ],
+            [
+                'description' => 'Zabezpečuje organizáciu prevádzky, kompletne spravuje produkty, kategórie a prezerá štatistiky skladu.'
+            ]
+        );
         $shopManager->syncPermissions([
-            'store.access',
-            'store.products.manage',
-            'store.orders.view',
-            'store.orders.manage',
-            'store.reports.view',
+            'tenant.access',
+            'tenant.products.manage',
+            'tenant.reports.view',
         ]);
 
-        $salesStaff = Role::firstOrCreate(['name' => 'Sales Staff', config('permission.column_names.team_foreign_key') => null]);
-        $salesStaff->syncPermissions([
-            'store.access',
-            'store.orders.view',
-            'store.orders.manage',
-            'store.products.manage',
+        $productStaff = Role::firstOrCreate(
+            [
+                'name' => 'Správca produktov',
+                config('permission.column_names.team_foreign_key') => null
+            ],
+            [
+                'description' => 'Zodpovedá za evidenciu, pridávanie a aktualizáciu informácií o produktoch v systéme.'
+            ]
+        );
+        $productStaff->syncPermissions([
+            'tenant.access',
+            'tenant.products.manage',
         ]);
 
-        $warehouseStaff = Role::firstOrCreate(['name' => 'Warehouse Staff', config('permission.column_names.team_foreign_key') => null]);
+        $warehouseStaff = Role::firstOrCreate(
+            [
+                'name' => 'Pracovník skladu',
+                config('permission.column_names.team_foreign_key') => null
+            ],
+            [
+                'description' => 'Má na starosti fyzickú kontrolu a dennú aktualizáciu skladových zásob produktov.'
+            ]
+        );
         $warehouseStaff->syncPermissions([
-            'store.access',
-            'store.orders.view',
-            'store.orders.manage',
-        ]);
-
-        $viewer = Role::firstOrCreate(['name' => 'Viewer', config('permission.column_names.team_foreign_key') => null]);
-        $viewer->syncPermissions([
-            'store.access',
-            'store.orders.view',
+            'tenant.access',
+            'tenant.products.manage',
         ]);
 
         $user = User::firstOrCreate(

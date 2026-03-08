@@ -2,22 +2,28 @@
 
 namespace App\Filament\Resources\TenantProducts\RelationManagers;
 
+use App\Filament\Resources\TenantProducts\RelationManagers\actions\AdjustStockAction;
+use App\Filament\Resources\TenantProducts\RelationManagers\actions\StockHistoryAction;
+use App\Filament\Resources\TenantProducts\RelationManagers\components\VariantAttributesSection;
+use App\Models\Attribute;
+use App\Models\AttributeValue;
 use App\Models\TenantProductVariant;
-use Filament\Actions\Action;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
-use Filament\Notifications\Notification;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
@@ -39,7 +45,7 @@ class VariantsRelationManager extends RelationManager
                             ->label('Názov variantu')
                             ->required()
                             ->maxLength(255)
-                            ->columnSpan(1),
+                            ->columnSpan(2),
 
                         TextInput::make('sku')
                             ->label('SKU (Skladové číslo)')
@@ -65,8 +71,9 @@ class VariantsRelationManager extends RelationManager
                             ->helperText(fn (string $operation): string => $operation === 'edit'
                                 ? 'Pre upravu skladu stlacte tlacidlo uprava skladu.'
                                 : '')
-                            ->columnSpan(1),
-                    ]),
+                            ->columnSpan(2),
+                    ])->columns(2),
+
                 Section::make('Cenotvorba')
                     ->schema([
                         TextInput::make('price')
@@ -84,16 +91,10 @@ class VariantsRelationManager extends RelationManager
                             ->helperText('Vyplňte, ak je produkt v zľave.'),
                     ]),
 
-                Section::make('Atribúty a obrázky')
-                    ->schema([
-                        Select::make('attributeValues')
-                            ->relationship('attributeValues', 'value')
-                            ->multiple()
-                            ->preload()
-                            ->searchable()
-                            ->label('Hodnoty atribútov')
-                            ->columnSpanFull(),
+                VariantAttributesSection::make(),
 
+                Section::make('Obrázky')
+                    ->schema([
                         SpatieMediaLibraryFileUpload::make('media')
                             ->collection('tenant_product_variants')
                             ->multiple()
@@ -130,12 +131,26 @@ class VariantsRelationManager extends RelationManager
                     ->copyable()
                     ->weight('bold'),
 
-                TextColumn::make('attributeValues.value')
+                TextColumn::make('variantAttributesList')
                     ->label('Atribúty')
                     ->badge()
-                    ->searchable()
-                    ->limitList(4)
-                    ->tooltip(fn ($record): string => $record->attributeValues->pluck('value')->join(', ')),
+                    ->getStateUsing(function (TenantProductVariant $record) {
+                        return $record->variantAttributes->map(function ($pivot) {
+                            $attrName = $pivot->attribute?->name ?? '??';
+                            $value = $pivot->attributeValue?->value ?? $pivot->custom_value;
+                            $unit = $pivot->attribute?->unit ?? "";
+
+                            return "{$attrName}: {$value}{$unit}";
+                        })->toArray();
+                    })
+                    ->limitList(2)
+                    ->tooltip(function (TextColumn $column): ?string {
+                        $state = $column->getState();
+                        if (is_array($state) && count($state) > 2) {
+                            return implode(', ', $state);
+                        }
+                        return null;
+                    }),
 
                 TextColumn::make('price')
                     ->label('Cena')
@@ -150,7 +165,7 @@ class VariantsRelationManager extends RelationManager
                     ->toggleable(isToggledHiddenByDefault: true),
 
                 TextColumn::make('stock_quantity')
-                    ->label('Skladom')
+                    ->label('KS')
                     ->numeric()
                     ->sortable()
                     ->badge()
@@ -165,60 +180,18 @@ class VariantsRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
+                    ->modalHeading("Pridať variant produktu " . $this->getOwnerRecord()?->name)
                     ->label('Pridať variant'),
             ])
             ->recordActions([
-                EditAction::make(),
-                DeleteAction::make(),
-                Action::make('adjust_stock')
-                    ->label('Sklad')
-                    ->icon('heroicon-o-circle-stack')
-                    ->color('warning')
-                    ->schema([
-                        Select::make('type')
-                            ->label('Zmenit typ')
-                            ->options([
-                                'purchase' => 'Nákup',
-                                'sale' => 'Predaj',
-                                'adjustment' => 'Oprava',
-                                'return' => 'Vrátenie',
-                                'transfer' => 'Prevod',
-                            ])
-                            ->required(),
-                        TextInput::make('quantity')
-                            ->label('Zmena skladu')
-                            ->numeric()
-                            ->required()
-                            ->rules([
-                                fn ($record) => function (string $attribute, $value, \Closure $fail) use ($record) {
-                                    $currentStock = $record->stock_quantity;
-
-                                    if ($value < 0 && ($currentStock + $value) < 0) {
-                                        $fail("Nedostatok zasob. Nemozete odobrat viac ako je aktuálny stav ({$currentStock}).");
-                                    }
-                                },
-                            ])
-                            ->helperText('Pozitívne na pridanie kusov, negatívne na odobratie.'),
-                        Textarea::make('note')
-                            ->label('Note')
-                            ->columnSpanFull(),
-                    ])
-                ->action(function (array $data, $record) {
-                    // transakcia, keby nejaké zlyha
-                    try {
-                        DB::transaction(function () use ($record, $data) {
-                            $record->stockHistories()->create([
-                                'type' => $data['type'],
-                                'quantity' => $data['quantity'],
-                                'note' => $data['note'],
-                            ]);
-
-                            $record->increment('stock_quantity', $data['quantity']);
-                        });
-                    } catch (\Exception $e) {
-                        Notification::make()->title('Nastala chyba.')->danger()->send();
-                    }
-                })->successNotificationTitle("Stav skladu zmenený úspešne.")
+                EditAction::make()
+                    ->modalWidth(Width::SevenExtraLarge)
+                    ->modalHeading(fn ($record) => "Upraviť variantu " . $record?->name)
+                    ->label("Upraviť"),
+                DeleteAction::make()
+                    ->label("Zmazať"),
+                AdjustStockAction::make(),
+                StockHistoryAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

@@ -16,6 +16,7 @@ class TenantProductVariant extends Model implements HasMedia
     use HasFactory, InteractsWithMedia;
 
     protected $fillable = [
+        'name',
         'tenant_product_id',
         'sku',
         'ean',
@@ -33,6 +34,20 @@ class TenantProductVariant extends Model implements HasMedia
         ];
     }
 
+    protected static function booted()
+    {
+        static::created(function (TenantProductVariant $productVariant) {
+            if ($productVariant->stock_quantity > 0) {
+                $productVariant->stockHistories()->create([
+                    'type' => 'adjustment',
+                    'quantity' => $productVariant->stock_quantity,
+                    'note' => 'initial stock',
+                    'user_id' => auth()->user()->id ?? null,
+                ]);
+            }
+        });
+    }
+
     public function stockHistories(): HasMany
     {
         return $this->hasMany(StockHistory::class, 'product_variant_id');
@@ -43,8 +58,9 @@ class TenantProductVariant extends Model implements HasMedia
         return $this->belongsTo(TenantProduct::class, 'tenant_product_id');
     }
 
-    public function attributeValues(): BelongsToMany
+    public function variantAttributes(): HasMany
     {
-        return $this->belongsToMany(AttributeValue::class, 'attribute_value_tenant_product_variant');
+        return $this->hasMany(VariantAttribute::class, 'tenant_product_variant_id')
+            ->with(['attribute', 'attributeValue']);
     }
 }

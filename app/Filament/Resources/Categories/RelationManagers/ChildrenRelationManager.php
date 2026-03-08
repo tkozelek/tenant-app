@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Categories\RelationManagers;
 
+use App\Filament\Resources\Categories\CategoryResource;
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -50,7 +51,8 @@ class ChildrenRelationManager extends RelationManager
                 AssociateAction::make(),
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->url(fn ($record): string => CategoryResource::getUrl('edit', ['record' => $record])),
                 DissociateAction::make(),
                 DeleteAction::make(),
             ])

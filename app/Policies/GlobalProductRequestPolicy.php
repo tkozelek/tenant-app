@@ -17,7 +17,7 @@ class GlobalProductRequestPolicy
             return true;
         }
 
-        return $user->hasPermissionTo('store.products.manage');
+        return $user->hasPermissionTo('tenant.products.manage');
     }
 
     /**
@@ -29,7 +29,7 @@ class GlobalProductRequestPolicy
             return true;
         }
 
-        return $user->hasPermissionToOnTenant('store.products.manage', $globalProductRequest->tenant_id);
+        return $user->hasPermissionToOnTenant('tenant.products.manage', $globalProductRequest->tenant_id);
     }
 
     /**
@@ -37,7 +37,7 @@ class GlobalProductRequestPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('store.products.manage');
+        return $user->hasPermissionTo('tenant.products.manage');
     }
 
     /**
@@ -49,7 +49,7 @@ class GlobalProductRequestPolicy
             return true;
         }
 
-        return $user->hasPermissionToOnTenant('store.products.manage', $globalProductRequest->tenant_id);
+        return $user->hasPermissionToOnTenant('tenant.products.manage', $globalProductRequest->tenant_id);
     }
 
     /**

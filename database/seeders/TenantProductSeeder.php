@@ -40,7 +40,7 @@ class TenantProductSeeder extends Seeder
                     'tenant_id' => $tenantId,
                     'global_product_id' => $globalProduct?->id,
                     'global_product_request_id' => $requestId,
-                    'name' => ucfirst($productName),
+                    'name' => ucfirst($productName) . " - {$tenantId}",
                     'description' => $productDesc,
                     'is_active' => fake()->boolean(80),
                 ]);

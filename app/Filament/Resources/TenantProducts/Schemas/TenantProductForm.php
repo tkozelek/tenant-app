@@ -25,6 +25,7 @@ class TenantProductForm
                             ->preload(),
                         Select::make('global_product_id')
                             ->relationship('globalProduct', 'name')
+                            ->placeholder('-')
                             ->searchable()
                             ->preload()
                             ->live(onBlur: true)
@@ -37,7 +38,7 @@ class TenantProductForm
                                     }
                                 }
                             }),
-                    ])->columns(3),
+                    ])->columns(),
                 Section::make('Detail')
                     ->schema([
                         TextInput::make('name')

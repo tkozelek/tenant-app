@@ -45,7 +45,11 @@ class GlobalProductsTable
             ->filters([
                 SelectFilter::make('category_id')
                     ->relationship('category', 'name')
-                    ->label('Podľa kategórie'),
+                    ->searchable()
+                    ->preload()
+                    ->multiple()
+                    ->label('Podľa kategórie')
+                ,
                 TernaryFilter::make('is_active')
                     ->label('Je aktívny'),
             ])

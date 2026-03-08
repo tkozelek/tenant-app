@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('attribute_value_tenant_product_variant', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_product_variant_id')->constrained('tenant_product_variants', 'id')->name('fk_av_tpv_tpv_id')->cascadeOnDelete();
-            $table->foreignId('attribute_value_id')->constrained('attribute_values', 'id')->name('fk_av_tpv_av_id')->cascadeOnDelete();
-            $table->unique(['tenant_product_variant_id', 'attribute_value_id'], 'av_tpv_unique');
+            $table->foreignId('tenant_product_variant_id')->constrained('tenant_product_variants', indexName: "att_var_variant_id_fk")->cascadeOnDelete();
+            $table->foreignId('attribute_id')->constrained('attributes', indexName: 'att_var_attr_id_fk')->cascadeOnDelete();
+            $table->foreignId('attribute_value_id')->nullable()->constrained('attribute_values', indexName: 'att_var_val_id_fk')->nullOnDelete();
+            $table->string('custom_value')->nullable();
+            $table->timestamps();
+            $table->unique(['tenant_product_variant_id', 'attribute_id'], 'variant_attribute_unique');
         });
     }
 

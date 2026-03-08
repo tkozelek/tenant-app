@@ -11,37 +11,42 @@ class GlobalProductSeeder extends Seeder
 {
     public function run(): void
     {
-        $category = Category::firstOrCreate([
-            'name' => 'Telefony',
-            'slug' => 'telefony',
-        ]);
-
         $products = [
             [
                 'name' => 'iPhone 15 Pro',
                 'description' => 'Najnovší smartfón od Apple s titánovým telom a čipom A17 Pro.',
                 'is_active' => true,
+                'category' => 'smartfony',
             ],
             [
                 'name' => 'MacBook Air M3',
                 'description' => 'Neuveriteľne tenký a rýchly notebook pre prácu aj zábavu.',
                 'is_active' => true,
+                'category' => 'notebooky'
             ],
             [
                 'name' => 'Sony WH-1000XM5',
                 'description' => 'Špičkové bezdrôtové slúchadlá s potlačením hluku.',
                 'is_active' => true,
+                'category' => 'audio-a-reproduktory'
             ],
             [
                 'name' => 'Logitech MX Master 3S',
                 'description' => 'Ergonomická bezdrôtová myš pre maximálnu produktivitu.',
                 'is_active' => false,
+                'category' => 'pocitacove-prislusenstvo'
+            ],
+            [
+                'name' => 'Samsung smart tv',
+                'description' => 'Smart tv od samsungu.',
+                'is_active' => true,
+                'category' => 'televizory'
             ],
         ];
 
         foreach ($products as $item) {
             $product = GlobalProduct::create([
-                'category_id' => $category->id,
+                'category_id' => Category::where('slug', $item['category'])->first()?->id,
                 'name' => $item['name'],
                 'slug' => Str::slug($item['name']),
                 'description' => $item['description'],

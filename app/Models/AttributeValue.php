@@ -30,4 +30,9 @@ class AttributeValue extends Model
     {
         return $this->belongsToMany(TenantProductVariant::class, 'attribute_value_tenant_product_variant');
     }
+
+    public function getFullLabelAttribute(): string
+    {
+        return "{$this->attribute->name}: {$this->value}";
+    }
 }

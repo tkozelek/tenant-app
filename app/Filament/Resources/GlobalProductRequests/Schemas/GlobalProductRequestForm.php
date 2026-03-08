@@ -35,6 +35,8 @@ class GlobalProductRequestForm
 
                         Select::make('suggested_category_id')
                             ->relationship('suggestedCategory', 'name')
+                            ->searchable()
+                            ->preload()
                             ->label('Kategória'),
 
                         Select::make('status')

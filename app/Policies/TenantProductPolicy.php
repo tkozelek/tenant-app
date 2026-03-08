@@ -11,7 +11,7 @@ class TenantProductPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('store.access') || $user->hasPermissionTo('products.view_any');
+        return $user->hasPermissionTo('tenant.access') || $user->hasPermissionTo('products.view_any');
     }
 
     /**
@@ -19,7 +19,7 @@ class TenantProductPolicy
      */
     public function view(User $user, TenantProduct $tenantProduct): bool
     {
-        return $user->hasPermissionToOnTenant('store.access', $tenantProduct->tenant_id) || $user->hasPermissionTo('products.view_any');
+        return $user->hasPermissionToOnTenant('tenant.access', $tenantProduct->tenant_id) || $user->hasPermissionTo('products.view_any');
     }
 
     /**
@@ -27,12 +27,12 @@ class TenantProductPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('store.products.manage')  || $user->hasPermissionTo('products.create');
+        return $user->hasPermissionTo('tenant.products.manage')  || $user->hasPermissionTo('products.create');
     }
 
     public function createForTenant(User $user, Tenant $tenant): bool
     {
-        return $user->hasPermissionToOnTenant('store.products.manage', $tenant->id) || $user->hasPermissionTo('products.create');
+        return $user->hasPermissionToOnTenant('tenant.products.manage', $tenant->id) || $user->hasPermissionTo('products.create');
     }
 
     /**
@@ -40,7 +40,7 @@ class TenantProductPolicy
      */
     public function update(User $user, TenantProduct $tenantProduct): bool
     {
-        return $user->hasPermissionTo('products.update') || $user->hasPermissionToOnTenant('store.products.manage', $tenantProduct->tenant_id);
+        return $user->hasPermissionTo('products.update') || $user->hasPermissionToOnTenant('tenant.products.manage', $tenantProduct->tenant_id);
     }
 
     /**
@@ -48,6 +48,6 @@ class TenantProductPolicy
      */
     public function delete(User $user, TenantProduct $tenantProduct): bool
     {
-        return $user->hasPermissionToOnTenant('store.products.manage', $tenantProduct->tenant_id)  || $user->hasPermissionTo('products.delete');
+        return $user->hasPermissionToOnTenant('tenant.products.manage', $tenantProduct->tenant_id)  || $user->hasPermissionTo('products.delete');
     }
 }
