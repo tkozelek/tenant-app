@@ -21,7 +21,7 @@ return new class extends Migration
                 'sale',
                 'adjustment',
                 'return',
-                'transfer'
+                'transfer',
             ]);
             $table->integer('quantity');
             $table->text('note')->nullable();

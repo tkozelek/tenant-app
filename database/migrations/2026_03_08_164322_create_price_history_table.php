@@ -17,10 +17,10 @@ return new class extends Migration
                 ->constrained('tenant_product_variants')
                 ->onDelete('cascade');
 
-            $table->decimal('price', 15, 4);
-            $table->decimal('old_price', 15, 4)->nullable();
+            $table->decimal('price', 10, 2);
 
-            $table->boolean('is_promotion')->default(false);
+            $table->timestamp('valid_from')->useCurrent();
+            $table->timestamp('valid_to')->nullable();
 
             $table->foreignId('user_id')->nullable()->constrained('users');
             $table->timestamps();

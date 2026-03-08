@@ -21,9 +21,9 @@ class RoleForm
                             ->unique(ignoreRecord: true)
                             ->maxLength(255),
 
-                         TextInput::make('guard_name')
-                             ->default('web')
-                             ->required(),
+                        TextInput::make('guard_name')
+                            ->default('web')
+                            ->required(),
                     ])->columns(1),
 
                 Section::make('Permissions')

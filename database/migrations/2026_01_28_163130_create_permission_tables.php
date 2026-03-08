@@ -105,7 +105,7 @@ return new class extends Migration
                     $columnNames['team_foreign_key'],
                     $pivotRole,
                     $columnNames['model_morph_key'],
-                    'model_type'
+                    'model_type',
                 ], 'model_has_roles_unique');
             } else {
                 $table->primary([$pivotRole, $columnNames['model_morph_key'], 'model_type'],

@@ -16,8 +16,9 @@ class AdjustStockAction extends Action
         return 'adjust_stock';
     }
 
-    protected function setUp(): void {
-            $this->label('Sklad')
+    protected function setUp(): void
+    {
+        $this->label('Sklad')
             ->icon('heroicon-o-circle-stack')
             ->color('warning')
             ->schema([
@@ -57,7 +58,7 @@ class AdjustStockAction extends Action
                             'type' => $data['type'],
                             'quantity' => $data['quantity'],
                             'note' => $data['note'],
-                            'user_id' => auth()->user()->id ?? null
+                            'user_id' => auth()->user()->id ?? null,
                         ]);
 
                         $record->increment('stock_quantity', $data['quantity']);
@@ -65,6 +66,6 @@ class AdjustStockAction extends Action
                 } catch (\Exception $e) {
                     Notification::make()->title('Nastala chyba.')->danger()->send();
                 }
-            })->successNotificationTitle("Stav skladu zmenený úspešne.");
+            })->successNotificationTitle('Stav skladu zmenený úspešne.');
     }
 }

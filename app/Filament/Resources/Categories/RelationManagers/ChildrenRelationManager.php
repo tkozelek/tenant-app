@@ -20,6 +20,7 @@ use Filament\Tables\Table;
 class ChildrenRelationManager extends RelationManager
 {
     protected static string $relationship = 'children';
+
     protected static ?string $inverseRelationship = 'parent';
 
     public function form(Schema $schema): Schema

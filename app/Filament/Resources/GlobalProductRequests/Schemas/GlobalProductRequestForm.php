@@ -27,7 +27,7 @@ class GlobalProductRequestForm
                             ->label('Vytvoril'),
 
                         TextInput::make('suggested_name')
-                            ->label("Názov"),
+                            ->label('Názov'),
 
                         RichEditor::make('suggested_description')
                             ->label('Popis')
@@ -43,20 +43,20 @@ class GlobalProductRequestForm
                             ->options([
                                 'pending' => 'Čaká',
                                 'rejected' => 'Zamietnutý',
-                                'approved' => 'Potvrdený'
+                                'approved' => 'Potvrdený',
                             ]),
 
                         Select::make('created_global_product_id')
                             ->relationship('createdGlobalProduct', 'name')
                             ->label('Výsledny produkt')
                             ->visible(fn (?GlobalProductRequest $record) => $record?->created_global_product_id !== null),
-                        ]),
+                    ]),
                 Section::make('Admin poznámka')
                     ->schema([
                         Textarea::make('admin_note')
                             ->label('Poznámka (admin)')
-                            ->columnSpanFull()
-                    ])
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 }

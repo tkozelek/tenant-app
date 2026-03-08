@@ -15,20 +15,21 @@ class RejectAction extends Action
         return 'reject';
     }
 
-    public function setUp(): void {
-            $this->label('Odmietnuť')
+    public function setUp(): void
+    {
+        $this->label('Odmietnuť')
             ->color('danger')
             ->icon('heroicon-o-x-circle')
             ->visible(fn (GlobalProductRequest $record) => $record->status === 'pending')
             ->schema([
                 Textarea::make('admin_note')
                     ->label('Poznámka (admin)')
-                    ->required()
+                    ->required(),
             ])
             ->action(function (array $data, GlobalProductRequest $record) {
                 $record->update([
                     'status' => 'rejected',
-                    'admin_note' => $data['admin_note']
+                    'admin_note' => $data['admin_note'],
                 ]);
 
                 Cache::forget('global_product_requests_count');

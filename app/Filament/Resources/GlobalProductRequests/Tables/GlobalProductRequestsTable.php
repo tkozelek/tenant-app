@@ -37,9 +37,9 @@ class GlobalProductRequestsTable
                         'danger' => 'rejected',
                     ])
                     ->formatStateUsing(fn (string $state): string => match ($state) {
-                        "pending" => "Čaká",
-                        "approved" => "Prijatý",
-                        "rejected" => "Zamietnutý",
+                        'pending' => 'Čaká',
+                        'approved' => 'Prijatý',
+                        'rejected' => 'Zamietnutý',
                         default => $state,
                     }),
 
@@ -55,7 +55,7 @@ class GlobalProductRequestsTable
                         'pending' => 'Čaká',
                         'approved' => 'Prijatý',
                         'rejected' => 'Zamietnutý',
-                    ])->default('pending')
+                    ])->default('pending'),
             ])
             ->recordActions([
                 EditAction::make()

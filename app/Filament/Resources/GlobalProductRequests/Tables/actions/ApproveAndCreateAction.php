@@ -24,7 +24,8 @@ class ApproveAndCreateAction extends Action
         return 'approve_and_create';
     }
 
-    protected function setUp(): void {
+    protected function setUp(): void
+    {
         $this->label('Prijať')
             ->color('success')
             ->icon('heroicon-o-check-badge')
@@ -48,18 +49,19 @@ class ApproveAndCreateAction extends Action
                     ->label('Kategória'),
 
                 RichEditor::make('description')
-                    ->label("Popis produktu")
+                    ->label('Popis produktu')
                     ->columnSpanFull()
                     ->default(fn (GlobalProductRequest $record) => $record->suggested_description ?? null)
                     ->hintAction(
                         Action::make('generate_description')
-                            ->icon("heroicon-o-sparkles")
-                            ->label("Generovať popis")
+                            ->icon('heroicon-o-sparkles')
+                            ->label('Generovať popis')
                             ->action(function (Get $get, Set $set) {
                                 $productName = $get('name');
                                 $currentDesc = $get('description');
                                 if (empty($productName)) {
-                                    Notification::make()->warning()->title("Zadajte názov produktu")->send();
+                                    Notification::make()->warning()->title('Zadajte názov produktu')->send();
+
                                     return;
                                 }
                                 try {
@@ -79,7 +81,7 @@ class ApproveAndCreateAction extends Action
                                     Notification::make()->success()->title('Popis vygenerovaný!')->send();
                                 } catch (\Exception $e) {
                                     Notification::make()->danger()->title('Nepodarilo sa pripojiť k AI.')->send();
-                                    Log::error('Error generating description: ' . $e->getMessage());
+                                    Log::error('Error generating description: '.$e->getMessage());
                                 }
                             })
                     ),

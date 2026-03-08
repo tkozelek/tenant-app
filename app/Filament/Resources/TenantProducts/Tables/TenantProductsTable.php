@@ -2,9 +2,11 @@
 
 namespace App\Filament\Resources\TenantProducts\Tables;
 
+use App\Filament\Exports\TenantProductExporter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
@@ -18,7 +20,7 @@ class TenantProductsTable
         return $table
             ->columns([
                 TextColumn::make('name')
-                    ->weight("bold")
+                    ->weight('bold')
                     ->copyable()
                     ->searchable()
                     ->sortable(),
@@ -30,7 +32,7 @@ class TenantProductsTable
 
                 TextColumn::make('globalProduct.name')
                     ->label('Globalny produkt')
-                    ->placeholder("Custom produkt")
+                    ->placeholder('Custom produkt')
                     ->badge()
                     ->searchable()
                     ->sortable(),
@@ -50,17 +52,17 @@ class TenantProductsTable
                     ->searchable()
                     ->preload()
                     ->relationship('tenant', 'name')
-                    ->label("Tenant"),
+                    ->label('Tenant'),
 
                 SelectFilter::make('global_product_id')
                     ->searchable()
                     ->preload()
                     ->relationship('globalProduct', 'name')
-                    ->label("Globalny prdukt"),
+                    ->label('Globalny prdukt'),
 
                 TernaryFilter::make('is_active')
-                    ->label("Je aktívny")
-                    ->placeholder("-"),
+                    ->label('Je aktívny')
+                    ->placeholder('-'),
             ])
             ->recordActions([
                 EditAction::make(),

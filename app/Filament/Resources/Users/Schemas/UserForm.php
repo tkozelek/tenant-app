@@ -2,11 +2,9 @@
 
 namespace App\Filament\Resources\Users\Schemas;
 
-use App\Models\Role;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
@@ -29,9 +27,9 @@ class UserForm
                     ->unique(ignoreRecord: true),
                 TextInput::make('password')
                     ->password()
-                    ->required(fn(string $operation): bool => $operation === 'create')
-                    ->dehydrateStateUsing(fn($state) => Hash::make($state))
-                    ->dehydrated(fn($state) => filled($state))
+                    ->required(fn (string $operation): bool => $operation === 'create')
+                    ->dehydrateStateUsing(fn ($state) => Hash::make($state))
+                    ->dehydrated(fn ($state) => filled($state))
                     ->rule(Password::default()),
 
                 Select::make('roles')
@@ -44,10 +42,10 @@ class UserForm
                             ->whereNull('roles.tenant_id')
                             ->whereHas('permissions', fn ($q) => $q->where('name', 'platform.access'))
                     )
-                    ->placeholder("No role selected")
+                    ->placeholder('No role selected')
                     ->preload()
                     ->searchable()
-                    ->nullable()
+                    ->nullable(),
             ]);
     }
 }

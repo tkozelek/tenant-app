@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\TenantProducts\Schemas;
 
+use App\Filament\Actions\GenerateDescipritonAction;
 use App\Models\GlobalProduct;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -46,11 +47,17 @@ class TenantProductForm
                             ->maxLength(255),
                         RichEditor::make('description')
                             ->required()
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->hintAction(
+                                GenerateDescipritonAction::make()
+                                    ->references('description')
+                                    ->title('name')
+                                    ->context('produkt')
+                            ),
                         Toggle::make('is_active')
                             ->label('Aktivny')
                             ->default(true),
-                    ])
+                    ]),
             ]);
     }
 }

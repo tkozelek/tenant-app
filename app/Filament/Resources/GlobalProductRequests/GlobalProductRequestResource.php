@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources\GlobalProductRequests;
 
-use App\Filament\Resources\GlobalProductRequests\Pages\CreateGlobalProductRequest;
 use App\Filament\Resources\GlobalProductRequests\Pages\EditGlobalProductRequest;
 use App\Filament\Resources\GlobalProductRequests\Pages\ListGlobalProductRequests;
 use App\Filament\Resources\GlobalProductRequests\Schemas\GlobalProductRequestForm;
@@ -27,7 +26,7 @@ class GlobalProductRequestResource extends Resource
 
     public static function getNavigationBadge(): ?string
     {
-        return Cache::remember('global_product_requests_count', 5*60, function () {
+        return Cache::remember('global_product_requests_count', 5 * 60, function () {
             return GlobalProductRequest::where('status', 'pending')->count();
         });
     }

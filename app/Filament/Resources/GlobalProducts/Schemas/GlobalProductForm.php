@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\GlobalProducts\Schemas;
 
+use App\Filament\Actions\GenerateDescipritonAction;
 use App\Models\GlobalProduct;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -47,7 +48,13 @@ class GlobalProductForm
 
                         RichEditor::make('description')
                             ->maxLength(65535)
-                            ->columnSpanFull(),
+                            ->columnSpanFull()
+                            ->hintAction(
+                                GenerateDescipritonAction::make()
+                                    ->references('description')
+                                    ->title('name')
+                                    ->context('produkt')
+                            ),
                     ]),
                 Section::make('Media')
                     ->schema([
@@ -56,8 +63,8 @@ class GlobalProductForm
                             ->multiple()
                             ->reorderable()
                             ->panelLayout('compact')
-                            ->columnSpanFull()
-                    ])
+                            ->columnSpanFull(),
+                    ]),
             ]);
     }
 }

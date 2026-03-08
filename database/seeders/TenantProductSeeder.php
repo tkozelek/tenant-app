@@ -7,7 +7,6 @@ use App\Models\GlobalProductRequest;
 use App\Models\Tenant;
 use App\Models\TenantProduct;
 use App\Models\TenantProductVariant;
-use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -40,7 +39,7 @@ class TenantProductSeeder extends Seeder
                     'tenant_id' => $tenantId,
                     'global_product_id' => $globalProduct?->id,
                     'global_product_request_id' => $requestId,
-                    'name' => ucfirst($productName) . " - {$tenantId}",
+                    'name' => ucfirst($productName)." - {$tenantId}",
                     'description' => $productDesc,
                     'is_active' => fake()->boolean(80),
                 ]);
@@ -62,10 +61,12 @@ class TenantProductSeeder extends Seeder
                     ]);
 
                     $skipImage = fake()->boolean(90);
-                    if ($skipImage) continue;
+                    if ($skipImage) {
+                        continue;
+                    }
 
                     try {
-                        $placeholderText = urlencode($tenantProduct->name . ' - ' . ($v + 1));
+                        $placeholderText = urlencode($tenantProduct->name.' - '.($v + 1));
                         $variant->addMediaFromUrl("https://placehold.co/600x400.jpeg?text={$placeholderText}")
                             ->toMediaCollection('tenant_product_variants');
                     } catch (\Exception $e) {

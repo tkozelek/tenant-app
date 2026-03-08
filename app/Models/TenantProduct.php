@@ -47,4 +47,26 @@ class TenantProduct extends Model
     {
         return $this->hasMany(TenantProductVariant::class);
     }
+
+    public function getLowestCurrentPriceAttribute(): ?float
+    {
+        return TenantProductVariant::whereHas('tenantProduct', function ($query) {
+            $query->where('global_product_id', $this->id);
+        })
+            ->where('stock_quantity', '>', 0)
+            ->min('price');
+    }
+
+    /**
+     * Vráti najlacnejsi variant tenanta
+     */
+    public function getCheapestVariant(): ?TenantProductVariant
+    {
+        return TenantProductVariant::whereHas('tenantProduct', function ($query) {
+            $query->where('global_product_id', $this->id);
+        })
+            ->where('stock_quantity', '>', 0)
+            ->orderBy('price', 'asc')
+            ->first();
+    }
 }

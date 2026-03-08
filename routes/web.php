@@ -42,9 +42,8 @@ Route::middleware('auth')->group(function () {
 
 Route::get('/obchod/{tenant:slug}', [TenantController::class, 'show'])->name('tenant.show');
 
-//Route::can('platform.access')->prefix('/admin')->name('admin.')->group(function () {
+// Route::can('platform.access')->prefix('/admin')->name('admin.')->group(function () {
 //    Route::get('/', [AdminController::class, 'index'])->name('index');
-//});
-
+// });
 
 require __DIR__.'/auth.php';

@@ -6,19 +6,14 @@ use App\Models\Role;
 use App\Models\User;
 use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\CreateAction;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
 class TenantsRelationManager extends RelationManager
@@ -44,10 +39,11 @@ class TenantsRelationManager extends RelationManager
                     ->label('Role')
                     ->getStateUsing(function (Model $record) {
                         $roleId = $record->pivot?->role_id;
+
                         return $roleId ? Role::find($roleId)?->name : 'No Role';
                     })
                     ->badge()
-                    ->color('info')
+                    ->color('info'),
             ])
             ->filters([
                 //
@@ -59,38 +55,39 @@ class TenantsRelationManager extends RelationManager
                         $action->getRecordSelect(),
                         Select::make('role_id')
                             ->label('Role')
-                            ->options(Role::whereDoesntHave('permissions', fn($q) =>
-                            $q->where('name', 'platform.access'))
+                            ->options(Role::whereDoesntHave('permissions', fn ($q) => $q->where('name', 'platform.access'))
                                 ->pluck('name', 'id')
                             )
                             ->required(),
                     ])
                     ->mutateDataUsing(function (array $data): array {
                         $data['model_type'] = User::class;
+
                         return $data;
                     })
                     ->after(function () {
                         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-                    })
+                    }),
             ])
             ->recordActions([
                 EditAction::make()
-                ->schema([
-                    Select::make('role_id')
-                        ->label('Role')
-                        ->options(Role::whereDoesntHave('permissions', fn($q) => $q->where('name', 'platform.access'))->pluck('name', 'id'))
-                        ->required()
-                        ->default(fn (Model $record) => $record->pivot?->role_id),
-                ])
-                ->mutateRecordDataUsing(function (array $data, Model $record): array {
-                    $this->getOwnerRecord()->tenants()->updateExistingPivot($record->id, [
-                        'role_id' => $data['role_id'],
-                    ]);
-                    return $data;
-                })
-                ->after(function () {
-                    app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-                }),
+                    ->schema([
+                        Select::make('role_id')
+                            ->label('Role')
+                            ->options(Role::whereDoesntHave('permissions', fn ($q) => $q->where('name', 'platform.access'))->pluck('name', 'id'))
+                            ->required()
+                            ->default(fn (Model $record) => $record->pivot?->role_id),
+                    ])
+                    ->mutateRecordDataUsing(function (array $data, Model $record): array {
+                        $this->getOwnerRecord()->tenants()->updateExistingPivot($record->id, [
+                            'role_id' => $data['role_id'],
+                        ]);
+
+                        return $data;
+                    })
+                    ->after(function () {
+                        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+                    }),
                 DetachAction::make()
                     ->after(function () {
                         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();

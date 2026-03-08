@@ -17,7 +17,8 @@ class EditRole extends EditRecord
         ];
     }
 
-    protected function afterEdit(): void {
+    protected function afterEdit(): void
+    {
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
     }
 }

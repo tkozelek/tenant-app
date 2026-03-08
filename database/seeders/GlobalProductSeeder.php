@@ -22,25 +22,25 @@ class GlobalProductSeeder extends Seeder
                 'name' => 'MacBook Air M3',
                 'description' => 'Neuveriteľne tenký a rýchly notebook pre prácu aj zábavu.',
                 'is_active' => true,
-                'category' => 'notebooky'
+                'category' => 'notebooky',
             ],
             [
                 'name' => 'Sony WH-1000XM5',
                 'description' => 'Špičkové bezdrôtové slúchadlá s potlačením hluku.',
                 'is_active' => true,
-                'category' => 'audio-a-reproduktory'
+                'category' => 'audio-a-reproduktory',
             ],
             [
                 'name' => 'Logitech MX Master 3S',
                 'description' => 'Ergonomická bezdrôtová myš pre maximálnu produktivitu.',
                 'is_active' => false,
-                'category' => 'pocitacove-prislusenstvo'
+                'category' => 'pocitacove-prislusenstvo',
             ],
             [
                 'name' => 'Samsung smart tv',
                 'description' => 'Smart tv od samsungu.',
                 'is_active' => true,
-                'category' => 'televizory'
+                'category' => 'televizory',
             ],
         ];
 

@@ -2,7 +2,6 @@
 
 namespace App\Filament\Actions;
 
-use Closure;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Component;
@@ -14,7 +13,9 @@ use Illuminate\Support\Facades\Log;
 class GenerateDescipritonAction extends Action
 {
     private ?string $referenceField = 'name';
+
     private ?string $context = 'produkt';
+
     private string $title = 'name';
 
     public static function getDefaultName(): ?string
@@ -25,16 +26,21 @@ class GenerateDescipritonAction extends Action
     public function references(string $field): static
     {
         $this->referenceField = $field;
+
         return $this;
     }
 
-    public function context(string $context) {
+    public function context(string $context)
+    {
         $this->context = $context;
+
         return $this;
     }
 
-    public function title(string $tite) {
+    public function title(string $tite)
+    {
         $this->title = $tite;
+
         return $this;
     }
 
@@ -57,6 +63,7 @@ class GenerateDescipritonAction extends Action
                         ->warning()
                         ->title("Zadajte hodnotu pre pole: {$this->title}")
                         ->send();
+
                     return;
                 }
 
@@ -64,6 +71,10 @@ class GenerateDescipritonAction extends Action
                     $prompt = $currentContent
                         ? "Si expert na e-commerce. Tu je návrh popisu pre {$this->context} '{$title}': '{$currentContent}'. Vylepši ho, aby bol profesionálny a pútavý v slovenčine. Vráť VÝHRADNE platný HTML kód."
                         : "Si expert na e-commerce. Napíš pútavý popis pre {$this->context} '{$title}' v slovenčine. Vráť VÝHRADNE platný HTML kód.";
+
+                    if (config('app.debug')) {
+                        $prompt .= " Debug verzia, vloz len 100 znakov max. But use Headings tags etc for testing. And append DEBUG at the end.";
+                    }
 
                     $result = Gemini::generativeModel(model: 'gemini-2.5-flash')->generateContent($prompt);
                     $generatedHtml = $result->text();
@@ -75,7 +86,7 @@ class GenerateDescipritonAction extends Action
                     Notification::make()->success()->title('Vygenerované!')->send();
                 } catch (\Exception $e) {
                     Notification::make()->danger()->title('Nepodarilo sa pripojiť k AI.')->send();
-                    Log::error('Error generating AI text: ' . $e->getMessage());
+                    Log::error('Error generating AI text: '.$e->getMessage());
                 }
             });
     }

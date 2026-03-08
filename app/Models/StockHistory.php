@@ -22,7 +22,8 @@ class StockHistory extends Model
         return $this->belongsTo(TenantProductVariant::class, 'product_variant_id');
     }
 
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class, 'user_id');
     }
 }

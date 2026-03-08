@@ -19,9 +19,9 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\Hash; // Opravený import
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder; // Opravený import
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules\Password;
 
 class UsersRelationManager extends RelationManager
@@ -52,7 +52,7 @@ class UsersRelationManager extends RelationManager
                     ->dehydrated(fn ($state) => filled($state))
                     ->rule(Password::default()),
                 Select::make('role_id')
-                ->label('Role')
+                    ->label('Role')
                     ->options(Role::whereDoesntHave('permissions', fn ($q) => $q->where('name', 'platform.access'))
                         ->pluck('name', 'id')
                     )
@@ -72,7 +72,7 @@ class UsersRelationManager extends RelationManager
                 TextColumn::make('email')
                     ->searchable(),
                 TextColumn::make('tenant_role')
-                ->label('Role')
+                    ->label('Role')
                     ->getStateUsing(function (Model $record) {
                         $roleId = $record->pivot?->role_id;
 
@@ -84,8 +84,8 @@ class UsersRelationManager extends RelationManager
             ->filters([
                 SelectFilter::make('role')
                     ->relationship('roles', 'name', fn ($query) => $query
-                        ->whereDoesntHave('permissions', fn($q) => $q->where('name', 'platform.access'))
-                    )
+                        ->whereDoesntHave('permissions', fn ($q) => $q->where('name', 'platform.access'))
+                    ),
             ])
             ->headerActions([
                 CreateAction::make()
@@ -107,8 +107,7 @@ class UsersRelationManager extends RelationManager
                         $action->getRecordSelect(),
                         Select::make('role_id')
                             ->label('Role')
-                            ->options(Role::whereDoesntHave('permissions', fn($q) =>
-                            $q->where('name', 'platform.access'))
+                            ->options(Role::whereDoesntHave('permissions', fn ($q) => $q->where('name', 'platform.access'))
                                 ->pluck('name', 'id')
                             )
                             ->required(),
@@ -120,7 +119,7 @@ class UsersRelationManager extends RelationManager
                     })
                     ->after(function () {
                         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-                    })
+                    }),
             ])
             ->recordActions([
                 EditAction::make(),

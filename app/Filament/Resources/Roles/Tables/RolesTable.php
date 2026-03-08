@@ -3,8 +3,6 @@
 namespace App\Filament\Resources\Roles\Tables;
 
 use App\Filament\Exports\RoleExporter;
-use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ExportBulkAction;
 use Filament\Tables\Columns\TextColumn;
@@ -29,7 +27,7 @@ class RolesTable
                     ->counts('permissions')
                     ->label('Počet povolení')
                     ->badge()
-                    ->color('success')
+                    ->color('success'),
             ])
             ->filters([
                 //

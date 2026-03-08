@@ -4,6 +4,7 @@ namespace App\Policies;
 
 use App\Models\TenantProductVariant;
 use App\Models\User;
+
 class TenantProductVariantPolicy
 {
     /**
@@ -19,7 +20,7 @@ class TenantProductVariantPolicy
      */
     public function view(User $user, TenantProductVariant $variant): bool
     {
-        return $user->hasPermissionTo('catalog.manage') ||  $user->hasPermissionToOnTenant('store.manage', $variant->product->tenant_id);
+        return $user->hasPermissionTo('catalog.manage') || $user->hasPermissionToOnTenant('store.manage', $variant->product->tenant_id);
     }
 
     /**

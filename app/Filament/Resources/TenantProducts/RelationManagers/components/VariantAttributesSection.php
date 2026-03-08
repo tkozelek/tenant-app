@@ -45,7 +45,7 @@ class VariantAttributesSection
 
                         // custom
                         TextInput::make('custom_value')
-                            ->label(fn (Get $get, Component $livewire) => "Hodnota " . self::getAttribute($get, $livewire)?->unit)
+                            ->label(fn (Get $get, Component $livewire) => 'Hodnota '.self::getAttribute($get, $livewire)?->unit)
                             ->visible(fn (Get $get, Component $livewire) => self::type($get, $livewire) !== 'select')
                             ->required(fn (Get $get, Component $livewire) => self::type($get, $livewire) !== 'select')
                             ->numeric(fn (Get $get, Component $livewire) => self::type($get, $livewire) === 'number')

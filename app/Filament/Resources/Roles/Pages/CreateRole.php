@@ -13,5 +13,4 @@ class CreateRole extends CreateRecord
     {
         app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
     }
-
 }

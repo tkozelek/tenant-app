@@ -50,8 +50,7 @@ class GlobalProductsTable
                     ->searchable()
                     ->preload()
                     ->multiple()
-                    ->label('Podľa kategórie')
-                ,
+                    ->label('Podľa kategórie'),
                 TernaryFilter::make('is_active')
                     ->label('Je aktívny'),
             ])

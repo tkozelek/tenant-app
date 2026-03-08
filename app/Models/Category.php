@@ -33,4 +33,9 @@ class Category extends Model
     {
         return $this->belongsToMany(Attribute::class, 'category_attribute');
     }
+
+    public function coupons(): BelongsToMany
+    {
+        return $this->belongsToMany(Coupon::class, 'coupon_category');
+    }
 }

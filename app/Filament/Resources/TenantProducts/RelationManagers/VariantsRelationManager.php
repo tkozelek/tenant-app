@@ -3,10 +3,8 @@
 namespace App\Filament\Resources\TenantProducts\RelationManagers;
 
 use App\Filament\Resources\TenantProducts\RelationManagers\actions\AdjustStockAction;
-use App\Filament\Resources\TenantProducts\RelationManagers\actions\StockHistoryAction;
+use App\Filament\Resources\TenantProducts\RelationManagers\actions\HistoryAction;
 use App\Filament\Resources\TenantProducts\RelationManagers\components\VariantAttributesSection;
-use App\Models\Attribute;
-use App\Models\AttributeValue;
 use App\Models\TenantProductVariant;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -14,20 +12,15 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Repeater;
-use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Get;
-use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\DB;
 
 class VariantsRelationManager extends RelationManager
 {
@@ -102,7 +95,7 @@ class VariantsRelationManager extends RelationManager
                             ->panelLayout('grid')
                             ->label('Obrázky variantu')
                             ->columnSpanFull(),
-                    ])
+                    ]),
             ]);
     }
 
@@ -138,7 +131,7 @@ class VariantsRelationManager extends RelationManager
                         return $record->variantAttributes->map(function ($pivot) {
                             $attrName = $pivot->attribute?->name ?? '??';
                             $value = $pivot->attributeValue?->value ?? $pivot->custom_value;
-                            $unit = $pivot->attribute?->unit ?? "";
+                            $unit = $pivot->attribute?->unit ?? '';
 
                             return "{$attrName}: {$value}{$unit}";
                         })->toArray();
@@ -149,6 +142,7 @@ class VariantsRelationManager extends RelationManager
                         if (is_array($state) && count($state) > 2) {
                             return implode(', ', $state);
                         }
+
                         return null;
                     }),
 
@@ -180,18 +174,18 @@ class VariantsRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->modalHeading("Pridať variant produktu " . $this->getOwnerRecord()?->name)
+                    ->modalHeading('Pridať variant produktu '.$this->getOwnerRecord()?->name)
                     ->label('Pridať variant'),
             ])
             ->recordActions([
                 EditAction::make()
                     ->modalWidth(Width::SevenExtraLarge)
-                    ->modalHeading(fn ($record) => "Upraviť variantu " . $record?->name)
-                    ->label("Upraviť"),
+                    ->modalHeading(fn ($record) => 'Upraviť variantu '.$record?->name)
+                    ->label('Upraviť'),
                 DeleteAction::make()
-                    ->label("Zmazať"),
+                    ->label('Zmazať'),
                 AdjustStockAction::make(),
-                StockHistoryAction::make(),
+                HistoryAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

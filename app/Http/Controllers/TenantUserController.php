@@ -8,16 +8,16 @@ use App\Models\User;
 use Cache;
 use Gate;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 
 class TenantUserController extends Controller
 {
     public function show(Tenant $tenant)
     {
         Gate::authorize('assignRoles', $tenant);
-        $roles = Cache::remember('user-roles', 60*60, function () {
-            return Role::whereDoesntHave('permissions', fn($q) => $q->where('name', 'platform.access'))->get();
+        $roles = Cache::remember('user-roles', 60 * 60, function () {
+            return Role::whereDoesntHave('permissions', fn ($q) => $q->where('name', 'platform.access'))->get();
         });
+
         return view('tenant.tenantuser', [
             'tenant' => $tenant,
             'roles' => $roles,
