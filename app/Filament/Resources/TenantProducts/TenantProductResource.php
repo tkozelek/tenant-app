@@ -14,12 +14,15 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class TenantProductResource extends Resource
 {
     protected static ?string $model = TenantProduct::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingStorefront;
+
+    protected static string | UnitEnum | null $navigationGroup = "Tenant produkty";
 
     protected static ?int $navigationSort = 30;
 

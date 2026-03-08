@@ -63,4 +63,9 @@ class TenantProductVariant extends Model implements HasMedia
         return $this->hasMany(VariantAttribute::class, 'tenant_product_variant_id')
             ->with(['attribute', 'attributeValue']);
     }
+
+    public function quantityPrices(): HasMany
+    {
+        return $this->hasMany(ProductQuantityPrice::class, 'tenant_product_variant_id');
+    }
 }

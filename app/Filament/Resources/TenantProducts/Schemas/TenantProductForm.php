@@ -6,6 +6,7 @@ use App\Filament\Actions\GenerateDescipritonAction;
 use App\Models\GlobalProduct;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
@@ -17,6 +18,32 @@ class TenantProductForm
     {
         return $schema
             ->components([
+                Section::make('Detail')
+                    ->schema([
+                        TextInput::make('name')
+                            ->required()
+                            ->maxLength(255),
+                        RichEditor::make('description')
+                            ->required()
+                            ->columnSpanFull()
+                            ->hintAction(
+                                GenerateDescipritonAction::make()
+                                    ->references('description')
+                                    ->title('name')
+                                    ->context('produkt')
+                            ),
+                        Toggle::make('is_active')
+                            ->label('Aktivny')
+                            ->default(true),
+                        SpatieMediaLibraryFileUpload::make('media')
+                            ->collection('tenant_products')
+                            ->multiple()
+                            ->reorderable()
+                            ->panelLayout('grid')
+                            ->label('Obrázky produktu')
+                            ->columnSpanFull(),
+                    ]),
+
                 Section::make('Prepojenie')
                     ->schema([
                         Select::make('tenant_id')
@@ -40,24 +67,6 @@ class TenantProductForm
                                 }
                             }),
                     ])->columns(),
-                Section::make('Detail')
-                    ->schema([
-                        TextInput::make('name')
-                            ->required()
-                            ->maxLength(255),
-                        RichEditor::make('description')
-                            ->required()
-                            ->columnSpanFull()
-                            ->hintAction(
-                                GenerateDescipritonAction::make()
-                                    ->references('description')
-                                    ->title('name')
-                                    ->context('produkt')
-                            ),
-                        Toggle::make('is_active')
-                            ->label('Aktivny')
-                            ->default(true),
-                    ]),
             ]);
     }
 }

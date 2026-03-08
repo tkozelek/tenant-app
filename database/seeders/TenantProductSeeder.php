@@ -35,14 +35,28 @@ class TenantProductSeeder extends Seeder
 
                 $requestId = $useGlobalProductRequest ? GlobalProductRequest::inRandomOrder()->value('id') : null;
 
+                $name = ucfirst($productName)." - {$tenantId}";
+
                 $tenantProduct = TenantProduct::create([
                     'tenant_id' => $tenantId,
                     'global_product_id' => $globalProduct?->id,
                     'global_product_request_id' => $requestId,
-                    'name' => ucfirst($productName)." - {$tenantId}",
+                    'name' => $name,
                     'description' => $productDesc,
                     'is_active' => fake()->boolean(80),
                 ]);
+
+                $skipImage = fake()->boolean(90);
+
+                if (!$skipImage) {
+                    try {
+                        $placeholderText = urlencode($name);
+                        $tenantProduct->addMediaFromUrl("https://placehold.co/600x400.jpeg?text={$placeholderText}")
+                            ->toMediaCollection('tenant_product');
+                    } catch (\Exception $e) {
+                        $this->command->warn("Failed to download img for: {$name}");
+                    }
+                }
 
                 $numberOfVariants = rand(1, 3);
 

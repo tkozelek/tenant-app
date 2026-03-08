@@ -8,6 +8,8 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ExportBulkAction;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Filters\TernaryFilter;
@@ -19,6 +21,12 @@ class TenantProductsTable
     {
         return $table
             ->columns([
+                SpatieMediaLibraryImageColumn::make('media')
+                    ->collection('tenant_products')
+                    ->square()
+                    ->stacked()
+                    ->limit(3),
+
                 TextColumn::make('name')
                     ->weight('bold')
                     ->copyable()

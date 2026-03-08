@@ -14,6 +14,7 @@ class PriceHistoryChart extends ChartWidget
 
     public ?TenantProductVariant $record = null;
 
+    protected static bool $isDiscovered = false;
 
     protected ?string $maxHeight = '400px';
     public ?string $filter = 'all';

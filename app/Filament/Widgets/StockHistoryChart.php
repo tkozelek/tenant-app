@@ -13,6 +13,8 @@ class StockHistoryChart extends ChartWidget
 
     public ?TenantProductVariant $record = null;
 
+    protected static bool $isDiscovered = false;
+
     protected int | string | array $columnSpan = 'full';
 
     protected static bool $isLazy = false;
@@ -26,6 +28,9 @@ class StockHistoryChart extends ChartWidget
 
     protected function getData(): array
     {
+        if (!$this->record) {
+            return [];
+        }
         $query = $this->record->stockHistories()->orderBy('created_at');
 
         if ($this->filter !== 'all') {
