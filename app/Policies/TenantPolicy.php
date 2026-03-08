@@ -35,7 +35,7 @@ class TenantPolicy
             return true;
         }
 
-        return $user->hasPermissionToOnTenant('store.access', $tenant->id);
+        return $user->hasPermissionToOnTenant('tenant.access', $tenant->id);
     }
 
     /**
@@ -63,7 +63,7 @@ class TenantPolicy
             return true;
         }
 
-        return $user->hasPermissionToOnTenant('store.settings', $tenant->id);
+        return $user->hasPermissionToOnTenant('tenant.settings', $tenant->id);
     }
 
     /**
@@ -119,7 +119,7 @@ class TenantPolicy
             return true;
         }
 
-        return $user->hasPermissionToOnTenant('store.users.manage', $tenant);
+        return $user->hasPermissionToOnTenant('tenant.users.manage', $tenant);
     }
 
     /**
