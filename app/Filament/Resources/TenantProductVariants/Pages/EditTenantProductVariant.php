@@ -2,6 +2,8 @@
 
 namespace App\Filament\Resources\TenantProductVariants\Pages;
 
+use App\Filament\Resources\TenantProducts\RelationManagers\actions\AdjustStockAction;
+use App\Filament\Resources\TenantProducts\RelationManagers\actions\HistoryAction;
 use App\Filament\Resources\TenantProducts\TenantProductResource;
 use App\Filament\Resources\TenantProductVariants\TenantProductVariantResource;
 use Filament\Actions\Action;
@@ -23,11 +25,14 @@ class EditTenantProductVariant extends EditRecord
                 ->color('info')
                 ->icon('heroicon-o-arrow-uturn-left')
                 ->url(fn ($record): string => TenantProductResource::getUrl('edit', ['record' => $record->tenant_product_id])),
+            HistoryAction::make(),
+            AdjustStockAction::make()
+                ->after(fn () => $this->refreshFormData(['stock_quantity'])),
         ];
     }
 
     public function getHeading(): string|Htmlable|null
     {
-        return 'Upravit ' . $this->record->name;
+        return 'Upravit '.$this->record->name;
     }
 }

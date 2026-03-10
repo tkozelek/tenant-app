@@ -6,10 +6,12 @@ use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Panel;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\DB;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 
 class User extends Authenticatable implements FilamentUser, HasName
 {
@@ -54,13 +56,8 @@ class User extends Authenticatable implements FilamentUser, HasName
     protected function fullName(): Attribute
     {
         return Attribute::make(
-            get: fn () => "{$this->first_name} {$this->last_name}",
+            get: fn () => $this->first_name . ' ' . $this->last_name,
         );
-    }
-
-    public function ownedTenants()
-    {
-        return $this->hasMany(Tenant::class, 'owner_id');
     }
 
     /**
@@ -81,20 +78,22 @@ class User extends Authenticatable implements FilamentUser, HasName
 
     public function hasPermissionToOnTenant(string $permission, $tenant): bool
     {
-        $currentTeamId = getPermissionsTeamId();
+        $originalTeamId = getPermissionsTeamId();
 
-        is_numeric($tenant) ? setPermissionsTeamId($tenant) : setPermissionsTeamId($tenant->id);
+        $tenantId = is_numeric($tenant) ? $tenant : $tenant->id;
 
-        try {
-            return $this->hasPermissionTo($permission);
-        } catch (\Exception $e) {
-            return false;
-        } finally {
-            setPermissionsTeamId($currentTeamId);
-        }
+        setPermissionsTeamId($tenantId);
+
+        $this->unsetRelation('roles', 'permissions');
+
+        $result = $this->hasPermissionTo($permission);
+
+        setPermissionsTeamId($originalTeamId);
+
+        return $result;
     }
 
-    public function tenants(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function tenants(): BelongsToMany
     {
         return $this->belongsToMany(
             Tenant::class,
@@ -102,10 +101,10 @@ class User extends Authenticatable implements FilamentUser, HasName
             'model_id',
             'tenant_id'
         )
-            ->withPivot('role_id');
+            ->withPivot('role_id', 'model_type');
     }
 
-    public function shops(): \Illuminate\Database\Eloquent\Relations\BelongsToMany
+    public function shops(): BelongsToMany
     {
         return $this->tenants();
     }

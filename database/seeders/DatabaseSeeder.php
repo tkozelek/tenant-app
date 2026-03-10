@@ -21,6 +21,7 @@ class DatabaseSeeder extends Seeder
             GlobalProductSeeder::class,
             GlobalProductRequestSeeder::class,
             TenantProductSeeder::class,
+            CouponSeeder::class,
         ]);
     }
 }

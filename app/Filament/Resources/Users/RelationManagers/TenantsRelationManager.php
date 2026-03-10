@@ -15,6 +15,7 @@ use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Permission\PermissionRegistrar;
 
 class TenantsRelationManager extends RelationManager
 {
@@ -52,7 +53,8 @@ class TenantsRelationManager extends RelationManager
                 AttachAction::make()
                     ->preloadRecordSelect()
                     ->schema(fn (AttachAction $action): array => [
-                        $action->getRecordSelect(),
+                        $action->getRecordSelect()
+                            ->multiple(),
                         Select::make('role_id')
                             ->label('Role')
                             ->options(Role::whereDoesntHave('permissions', fn ($q) => $q->where('name', 'platform.access'))
@@ -66,7 +68,7 @@ class TenantsRelationManager extends RelationManager
                         return $data;
                     })
                     ->after(function () {
-                        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
+                        app(PermissionRegistrar::class)->forgetCachedPermissions();
                     }),
             ])
             ->recordActions([

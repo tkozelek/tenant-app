@@ -2,12 +2,15 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class Coupon extends Model
 {
+    use HasFactory;
+
     protected $fillable = [
         'tenant_id', 'code', 'discount_type', 'value',
         'min_order_amount', 'usage_limit', 'used_count',
@@ -18,7 +21,10 @@ class Coupon extends Model
         'starts_at' => 'datetime',
         'expires_at' => 'datetime',
         'is_active' => 'boolean',
-        'value' => 'decimal:4',
+        'value' => 'decimal:2',
+        'min_order_amount' => 'decimal:2',
+        'usage_limit' => 'integer',
+        'used_count' => 'integer',
     ];
 
     public function tenant(): BelongsTo

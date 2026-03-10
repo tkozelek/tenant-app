@@ -10,23 +10,30 @@ class DashboardController extends Controller
     {
         $user = auth()->user();
 
-        $ownedTenants = Tenant::with('media')
-            ->where('owner_id', $user->id)
-            ->get();
+        $user->load('roles.permissions');
 
-        $otherTenants = Tenant::with('media')
-            ->whereIn('id', function ($query) use ($user) {
-                $query->select('tenant_id')
-                    ->from(config('permission.table_names.model_has_roles'))
-                    ->where('model_id', $user->id)
-                    ->where('model_type', get_class($user));
+        $tenants = Tenant::with([
+            'media',
+            'users' => fn ($query) => $query->where('users.id', $user->id),
+        ])
+            ->where(function ($query) use ($user) {
+                $query->where('owner_id', $user->id)
+                    ->orWhereHas('users', fn ($q) => $q->where('users.id', $user->id));
             })
-            ->where('owner_id', '!=', $user->id)
-            ->get();
+            ->get()
+            ->sortBy(function ($tenant) use ($user) {
+                if ($tenant->owner_id === $user->id) {
+                    return 0;
+                }
+
+                $roleId = $tenant->users->first()?->pivot->role_id;
+
+                return $roleId ?? 999;
+            })
+            ->values();
 
         return view('dashboard.dashboard', [
-            'ownedTenants' => $ownedTenants,
-            'otherTenants' => $otherTenants,
+            'tenants' => $tenants,
             'title' => 'Dashboard',
         ]);
     }

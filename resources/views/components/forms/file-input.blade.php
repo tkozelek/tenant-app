@@ -1,9 +1,9 @@
-<div class="p-4 border border-gray-200 dark:border-gray-700 rounded-lg bg-gray-50 dark:bg-gray-700/30">
+<div class="p-4 border border-gray-200 dark:border-neutral-700 rounded-lg bg-gray-50 dark:bg-neutral-700/30">
     <x-input-label :for="$name" :value="$label" class="mb-2" />
 
     @if($currentImage)
         <div class="mb-4 relative group w-full max-w-xs h-32">
-            <img src="{{ $currentImage }}" alt="{{ $label }}" class="w-full h-full object-cover rounded-lg shadow-sm border border-gray-200 dark:border-gray-600">
+            <img src="{{ $currentImage }}" alt="{{ $label }}" class="w-full h-full object-cover rounded-lg shadow-sm border border-gray-200 dark:border-neutral-600">
 
             @if($deleteAction)
                 <button type="button"

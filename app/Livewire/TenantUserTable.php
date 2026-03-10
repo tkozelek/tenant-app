@@ -42,7 +42,9 @@ class TenantUserTable extends Component
     public function roles()
     {
         return Role::whereNull('tenant_id')
-            ->whereNotIn('name', ['Super Admin', 'Platform Admin'])
+            ->whereDoesntHave('permissions', function ($query) {
+                $query->where('name', 'platform.access');
+            })
             ->get();
     }
 

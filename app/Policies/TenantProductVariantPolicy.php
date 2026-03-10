@@ -12,7 +12,7 @@ class TenantProductVariantPolicy
      */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('catalog.manage') || $user->hasPermissionTo('store.manage');
+        return $user->hasPermissionTo('catalog.manage');
     }
 
     /**
@@ -20,7 +20,7 @@ class TenantProductVariantPolicy
      */
     public function view(User $user, TenantProductVariant $variant): bool
     {
-        return $user->hasPermissionTo('catalog.manage') || $user->hasPermissionToOnTenant('store.manage', $variant->product->tenant_id);
+        return $user->hasPermissionTo('catalog.manage') || $user->hasPermissionToOnTenant('tenant.manage', $variant->product->tenant_id);
     }
 
     /**
@@ -28,7 +28,7 @@ class TenantProductVariantPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('catalog.manage') || $user->hasPermissionTo('store.products.manage');
+        return $user->hasPermissionTo('catalog.manage') || $user->hasPermissionTo('tenant.products.manage');
     }
 
     /**
@@ -36,7 +36,7 @@ class TenantProductVariantPolicy
      */
     public function update(User $user, TenantProductVariant $variant): bool
     {
-        return $user->hasPermissionTo('catalog.manage') || $user->hasPermissionToOnTenant('store.products.manage', $variant->product->tenant_id);
+        return $user->hasPermissionTo('catalog.manage') || $user->hasPermissionToOnTenant('tenant.products.manage', $variant->product->tenant_id);
     }
 
     /**
@@ -44,6 +44,6 @@ class TenantProductVariantPolicy
      */
     public function delete(User $user, TenantProductVariant $variant): bool
     {
-        return $user->hasPermissionTo('catalog.manage') || $user->hasPermissionToOnTenant('store.products.manage', $variant->product->tenant_id);
+        return $user->hasPermissionTo('catalog.manage') || $user->hasPermissionToOnTenant('tenant.products.manage', $variant->product->tenant_id);
     }
 }

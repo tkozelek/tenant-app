@@ -3,6 +3,7 @@
 namespace App\Filament\Resources\TenantProducts\RelationManagers\components;
 
 use App\Models\AttributeValue;
+use App\Models\TenantProduct;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -64,11 +65,26 @@ class VariantAttributesSection
             return $attributes;
         }
         // prve volanie, napln premenu
-        $attributes = $livewire->getOwnerRecord()
-            ?->globalProduct
-            ?->category
-            ?->attributes
-            ?->keyBy('id') ?? collect();
+        if (method_exists($livewire, 'getOwnerRecord') && $livewire->getOwnerRecord()) {
+            $attributes = $livewire->getOwnerRecord()
+                ?->globalProduct
+                ?->category
+                ?->attributes
+                ?->keyBy('id') ?? collect();
+        } else {
+            $tenantProductId = $livewire->data['tenant_product_id'] ?? null;
+            if (! $tenantProductId) {
+                return $attributes = collect();
+            }
+
+            $tenantProduct = TenantProduct::with('globalProduct.category.attributes')->find($tenantProductId);
+
+            $attributes = $tenantProduct
+                ?->globalProduct
+                ?->category
+                ?->attributes
+                ?->keyBy('id') ?? collect();
+        }
 
         return $attributes;
     }

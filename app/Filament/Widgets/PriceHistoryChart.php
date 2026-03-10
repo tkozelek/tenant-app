@@ -17,6 +17,7 @@ class PriceHistoryChart extends ChartWidget
     protected static bool $isDiscovered = false;
 
     protected ?string $maxHeight = '400px';
+
     public ?string $filter = 'all';
 
     protected string $color = 'success';
@@ -54,6 +55,16 @@ class PriceHistoryChart extends ChartWidget
                 ],
             ],
             'labels' => $histories->pluck('valid_from')->map(fn ($date) => $date->format('d.m.Y H:i'))->toArray(),
+        ];
+    }
+
+    protected function getOptions(): array
+    {
+        return [
+            'maintainAspectRatio' => false,
+            'animation' => [
+                'duration' => 0,
+            ],
         ];
     }
 

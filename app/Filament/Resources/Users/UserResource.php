@@ -16,12 +16,15 @@ use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
+use UnitEnum;
 
 class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::User;
+
+    protected static string | UnitEnum | null $navigationGroup = 'Použivatelia';
 
     protected static ?int $navigationSort = 10;
 

@@ -18,6 +18,7 @@ return new class extends Migration
             $table->integer('max_quantity')->nullable();
             $table->decimal('unit_price', 10, 2);
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

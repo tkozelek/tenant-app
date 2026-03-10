@@ -76,9 +76,20 @@ class RoleSeeder extends Seeder
             'attributes.import',
         ];
 
+        $couponsPermissions = [
+            'coupons.view_any',
+            'coupons.create',
+            'coupons.update',
+            'coupons.delete',
+            'coupons.export',
+            'coupons.import',
+        ];
+
         $tenantPermissions = [
+            'tenant.owner',
             'tenant.access',
             'tenant.settings',
+            'tenant.update',
             'tenant.users.manage',
             'tenant.products.manage',
             'tenant.reports.view',
@@ -90,6 +101,7 @@ class RoleSeeder extends Seeder
             $tenantPermissions,
             $rolePermissions,
             $userPermissions,
+            $couponsPermissions,
             $categoryPermissions,
             $attributePermissions,
             $productPermissions,
@@ -122,6 +134,7 @@ class RoleSeeder extends Seeder
         $platformAdmin->syncPermissions(array_merge(
             $platformPermissions,
             $tenantPermissions,
+            $couponsPermissions,
             ['users.view_any'],
             $rolePermissions,
             $categoryPermissions,
@@ -193,8 +206,8 @@ class RoleSeeder extends Seeder
         );
 
         setPermissionsTeamId(null);
-        if (! $user->hasRole($platformAdmin)) {
-            $user->assignRole($platformAdmin);
-        }
+
+        $user->assignRole($superAdmin);
+
     }
 }

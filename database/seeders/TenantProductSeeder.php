@@ -4,9 +4,12 @@ namespace Database\Seeders;
 
 use App\Models\GlobalProduct;
 use App\Models\GlobalProductRequest;
+use App\Models\PriceHistory;
+use App\Models\StockHistory;
 use App\Models\Tenant;
 use App\Models\TenantProduct;
 use App\Models\TenantProductVariant;
+use Carbon\Carbon;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
 
@@ -74,6 +77,9 @@ class TenantProductSeeder extends Seeder
                         'stock_quantity' => fake()->numberBetween(0, 50),
                     ]);
 
+                    $this->generatePriceHistory($variant, $basePrice);
+                    $this->generateStockHistory($variant);
+
                     $skipImage = fake()->boolean(90);
                     if ($skipImage) {
                         continue;
@@ -89,5 +95,67 @@ class TenantProductSeeder extends Seeder
                 }
             }
         }
+    }
+
+    private function generatePriceHistory(TenantProductVariant $variant, float $initialPrice): void
+    {
+        $price = $initialPrice;
+        $date = Carbon::now()->subMonths(6);
+
+        $priceChanges = rand(1, 5);
+
+        for ($i = 0; $i < $priceChanges; $i++) {
+            $date = $date->addDays(rand(10, 30));
+            $priceChangePercentage = rand(-15, 20) / 100;
+            $price *= (1 + $priceChangePercentage);
+            $price = round($price, 2);
+
+            if ($price <= 0) {
+                $price = $initialPrice;
+            }
+
+            PriceHistory::create([
+                'tenant_product_variant_id' => $variant->id,
+                'price' => $price,
+                'created_at' => $date,
+                'updated_at' => $date,
+            ]);
+        }
+
+        $variant->update(['price' => $price]);
+    }
+
+    private function generateStockHistory(TenantProductVariant $variant): void
+    {
+        $stock = $variant->stock_quantity;
+        $date = Carbon::now()->subMonths(6);
+
+        $stockChanges = rand(2, 8);
+
+        for ($i = 0; $i < $stockChanges; $i++) {
+            $date = $date->addDays(rand(7, 25));
+            $change = rand(-20, 20);
+
+            if ($stock + $change < 0) {
+                $change = -$stock;
+            }
+
+            $stock += $change;
+
+            $reason = $change > 0 ? 'purchase' : 'sale';
+            if (rand(1, 10) > 8) {
+                $reason = 'adjustment';
+            }
+
+            StockHistory::create([
+                'tenant_product_variant_id' => $variant->id,
+                'quantity_change' => $change,
+                'reason' => $reason,
+                'created_at' => $date,
+                'updated_at' => $date,
+            ]);
+        }
+
+        $variant->update(['stock_quantity' => $stock]);
     }
 }

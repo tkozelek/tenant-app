@@ -75,10 +75,6 @@ class TenantPolicy
             return true;
         }
 
-        if ($user->hasPermissionTo('tenants.delete')) {
-            return true;
-        }
-
         return false;
     }
 
@@ -115,7 +111,7 @@ class TenantPolicy
             return true;
         }
 
-        if ($user->hasPermissionTo('users.manage')) {
+        if ($user->hasPermissionTo('tenant.users.manage')) {
             return true;
         }
 
@@ -136,5 +132,14 @@ class TenantPolicy
     public function importAny(User $user): bool
     {
         return $user->hasPermissionTo('tenants.import');
+    }
+
+    public function changeOwner(User $user, Tenant $tenant): bool
+    {
+        if ($tenant->owner_id === $user->id) {
+            return true;
+        }
+
+        return false;
     }
 }

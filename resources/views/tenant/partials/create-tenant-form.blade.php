@@ -1,9 +1,9 @@
-<section class="bg-white dark:bg-gray-800 shadow-sm rounded-xl p-6 sm:p-8 border border-gray-200 dark:border-gray-700">
+<section class="bg-white dark:bg-neutral-800 shadow-sm rounded-xl p-6 sm:p-8 border border-gray-200 dark:border-neutral-700">
     <header class="mb-6">
-        <h2 class="text-xl font-bold text-gray-900 dark:text-white">
+        <h2 class="text-xl font-bold text-neutral-900 dark:text-white">
             {{ isset($tenant) ? 'Upraviť obchod' : 'Vytvoriť nový obchod' }}
         </h2>
-        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+        <p class="mt-1 text-sm text-neutral-500 dark:text-neutral-400">
             {{ isset($tenant) ? 'Upravte informácie o vašom obchode nižšie.' : 'Vyplňte základné informácie pre založenie nového obchodu.' }}
         </p>
     </header>
@@ -31,7 +31,7 @@
             <div>
                 <x-input-label for="slug" value="URL adresa (slug)" />
                 <div class="mt-1 flex rounded-md shadow-sm">
-                    <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-sm">
+                    <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-300 text-sm">
                         {{ config('app.url') }}/
                     </span>
                     <x-text-input id="slug" name="slug" type="text" class="rounded-l-none" :value="old('slug', $tenant->slug ?? '')" required placeholder="moj-obchod" />
@@ -47,7 +47,7 @@
             <x-input-error class="mt-2" :messages="$errors->get('short_description')" />
         </div>
 
-        <!-- Full description (TinyMCE) -->
+        <!-- Full description -->
         <div>
             <x-forms.tinymce-editor name="description" label="Detailný popis obchodu" :value="old('description', $tenant->description ?? '')" />
         </div>

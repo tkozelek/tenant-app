@@ -18,6 +18,8 @@ class AdjustStockAction extends Action
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->label('Sklad')
             ->icon('heroicon-o-circle-stack')
             ->color('warning')
