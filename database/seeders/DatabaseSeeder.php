@@ -18,9 +18,13 @@ class DatabaseSeeder extends Seeder
 
             CategorySeeder::class,
             AttributeSeeder::class,
+
             GlobalProductSeeder::class,
             GlobalProductRequestSeeder::class,
+
             TenantProductSeeder::class,
+            TenantProductVariantSeeder::class,
+
             CouponSeeder::class,
         ]);
     }

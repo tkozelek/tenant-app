@@ -27,7 +27,6 @@ class TenantProductSeeder extends Seeder
 
             for ($i = 0; $i < $numberOfProducts; $i++) {
                 $useGlobalProduct = rand(1, 100) <= 60;
-                $useGlobalProductRequest = rand(1, 100) <= 60;
 
                 $globalProduct = $useGlobalProduct
                     ? GlobalProduct::select(['id', 'name', 'description'])->inRandomOrder()->first()
@@ -36,22 +35,18 @@ class TenantProductSeeder extends Seeder
                 $productName = $globalProduct ? $globalProduct->name : fake()->words(3, true);
                 $productDesc = $globalProduct ? $globalProduct->description : fake()->sentence();
 
-                $requestId = $useGlobalProductRequest ? GlobalProductRequest::inRandomOrder()->value('id') : null;
-
-                $name = ucfirst($productName)." - {$tenantId}";
+                $name = ucfirst($productName);
 
                 $tenantProduct = TenantProduct::create([
                     'tenant_id' => $tenantId,
                     'global_product_id' => $globalProduct?->id,
-                    'global_product_request_id' => $requestId,
+                    'global_product_request_id' => null,
                     'name' => $name,
                     'description' => $productDesc,
                     'is_active' => fake()->boolean(80),
                 ]);
 
-                $skipImage = fake()->boolean(90);
-
-                if (!$skipImage) {
+                if (!fake()->boolean(90)) {
                     try {
                         $placeholderText = urlencode($name);
                         $tenantProduct->addMediaFromUrl("https://placehold.co/600x400.jpeg?text={$placeholderText}")
@@ -60,102 +55,7 @@ class TenantProductSeeder extends Seeder
                         $this->command->warn("Failed to download img for: {$name}");
                     }
                 }
-
-                $numberOfVariants = rand(1, 3);
-
-                for ($v = 0; $v < $numberOfVariants; $v++) {
-                    $basePrice = fake()->randomFloat(2, 50, 1500);
-                    $hasDiscount = fake()->boolean(30);
-
-                    $variant = TenantProductVariant::create([
-                        'tenant_product_id' => $tenantProduct->id,
-                        'name' => ucfirst($productName)." - {$v}",
-                        'sku' => strtoupper(Str::random(8)),
-                        'ean' => fake()->ean13(),
-                        'price' => $hasDiscount ? ($basePrice * 0.8) : $basePrice,
-                        'original_price' => $hasDiscount ? $basePrice : null,
-                        'stock_quantity' => fake()->numberBetween(0, 50),
-                    ]);
-
-                    $this->generatePriceHistory($variant, $basePrice);
-                    $this->generateStockHistory($variant);
-
-                    $skipImage = fake()->boolean(90);
-                    if ($skipImage) {
-                        continue;
-                    }
-
-                    try {
-                        $placeholderText = urlencode($tenantProduct->name.' - '.($v + 1));
-                        $variant->addMediaFromUrl("https://placehold.co/600x400.jpeg?text={$placeholderText}")
-                            ->toMediaCollection('tenant_product_variants');
-                    } catch (\Exception $e) {
-                        $this->command->warn("Failed to download img for: {$variant->sku}");
-                    }
-                }
             }
         }
-    }
-
-    private function generatePriceHistory(TenantProductVariant $variant, float $initialPrice): void
-    {
-        $price = $initialPrice;
-        $date = Carbon::now()->subMonths(6);
-
-        $priceChanges = rand(1, 5);
-
-        for ($i = 0; $i < $priceChanges; $i++) {
-            $date = $date->addDays(rand(10, 30));
-            $priceChangePercentage = rand(-15, 20) / 100;
-            $price *= (1 + $priceChangePercentage);
-            $price = round($price, 2);
-
-            if ($price <= 0) {
-                $price = $initialPrice;
-            }
-
-            PriceHistory::create([
-                'tenant_product_variant_id' => $variant->id,
-                'price' => $price,
-                'created_at' => $date,
-                'updated_at' => $date,
-            ]);
-        }
-
-        $variant->update(['price' => $price]);
-    }
-
-    private function generateStockHistory(TenantProductVariant $variant): void
-    {
-        $stock = $variant->stock_quantity;
-        $date = Carbon::now()->subMonths(6);
-
-        $stockChanges = rand(2, 8);
-
-        for ($i = 0; $i < $stockChanges; $i++) {
-            $date = $date->addDays(rand(7, 25));
-            $change = rand(-20, 20);
-
-            if ($stock + $change < 0) {
-                $change = -$stock;
-            }
-
-            $stock += $change;
-
-            $reason = $change > 0 ? 'purchase' : 'sale';
-            if (rand(1, 10) > 8) {
-                $reason = 'adjustment';
-            }
-
-            StockHistory::create([
-                'tenant_product_variant_id' => $variant->id,
-                'quantity_change' => $change,
-                'reason' => $reason,
-                'created_at' => $date,
-                'updated_at' => $date,
-            ]);
-        }
-
-        $variant->update(['stock_quantity' => $stock]);
     }
 }

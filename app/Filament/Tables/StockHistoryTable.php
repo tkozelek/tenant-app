@@ -25,7 +25,7 @@ class StockHistoryTable extends Component implements HasActions, HasForms, HasTa
     public function table(Table $table): Table
     {
         return $table
-            ->query($this->record->stockHistories()->getQuery())
+            ->query($this->record->stockHistories()->orderBy('created_at')->getQuery())
             ->columns([
                 TextColumn::make('created_at')
                     ->label('Datum')

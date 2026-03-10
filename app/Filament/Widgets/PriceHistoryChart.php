@@ -24,29 +24,53 @@ class PriceHistoryChart extends ChartWidget
 
     protected function getData(): array
     {
+        if (!$this->record) {
+            return ['datasets' => [], 'labels' => []];
+        }
+
         $query = $this->record->priceHistories()->orderBy('valid_from');
+        $startDate = null;
 
         if ($this->filter !== 'all') {
-            $query->where('valid_from', '>=', Carbon::now()->subDays((int) $this->filter));
+            $startDate = Carbon::now()->subDays((int) $this->filter);
+            $query->where('valid_from', '>=', $startDate);
         }
 
         $histories = $query->get();
-        if ($histories->isEmpty()) {
-            return [
-                'datasets' => [],
-                'labels' => [],
-            ];
+        $chartData = [];
+        $labels = [];
+
+        if ($startDate) {
+            $previousPrice = $this->record->priceHistories()
+                ->where('valid_from', '<', $startDate)
+                ->orderByDesc('valid_from')
+                ->first();
+
+            if ($previousPrice) {
+                $chartData[] = $previousPrice->price;
+                $labels[] = $startDate->format('d.m.Y H:i');
+            }
+        }
+
+        foreach ($histories as $history) {
+            $chartData[] = $history->price;
+            $labels[] = Carbon::parse($history->valid_from)->format('d.m.Y H:i');
+        }
+
+        if (!empty($chartData)) {
+            $chartData[] = end($chartData);
+            $labels[] = Carbon::now()->format('d.m.Y H:i');
         }
 
         return [
             'datasets' => [
                 [
                     'label' => 'Cena (€)',
-                    'data' => $histories->pluck('price')->toArray(),
+                    'data' => $chartData,
 
-                    'stepped' => false,
+                    'stepped' => true,
                     'fill' => true,
-                    'tension' => 0.2,
+                    'tension' => 0,
                     'responsive' => true,
 
                     'pointBorderWidth' => 2,
@@ -54,7 +78,7 @@ class PriceHistoryChart extends ChartWidget
                     'pointHoverRadius' => 6,
                 ],
             ],
-            'labels' => $histories->pluck('valid_from')->map(fn ($date) => $date->format('d.m.Y H:i'))->toArray(),
+            'labels' => $labels,
         ];
     }
 

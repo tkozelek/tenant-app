@@ -32,9 +32,16 @@ class StockHistoryChart extends ChartWidget
             return [];
         }
         $query = $this->record->stockHistories()->orderBy('created_at');
+        $runningTotal = 0;
 
         if ($this->filter !== 'all') {
-            $query->where('created_at', '>=', Carbon::now()->subDays((int) $this->filter));
+            $startDate = Carbon::now()->subDays((int) $this->filter);
+
+            $runningTotal = (int) $this->record->stockHistories()
+                ->where('created_at', '<', $startDate)
+                ->sum('quantity');
+
+            $query->where('created_at', '>=', $startDate);
         }
 
         $history = $query->get();
@@ -46,7 +53,6 @@ class StockHistoryChart extends ChartWidget
             ];
         }
 
-        $runningTotal = 0;
         $chartData = [];
         $labels = [];
 

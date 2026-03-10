@@ -26,12 +26,12 @@ class TenantProductPolicy
      */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('tenant.products.manage') || $user->hasPermissionTo('products.create');
+        return  $user->hasPermissionTo('products.create') || $user->hasPermissionTo('tenant.products.manage');
     }
 
     public function createForTenant(User $user, Tenant $tenant): bool
     {
-        return $user->hasPermissionToOnTenant('tenant.products.manage', $tenant->id) || $user->hasPermissionTo('products.create');
+        return  $user->hasPermissionTo('products.create') || $user->hasPermissionToOnTenant('tenant.products.manage', $tenant->id);
     }
 
     /**
@@ -47,7 +47,7 @@ class TenantProductPolicy
      */
     public function delete(User $user, TenantProduct $tenantProduct): bool
     {
-        return $user->hasPermissionToOnTenant('tenant.products.manage', $tenantProduct->tenant_id) || $user->hasPermissionTo('products.delete');
+        return $user->hasPermissionTo('products.delete') || $user->hasPermissionToOnTenant('tenant.products.manage', $tenantProduct->tenant_id);
     }
 
     public function exportAny(User $user): bool
