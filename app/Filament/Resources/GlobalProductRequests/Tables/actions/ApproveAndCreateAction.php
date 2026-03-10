@@ -30,6 +30,8 @@ class ApproveAndCreateAction extends Action
 
     protected function setUp(): void
     {
+        parent::setUp();
+
         $this->label('Prijať')
             ->color('success')
             ->icon('heroicon-o-check-badge')

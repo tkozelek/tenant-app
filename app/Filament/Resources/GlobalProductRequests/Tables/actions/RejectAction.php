@@ -17,8 +17,10 @@ class RejectAction extends Action
 
     public function setUp(): void
     {
+        parent::setUp();
+
         $this->label('Odmietnuť')
-            ->color('danger')
+            ->color('warning')
             ->icon('heroicon-o-x-circle')
             ->visible(fn (GlobalProductRequest $record) => $record->status === 'pending')
             ->schema([

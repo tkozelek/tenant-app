@@ -105,6 +105,11 @@ class BundleForm
                         ->schema([
                             Repeater::make('items')
                                 ->relationship()
+                                ->itemLabel(function (array $state): ?string {
+                                    $variantId = $state['tenant_product_variant_id'] ?? null;
+                                    if (! $variantId) return null;
+                                    return sprintf("%s - %s ks", TenantProductVariant::whereKey($variantId)->value('name'), $state['quantity'] ?? 0);
+                                })
                                 ->schema([
                                     Select::make('tenant_product_variant_id')
                                         ->required()
