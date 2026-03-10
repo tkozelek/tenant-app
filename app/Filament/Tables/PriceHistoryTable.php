@@ -11,6 +11,7 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\View\View;
 use Livewire\Component;
 
@@ -18,7 +19,7 @@ class PriceHistoryTable extends Component implements HasActions, HasForms, HasTa
 {
     use InteractsWithActions, InteractsWithForms, InteractsWithTable;
 
-    public TenantProductVariant $record;
+    public Model $record;
 
     public function table(Table $table): Table
     {

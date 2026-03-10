@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources\Bundles\Tables;
 
+use App\Filament\Resources\Bundles\Schemas\actions\HistoryAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
@@ -35,6 +36,7 @@ class BundlesTable
             ])
             ->recordActions([
                 EditAction::make(),
+                HistoryAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

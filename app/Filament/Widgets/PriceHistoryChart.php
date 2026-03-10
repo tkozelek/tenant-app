@@ -5,6 +5,7 @@ namespace App\Filament\Widgets;
 use App\Models\TenantProductVariant;
 use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
+use Illuminate\Database\Eloquent\Model;
 
 class PriceHistoryChart extends ChartWidget
 {
@@ -12,7 +13,7 @@ class PriceHistoryChart extends ChartWidget
 
     // https://filamentphp.com/docs/5.x/widgets/charts
 
-    public ?TenantProductVariant $record = null;
+    public ?Model $record = null;
 
     protected static bool $isDiscovered = false;
 

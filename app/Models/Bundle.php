@@ -2,11 +2,15 @@
 
 namespace App\Models;
 
+use App\Observers\BundleObserver;
+use App\Observers\TenantProductVariantObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+#[ObservedBy([BundleObserver::class])]
 class Bundle extends Model
 {
     protected $fillable = [

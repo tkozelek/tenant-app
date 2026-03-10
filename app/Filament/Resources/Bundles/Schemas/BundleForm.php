@@ -5,11 +5,13 @@ namespace App\Filament\Resources\Bundles\Schemas;
 use App\Filament\Actions\GenerateDescipritonAction;
 use App\Filament\Resources\TenantProductVariants\Schemas\actions\QuantityPriceRepeater;
 use App\Models\TenantProductVariant;
+use Filament\Forms\Components\Placeholder;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
+use Filament\Infolists\Components\TextEntry;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
@@ -75,6 +77,29 @@ class BundleForm
                                 ->prefix('€')
                                 ->step('0.01')
                                 ->helperText('Vyplňte, ak je produkt v zľave.'),
+
+                            TextEntry::make('total_price')
+                                ->label('Hodnota poloziek v baliku')
+                                ->state(function (Get $get) {
+                                    $items = $get('items') ?? [];
+
+                                    $ids = collect($items)->pluck('tenant_product_variant_id')->toArray();
+                                    if (empty($ids)) return '0.00';
+
+                                    $prices = TenantProductVariant::whereIn('id', $ids)->get()->pluck('price', 'id');
+
+                                    $total = 0;
+                                    foreach ($items as $item) {
+                                        $id = $item['tenant_product_variant_id'] ?? null;
+                                        $qty = floatval($item['quantity'] ?? 0);
+
+                                        if ($id && isset($prices[$id])) {
+                                            $total += $prices[$id] * $qty;
+                                        }
+                                    }
+
+                                    return number_format($total, 2, ',', ' ') . ' €';
+                                })
                         ]),
                     Section::make('Produkty')
                         ->schema([
@@ -106,7 +131,8 @@ class BundleForm
                                         ->required()
                                         ->numeric()
                                         ->default(1)
-                                        ->minValue(1),
+                                        ->minValue(1)
+                                        ->live(debounce: 300),
                                 ])
                                 ->columns()
                                 ->defaultItems(1)

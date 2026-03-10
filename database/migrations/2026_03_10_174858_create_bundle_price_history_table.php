@@ -13,7 +13,8 @@ return new class extends Migration
     {
         Schema::create('bundle_price_history', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('bundle_id')->constrained()->cascadeOnDelete();
+            $table->foreignId('bundle_id')->constrained('bundles')->cascadeOnDelete();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->decimal('price', 10, 2);
             $table->decimal('original_price', 10, 2)->nullable();
             $table->timestamp('valid_from')->useCurrent();
