@@ -2,12 +2,15 @@
 
 namespace App\Filament\Resources\GlobalProductRequests\Tables\actions;
 
+use App\Filament\Actions\GenerateDescipritonAction;
 use App\Models\Category;
 use App\Models\GlobalProduct;
 use App\Models\GlobalProductRequest;
 use Filament\Actions\Action;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Utilities\Get;
@@ -15,6 +18,7 @@ use Filament\Schemas\Components\Utilities\Set;
 use Gemini\Laravel\Facades\Gemini;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ApproveAndCreateAction extends Action
@@ -53,42 +57,33 @@ class ApproveAndCreateAction extends Action
                     ->columnSpanFull()
                     ->default(fn (GlobalProductRequest $record) => $record->suggested_description ?? null)
                     ->hintAction(
-                        Action::make('generate_description')
-                            ->icon('heroicon-o-sparkles')
-                            ->label('Generovať popis')
-                            ->action(function (Get $get, Set $set) {
-                                $productName = $get('name');
-                                $currentDesc = $get('description');
-                                if (empty($productName)) {
-                                    Notification::make()->warning()->title('Zadajte názov produktu')->send();
-
-                                    return;
-                                }
-                                try {
-                                    $prompt = $currentDesc
-                                        ? "Si expert na e-commerce. Tu je návrh popisu pre produkt '{$productName}': '{$currentDesc}'. Vylepši ho, aby bol profesionálny a pútavý v slovenčine. Vráť VÝHRADNE platný HTML kód."
-                                        : "Si expert na e-commerce. Napíš pútavý popis pre produkt '{$productName}' v slovenčine. Vráť VÝHRADNE platný HTML kód.";
-
-                                    $result = Gemini::generativeModel(model: 'gemini-2.5-flash')->generateContent($prompt);
-
-                                    $generatedHtml = $result->text();
-
-                                    $generatedHtml = preg_replace('/```html\n?(.*?)\n?```/s', '$1', $generatedHtml);
-                                    $set('description', trim($generatedHtml));
-
-                                    Cache::forget('global_product_requests_count');
-
-                                    Notification::make()->success()->title('Popis vygenerovaný!')->send();
-                                } catch (\Exception $e) {
-                                    Notification::make()->danger()->title('Nepodarilo sa pripojiť k AI.')->send();
-                                    Log::error('Error generating description: '.$e->getMessage());
-                                }
-                            })
+                        GenerateDescipritonAction::make()
+                            ->context("globalny produkt")
+                            ->title('name')
+                            ->references('description')
                     ),
+
+                FileUpload::make('media')
+                    ->multiple()
+                    ->disk('public')
+                    ->reorderable()
+                    ->panelLayout('compact')
+                    ->directory('temp-media')
+                    ->columnSpanFull(),
             ])
             ->action(function (array $data, GlobalProductRequest $record) {
+                $mediaPaths = $data['media'] ?? [];
+                unset($data['media']);
+
                 $data['is_active'] = true;
                 $globalProduct = GlobalProduct::create($data);
+
+                foreach ($mediaPaths as $path) {
+                    $globalProduct->addMediaFromDisk($path, 'public')
+                    ->toMediaCollection('global_products');
+
+                    Storage::disk('public')->delete($path);
+                }
 
                 $record->update([
                     'status' => 'approved',

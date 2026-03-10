@@ -11,15 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('bundles', function (Blueprint $table) {
+        Schema::create('bundle_price_history', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tenant_id')->constrained('tenants')->cascadeOnDelete();
-            $table->string('name');
-            $table->string('slug')->unique();
-            $table->text('description')->nullable();
+            $table->foreignId('bundle_id')->constrained()->cascadeOnDelete();
             $table->decimal('price', 10, 2);
-            $table->decimal('original_price', 10, 2);
-            $table->boolean('is_active')->default(true);
+            $table->decimal('original_price', 10, 2)->nullable();
+            $table->timestamp('valid_from')->useCurrent();
+            $table->timestamp('valid_to')->nullable();
             $table->timestamps();
         });
     }
@@ -29,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('bundles');
+        Schema::dropIfExists('bundle_price_history');
     }
 };

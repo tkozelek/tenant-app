@@ -40,6 +40,7 @@ class GlobalProductRequestForm
                             ->label('Kategória'),
 
                         Select::make('status')
+                            ->disabled(fn (?GlobalProductRequest $record) => $record?->status !== 'rejected')
                             ->options([
                                 'pending' => 'Čaká',
                                 'rejected' => 'Zamietnutý',

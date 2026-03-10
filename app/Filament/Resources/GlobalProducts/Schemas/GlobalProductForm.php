@@ -47,7 +47,6 @@ class GlobalProductForm
                             ->inline(false),
 
                         RichEditor::make('description')
-                            ->maxLength(65535)
                             ->columnSpanFull()
                             ->hintAction(
                                 GenerateDescipritonAction::make()

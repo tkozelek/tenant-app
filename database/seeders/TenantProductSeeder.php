@@ -26,9 +26,7 @@ class TenantProductSeeder extends Seeder
             $numberOfProducts = rand(2, 4);
 
             for ($i = 0; $i < $numberOfProducts; $i++) {
-                $useGlobalProduct = rand(1, 100) <= 60;
-
-                $globalProduct = $useGlobalProduct
+                $globalProduct = fake()->boolean(90)
                     ? GlobalProduct::select(['id', 'name', 'description'])->inRandomOrder()->first()
                     : null;
 
