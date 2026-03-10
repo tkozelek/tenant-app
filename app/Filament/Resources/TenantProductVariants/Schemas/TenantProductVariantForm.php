@@ -3,9 +3,12 @@
 namespace App\Filament\Resources\TenantProductVariants\Schemas;
 
 use App\Filament\Resources\TenantProducts\RelationManagers\components\VariantAttributesSection;
+use App\Filament\Resources\TenantProductVariants\Schemas\actions\QuantityPriceRepeater;
+use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 class TenantProductVariantForm
@@ -64,6 +67,8 @@ class TenantProductVariantForm
                             ->prefix('€')
                             ->step('0.01')
                             ->helperText('Vyplňte, ak je produkt v zľave.'),
+
+                        QuantityPriceRepeater::make(),
                     ]),
 
                 VariantAttributesSection::make(),

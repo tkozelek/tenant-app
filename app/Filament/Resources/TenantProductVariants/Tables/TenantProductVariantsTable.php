@@ -68,7 +68,25 @@ class TenantProductVariantsTable
                 TextColumn::make('price')
                     ->label('Cena')
                     ->money('EUR')
-                    ->sortable(),
+                    ->sortable()
+                    ->icon(fn (TenantProductVariant $record): ?string =>
+                        $record->quantityPrices->isNotEmpty() ? 'heroicon-m-rectangle-stack' : null
+                    )
+                    ->iconPosition('after')
+                    ->iconColor('success')
+                    ->tooltip(function (TenantProductVariant $record): ?string {
+                        if ($record->quantityPrices->isEmpty()) return null;
+
+                        $prices = $record->quantityPrices->sortBy('min_quantity');
+                        $tooltipLines = [];
+                        foreach ($prices as $qp) {
+                            $maxText = $qp->max_quantity ? "do {$qp->max_quantity} ks" : "a viac";
+                            $formattedPrice = number_format($qp->unit_price, 2, ',', ' ');
+                            $tooltipLines[] = "Od {$qp->min_quantity} ks {$maxText} -> {$formattedPrice} €";
+                        }
+
+                        return implode(", ", $tooltipLines);
+                    }),
 
                 TextColumn::make('original_price')
                     ->label('Pôvodná cena')
