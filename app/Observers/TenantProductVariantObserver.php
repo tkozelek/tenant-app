@@ -9,7 +9,7 @@ class TenantProductVariantObserver
 {
     public function updated(TenantProductVariant $productVariant): void
     {
-        if ($productVariant->wasChanged('price')) {
+        if ($productVariant->wasChanged('price') || $productVariant->wasChanged('original_price')) {
             $now = Carbon::now();
 
             $productVariant->priceHistories()
@@ -18,6 +18,7 @@ class TenantProductVariantObserver
 
             $productVariant->priceHistories()->create([
                 'price' => $productVariant->price,
+                'original_price' => $productVariant->original_price,
                 'user_id' => auth()->user()->id ?? null,
                 'valid_from' => $now,
                 'valid_to' => null,

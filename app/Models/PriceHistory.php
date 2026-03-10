@@ -14,6 +14,7 @@ class PriceHistory extends Model
     protected $fillable = [
         'tenant_product_variant_id',
         'price',
+        'original_price',
         'user_id',
         'valid_from',
         'valid_to',

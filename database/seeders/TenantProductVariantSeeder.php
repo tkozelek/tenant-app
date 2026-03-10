@@ -57,6 +57,9 @@ class TenantProductVariantSeeder extends Seeder
         $date = Carbon::now()->subMonths(6);
         $now = Carbon::now();
 
+        $finalPrice = $initialPrice;
+        $finalOriginalPrice = null;
+
         while (true) {
             $daysToAdd = rand(15, 30);
 
@@ -73,13 +76,27 @@ class TenantProductVariantSeeder extends Seeder
                 $price = $initialPrice;
             }
 
+            if (fake()->boolean(30)) {
+                $finalOriginalPrice = $price;
+                $discountMultiplier = rand(70, 90) / 100;
+                $finalPrice = round($price * $discountMultiplier, 2);
+            } else {
+                $finalOriginalPrice = null;
+                $finalPrice = $price;
+            }
+
             $variant->priceHistories()->create([
-                'price' => $price,
+                'price' => $finalPrice,
+                'original_price' => $finalOriginalPrice,
+                'valid_from' => $date,
                 'created_at' => $date,
                 'updated_at' => $date,
             ]);
         }
-        $variant->update(['price' => $price]);
+        $variant->update([
+            'price' => $price,
+            'original_price' => $finalOriginalPrice,
+        ]);
     }
 
     private function generateStockHistory(TenantProductVariant $variant): void

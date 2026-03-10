@@ -20,7 +20,7 @@ class PriceHistoryChart extends ChartWidget
 
     public ?string $filter = 'all';
 
-    protected string $color = 'success';
+//    protected string $color = 'success';
 
     protected function getData(): array
     {
@@ -37,7 +37,9 @@ class PriceHistoryChart extends ChartWidget
         }
 
         $histories = $query->get();
-        $chartData = [];
+
+        $priceData = [];
+        $originalPriceData = [];
         $labels = [];
 
         if ($startDate) {
@@ -47,18 +49,21 @@ class PriceHistoryChart extends ChartWidget
                 ->first();
 
             if ($previousPrice) {
-                $chartData[] = $previousPrice->price;
+                $priceData[] = $previousPrice->price;
+                $originalPriceData[] = $previousPrice->original_price;
                 $labels[] = $startDate->format('d.m.Y H:i');
             }
         }
 
         foreach ($histories as $history) {
-            $chartData[] = $history->price;
+            $priceData[] = $history->price;
+            $originalPriceData[] = $history->original_price;
             $labels[] = Carbon::parse($history->valid_from)->format('d.m.Y H:i');
         }
 
-        if (!empty($chartData)) {
-            $chartData[] = end($chartData);
+        if (!empty($priceData)) {
+            $priceData[] = end($priceData);
+            $originalPriceData[] = end($originalPriceData);
             $labels[] = Carbon::now()->format('d.m.Y H:i');
         }
 
@@ -66,12 +71,30 @@ class PriceHistoryChart extends ChartWidget
             'datasets' => [
                 [
                     'label' => 'Cena (€)',
-                    'data' => $chartData,
+                    'data' => $priceData,
 
                     'stepped' => true,
                     'fill' => true,
                     'tension' => 0,
                     'responsive' => true,
+
+                    'borderColor' => '#10b981',
+
+                    'pointBorderWidth' => 2,
+                    'pointRadius' => 4,
+                    'pointHoverRadius' => 6,
+                ],
+                [
+                    'label' => 'Originalna cena (€)',
+                    'data' => $originalPriceData,
+
+                    'stepped' => true,
+                    'fill' => true,
+                    'tension' => 0,
+                    'responsive' => true,
+
+                    'borderColor' => '#94a3b8',
+                    'borderDash' => [5, 5],
 
                     'pointBorderWidth' => 2,
                     'pointRadius' => 4,
@@ -89,6 +112,11 @@ class PriceHistoryChart extends ChartWidget
             'animation' => [
                 'duration' => 0,
             ],
+            'scales' => [
+                'y' => [
+                    'grace' => '10%'
+                ]
+            ]
         ];
     }
 
