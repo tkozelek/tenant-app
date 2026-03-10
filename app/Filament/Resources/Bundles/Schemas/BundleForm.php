@@ -111,6 +111,7 @@ class BundleForm
                                         ->searchable()
                                         ->preload()
                                         ->placeholder('Vyberte produkt variantu')
+                                        ->live(debounce: 300)
                                         ->options(function (Get $get) {
                                             $tenantId = $get('../../tenant_id');
 
