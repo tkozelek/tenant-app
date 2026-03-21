@@ -21,17 +21,21 @@ class QuantityPriceRepeater
             ->reorderable(false)
             ->itemLabel(function (array $state): ?string {
                 $minQuantity = $state['min_quantity'] ?? 0;
-                $maxQuantity = $state['max_quantity'] ?? "";
+                $maxQuantity = $state['max_quantity'] ?? '';
 
-                return sprintf("%s ks - %s => %s €", $minQuantity, $maxQuantity, $state['unit_price']);
+                return sprintf('%s ks - %s => %s €', $minQuantity, $maxQuantity, $state['unit_price']);
             })
             ->rules([
                 fn () => function (string $attribute, $value, \Closure $fail) {
-                    if (!is_array($value) || empty($value)) return;
+                    if (! is_array($value) || empty($value)) {
+                        return;
+                    }
 
-                    $tiers = array_values(array_filter($value, fn($item) => is_array($item)));
+                    $tiers = array_values(array_filter($value, fn ($item) => is_array($item)));
 
-                    if (empty($tiers)) return;
+                    if (empty($tiers)) {
+                        return;
+                    }
 
                     usort($tiers, function ($a, $b) {
                         $aMin = $a['min_quantity'] ?? 0;
@@ -49,7 +53,7 @@ class QuantityPriceRepeater
 
                     foreach ($tiers as $index => $item) {
                         $min = (int) ($item['min_quantity'] ?? 0);
-                        $max = !empty($item['max_quantity']) ? (int) $item['max_quantity'] : null;
+                        $max = ! empty($item['max_quantity']) ? (int) $item['max_quantity'] : null;
                         $isLast = ($index === $totalItems - 1);
 
                         // last one
@@ -57,13 +61,13 @@ class QuantityPriceRepeater
                             $fail("Posledná cenová hladina (od $min ks) musí mať 'Maximálny počet' prázdny (a viac).");
                         }
 
-                        if (!$isLast && $max === null) {
+                        if (! $isLast && $max === null) {
                             $fail("Cenová hladina (od $min ks) nie je posledná, preto musí mať vyplnený 'Maximálny počet'.");
                         }
 
                         if ($previousMax !== null) {
                             if ($min <= $previousMax) {
-                                $fail("Rozsahy sa nesmú prekrývať.");
+                                $fail('Rozsahy sa nesmú prekrývať.');
                             }
                             if ($min > $previousMax + 1) {
                                 $fail("Medzi rozsahmi nesmú byť medzery (chýbajúce množstvo medzi {$previousMax} a {$min} ks).");
@@ -83,19 +87,19 @@ class QuantityPriceRepeater
                     ->default(function (Get $get) {
                         $repeaterState = $get('../../quantityPrices');
 
-                        if (!is_array($repeaterState) || empty($repeaterState)) {
+                        if (! is_array($repeaterState) || empty($repeaterState)) {
                             return 1;
                         }
 
-                        $validTiers = array_filter($repeaterState, fn($item) => is_array($item) && !empty($item['min_quantity']));
+                        $validTiers = array_filter($repeaterState, fn ($item) => is_array($item) && ! empty($item['min_quantity']));
                         if (empty($validTiers)) {
                             return 1;
                         }
 
-                        usort($validTiers, fn($a, $b) => ((int)($a['min_quantity'] ?? 0)) <=> ((int)($b['min_quantity'] ?? 0)));
+                        usort($validTiers, fn ($a, $b) => ((int) ($a['min_quantity'] ?? 0)) <=> ((int) ($b['min_quantity'] ?? 0)));
                         $lastItem = end($validTiers);
 
-                        if (!empty($lastItem['max_quantity'])) {
+                        if (! empty($lastItem['max_quantity'])) {
                             return (int) $lastItem['max_quantity'] + 1;
                         }
 
@@ -111,7 +115,7 @@ class QuantityPriceRepeater
                     ->rules([
                         fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
                             $min = $get('min_quantity');
-                            if ($value !== null && $value !== '' && $min !== null && (int)$value <= (int)$min) {
+                            if ($value !== null && $value !== '' && $min !== null && (int) $value <= (int) $min) {
                                 $fail('Maximálny počet musí byť väčší ako minimálny počet.');
                             }
                         },

@@ -2,14 +2,12 @@
 
 namespace App\Filament\Admin\Resources\Users\RelationManagers;
 
+use App\Filament\Admin\Resources\Users\RelationManagers\actions\AttachTenantAction;
+use App\Filament\Admin\Resources\Users\RelationManagers\actions\EditTenantRoleAction;
 use App\Models\Role;
-use App\Models\User;
-use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
-use Filament\Actions\EditAction;
-use Filament\Forms\Components\Select;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
@@ -23,9 +21,7 @@ class TenantsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-            ]);
+        return $schema->components([]);
     }
 
     public function table(Table $table): Table
@@ -34,66 +30,21 @@ class TenantsRelationManager extends RelationManager
             ->recordTitleAttribute('name')
             ->columns([
                 TextColumn::make('name')
-                    ->label('Name')
+                    ->label('Obchod')
                     ->searchable(),
                 TextColumn::make('tenant_role')
-                    ->label('Role')
-                    ->getStateUsing(function (Model $record) {
-                        $roleId = $record->pivot?->role_id;
-
-                        return $roleId ? Role::find($roleId)?->name : 'No Role';
-                    })
+                    ->label('Rola')
+                    ->getStateUsing(fn (Model $record) => Role::find($record->pivot?->role_id)?->name ?? 'Bez roly')
                     ->badge()
                     ->color('info'),
             ])
-            ->filters([
-                //
-            ])
             ->headerActions([
-                AttachAction::make()
-                    ->preloadRecordSelect()
-                    ->schema(fn (AttachAction $action): array => [
-                        $action->getRecordSelect()
-                            ->multiple(),
-                        Select::make('role_id')
-                            ->label('Role')
-                            ->options(Role::whereDoesntHave('permissions', fn ($q) => $q->where('name', 'platform.access'))
-                                ->pluck('name', 'id')
-                            )
-                            ->required(),
-                    ])
-                    ->mutateDataUsing(function (array $data): array {
-                        $data['model_type'] = User::class;
-
-                        return $data;
-                    })
-                    ->after(function () {
-                        app(PermissionRegistrar::class)->forgetCachedPermissions();
-                    }),
+                AttachTenantAction::make(),
             ])
             ->recordActions([
-                EditAction::make()
-                    ->schema([
-                        Select::make('role_id')
-                            ->label('Role')
-                            ->options(Role::whereDoesntHave('permissions', fn ($q) => $q->where('name', 'platform.access'))->pluck('name', 'id'))
-                            ->required()
-                            ->default(fn (Model $record) => $record->pivot?->role_id),
-                    ])
-                    ->mutateRecordDataUsing(function (array $data, Model $record): array {
-                        $this->getOwnerRecord()->tenants()->updateExistingPivot($record->id, [
-                            'role_id' => $data['role_id'],
-                        ]);
-
-                        return $data;
-                    })
-                    ->after(function () {
-                        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-                    }),
+                EditTenantRoleAction::make(),
                 DetachAction::make()
-                    ->after(function () {
-                        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-                    }),
+                    ->after(fn () => app(PermissionRegistrar::class)->forgetCachedPermissions()),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

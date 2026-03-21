@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Filament\Models\Contracts\HasName;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
-class Tenant extends Model implements HasMedia
+class Tenant extends Model implements HasMedia, HasName
 {
     /** @use HasFactory<\Database\Factories\TenantFactory> */
     use HasFactory;
@@ -31,6 +32,11 @@ class Tenant extends Model implements HasMedia
         return [
             'is_public' => 'boolean',
         ];
+    }
+
+    public function getFilamentName(): string
+    {
+        return $this->name;
     }
 
     public function owner(): BelongsTo

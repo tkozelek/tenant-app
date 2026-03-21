@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\GlobalProducts\RelationManagers;
 
+use App\Filament\Admin\Resources\GlobalProducts\RelationManagers\Schemas\TenantProductRelationForm;
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -10,10 +11,6 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DissociateAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\IconColumn;
@@ -26,26 +23,7 @@ class TenantProductsRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                Select::make('tenant_id')
-                    ->relationship('tenant', 'name')
-                    ->required()
-                    ->searchable()
-                    ->preload(),
-
-                TextInput::make('name')
-                    ->required()
-                    ->maxLength(255)
-                    ->default(fn () => isset($this->ownerRecord) ? $this->getOwnerRecord()->name : null),
-
-                Toggle::make('is_active')
-                    ->default(true),
-
-                RichEditor::make('description')
-                    ->columnSpanFull()
-                    ->default(fn () => isset($this->ownerRecord) ? $this->getOwnerRecord()->description : null),
-            ]);
+        return TenantProductRelationForm::configure($schema, $this);
     }
 
     public function table(Table $table): Table

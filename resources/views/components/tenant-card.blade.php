@@ -40,7 +40,7 @@
                 <span class="truncate font-mono select-all">{{ $tenant->slug }}</span>
             </div>
 
-            <a href="{{ route('tenant.show', $tenant) }}"
+            <a href="{{ route('filament.tenant.pages.dashboard', ['tenant' => $tenant->slug]) }}"
                class="group relative w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-900 transition-all duration-200 shadow-md hover:shadow-lg overflow-hidden">
                 <span class="relative z-10 flex items-center">
                     Spravovať obchod

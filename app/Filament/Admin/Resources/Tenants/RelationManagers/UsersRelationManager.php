@@ -2,9 +2,10 @@
 
 namespace App\Filament\Admin\Resources\Tenants\RelationManagers;
 
+use App\Filament\Admin\Resources\Tenants\RelationManagers\actions\AttachTenantUserAction;
+use App\Filament\Admin\Resources\Tenants\RelationManagers\Schemas\TenantUserForm;
 use App\Models\Role;
 use App\Models\User;
-use Filament\Actions\AttachAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -12,19 +13,13 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\DetachAction;
 use Filament\Actions\DetachBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\TextInput;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
-
-// Opravený import
+use Spatie\Permission\PermissionRegistrar;
 
 class UsersRelationManager extends RelationManager
 {
@@ -34,34 +29,7 @@ class UsersRelationManager extends RelationManager
 
     public function form(Schema $schema): Schema
     {
-        return $schema
-            ->components([
-                TextInput::make('first_name')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('last_name')
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('email')
-                    ->email()
-                    ->unique(ignoreRecord: true) // Opravené: ignoruje aktuálny záznam pri EditAction
-                    ->required()
-                    ->maxLength(255),
-                TextInput::make('password')
-                    ->password()
-                    ->required(fn (string $operation): bool => $operation === 'create')
-                    ->dehydrateStateUsing(fn ($state) => Hash::make($state))
-                    ->dehydrated(fn ($state) => filled($state))
-                    ->rule(Password::default()),
-                Select::make('role_id')
-                    ->label('Role')
-                    ->options(Role::whereDoesntHave('permissions', fn ($q) => $q->where('name', 'platform.access'))
-                        ->pluck('name', 'id')
-                    )
-                    ->preload()
-                    ->searchable()
-                    ->required(),
-            ]);
+        return TenantUserForm::configure($schema);
     }
 
     public function table(Table $table): Table
@@ -70,16 +38,13 @@ class UsersRelationManager extends RelationManager
             ->recordTitleAttribute('email')
             ->columns([
                 TextColumn::make('last_name')
+                    ->label('Priezvisko')
                     ->searchable(),
                 TextColumn::make('email')
                     ->searchable(),
                 TextColumn::make('tenant_role')
-                    ->label('Role')
-                    ->getStateUsing(function (Model $record) {
-                        $roleId = $record->pivot?->role_id;
-
-                        return $roleId ? \App\Models\Role::find($roleId)?->name : 'No Role';
-                    })
+                    ->label('Rola')
+                    ->getStateUsing(fn (Model $record) => Role::find($record->pivot?->role_id)?->name ?? 'Bez roly')
                     ->badge()
                     ->color('info'),
             ])
@@ -91,37 +56,9 @@ class UsersRelationManager extends RelationManager
             ])
             ->headerActions([
                 CreateAction::make()
-                    ->mutateFormDataUsing(function (array $data): array {
-                        $data['model_type'] = User::class;
-
-                        return $data;
-                    })
-                    ->after(function () {
-                        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-                    }),
-                AttachAction::make()
-                    ->preloadRecordSelect(false)
-                    ->recordSelectSearchColumns(['email', 'last_name', 'first_name'])
-                    ->recordSelectOptionsQuery(function (Builder $query) {
-                        return $query->withoutGlobalScopes();
-                    })
-                    ->schema(fn (AttachAction $action): array => [
-                        $action->getRecordSelect(),
-                        Select::make('role_id')
-                            ->label('Role')
-                            ->options(Role::whereDoesntHave('permissions', fn ($q) => $q->where('name', 'platform.access'))
-                                ->pluck('name', 'id')
-                            )
-                            ->required(),
-                    ])
-                    ->mutateDataUsing(function (array $data): array {
-                        $data['model_type'] = User::class;
-
-                        return $data;
-                    })
-                    ->after(function () {
-                        app(\Spatie\Permission\PermissionRegistrar::class)->forgetCachedPermissions();
-                    }),
+                    ->mutateFormDataUsing(fn (array $data): array => array_merge($data, ['model_type' => User::class]))
+                    ->after(fn () => app(PermissionRegistrar::class)->forgetCachedPermissions()),
+                AttachTenantUserAction::make(),
             ])
             ->recordActions([
                 EditAction::make(),
