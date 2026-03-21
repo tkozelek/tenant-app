@@ -22,7 +22,7 @@ class TenantProductResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingStorefront;
 
-    protected static string | UnitEnum | null $navigationGroup = "Tenant produkty";
+    protected static string|UnitEnum|null $navigationGroup = 'Tenant produkty';
 
     protected static ?int $navigationSort = 30;
 

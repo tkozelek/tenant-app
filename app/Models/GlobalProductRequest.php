@@ -12,6 +12,7 @@ class GlobalProductRequest extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\GlobalProductRequestFactory> */
     use HasFactory;
+
     use InteractsWithMedia;
 
     protected $fillable = [
@@ -19,6 +20,7 @@ class GlobalProductRequest extends Model implements HasMedia
         'requested_by_user_id',
         'status',
         'suggested_name',
+        'suggested_description',
         'suggested_category_id',
         'admin_note',
         'created_global_product_id',

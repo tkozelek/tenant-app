@@ -20,7 +20,7 @@ class TenantProductVariantResource extends Resource
 {
     protected static ?string $model = TenantProductVariant::class;
 
-    protected static string | UnitEnum | null $navigationGroup = "Tenant produkty";
+    protected static string|UnitEnum|null $navigationGroup = 'Tenant produkty';
 
     protected static ?int $navigationSort = 35;
 
@@ -37,7 +37,7 @@ class TenantProductVariantResource extends Resource
     {
         $table = TenantProductVariantsTable::configure($table, true);
 
-        return $table->modifyQueryUsing(fn(Builder $query) => $query->with('product.tenant'));
+        return $table->modifyQueryUsing(fn (Builder $query) => $query->with('product.tenant'));
     }
 
     public static function getRelations(): array

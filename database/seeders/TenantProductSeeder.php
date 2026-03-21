@@ -3,15 +3,9 @@
 namespace Database\Seeders;
 
 use App\Models\GlobalProduct;
-use App\Models\GlobalProductRequest;
-use App\Models\PriceHistory;
-use App\Models\StockHistory;
 use App\Models\Tenant;
 use App\Models\TenantProduct;
-use App\Models\TenantProductVariant;
-use Carbon\Carbon;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Str;
 
 class TenantProductSeeder extends Seeder
 {
@@ -44,7 +38,7 @@ class TenantProductSeeder extends Seeder
                     'is_active' => fake()->boolean(80),
                 ]);
 
-                if (!fake()->boolean(90)) {
+                if (! fake()->boolean(90)) {
                     try {
                         $placeholderText = urlencode($name);
                         $tenantProduct->addMediaFromUrl("https://placehold.co/600x400.jpeg?text={$placeholderText}")

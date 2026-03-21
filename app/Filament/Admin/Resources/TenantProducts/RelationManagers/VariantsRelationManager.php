@@ -35,7 +35,7 @@ class VariantsRelationManager extends RelationManager
                 CreateAction::make()
                     ->modalHeading('Pridať variant produktu '.$this->getOwnerRecord()?->name)
                     ->label('Pridať variant'),
-                ])
+            ])
             ->recordActions([
                 EditAction::make()
                     ->modalWidth(Width::SevenExtraLarge)

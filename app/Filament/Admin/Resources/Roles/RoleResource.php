@@ -21,7 +21,7 @@ class RoleResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Key;
 
-    protected static string | UnitEnum | null $navigationGroup = 'Použivatelia';
+    protected static string|UnitEnum|null $navigationGroup = 'Použivatelia';
 
     protected static ?int $navigationSort = 40;
 

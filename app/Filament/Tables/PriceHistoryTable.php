@@ -2,7 +2,6 @@
 
 namespace App\Filament\Tables;
 
-use App\Models\TenantProductVariant;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
 use Filament\Forms\Concerns\InteractsWithForms;

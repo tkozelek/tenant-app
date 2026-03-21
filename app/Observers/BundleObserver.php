@@ -7,7 +7,8 @@ use Carbon\Carbon;
 
 class BundleObserver
 {
-    public function updated(Bundle $bundle): void {
+    public function updated(Bundle $bundle): void
+    {
         if ($bundle->wasChanged(['price', 'original_price'])) {
             $now = Carbon::now();
 
@@ -25,7 +26,8 @@ class BundleObserver
         }
     }
 
-    public function created(Bundle $bundle): void {
+    public function created(Bundle $bundle): void
+    {
         $bundle->priceHistories()->create([
             'price' => $bundle->price,
             'original_price' => $bundle->original_price,

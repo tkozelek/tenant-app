@@ -55,7 +55,7 @@ class ApproveAndCreateAction extends Action
                     ->default(fn (GlobalProductRequest $record) => $record->suggested_description ?? null)
                     ->hintAction(
                         GenerateDescipritonAction::make()
-                            ->context("globalny produkt")
+                            ->context('globalny produkt')
                             ->title('name')
                             ->references('description')
                     ),
@@ -77,7 +77,7 @@ class ApproveAndCreateAction extends Action
 
                 foreach ($mediaPaths as $path) {
                     $globalProduct->addMediaFromDisk($path, 'public')
-                    ->toMediaCollection('global_products');
+                        ->toMediaCollection('global_products');
 
                     Storage::disk('public')->delete($path);
                 }

@@ -24,7 +24,7 @@ class TenantProductVariantSeeder extends Seeder
                 $variant = TenantProductVariant::withoutEvents(function () use ($product, $v, $basePrice, $hasDiscount) {
 
                     $newVariant = $product->variants()->create([
-                        'name' => $product->name . " - {$v}",
+                        'name' => $product->name." - {$v}",
                         'sku' => strtoupper(Str::random(8)),
                         'ean' => fake()->ean13(),
                         'price' => $hasDiscount ? ($basePrice * 0.8) : $basePrice,
@@ -38,7 +38,7 @@ class TenantProductVariantSeeder extends Seeder
                     return $newVariant;
                 });
 
-                if (!fake()->boolean(90)) {
+                if (! fake()->boolean(90)) {
                     try {
                         $placeholderText = urlencode($product->name.' - '.($v + 1));
                         $variant->addMediaFromUrl("https://placehold.co/600x400.jpeg?text={$placeholderText}")
@@ -130,8 +130,8 @@ class TenantProductVariantSeeder extends Seeder
             $currentRunningStock += $change;
 
             $variant->stockHistories()->create([
-                'quantity'   => $change,
-                'type'       => $type,
+                'quantity' => $change,
+                'type' => $type,
                 'created_at' => $date,
                 'updated_at' => $date,
             ]);

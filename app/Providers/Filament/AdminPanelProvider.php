@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use Filament\Actions\Action;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -51,6 +52,12 @@ class AdminPanelProvider extends PanelProvider
             ->widgets([
                 AccountWidget::class,
                 FilamentInfoWidget::class,
+            ])
+            ->userMenuItems([
+                Action::make('backToApp')
+                    ->label('Späť na aplikáciu')
+                    ->icon('heroicon-o-arrow-left-circle')
+                    ->url(fn (): string => route('dashboard.index')),
             ])
             ->middleware([
                 EncryptCookies::class,

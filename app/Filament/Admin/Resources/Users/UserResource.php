@@ -24,7 +24,7 @@ class UserResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::User;
 
-    protected static string | UnitEnum | null $navigationGroup = 'Použivatelia';
+    protected static string|UnitEnum|null $navigationGroup = 'Použivatelia';
 
     protected static ?int $navigationSort = 10;
 

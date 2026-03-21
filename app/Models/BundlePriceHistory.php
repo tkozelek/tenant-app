@@ -15,14 +15,14 @@ class BundlePriceHistory extends Model
         'original_price',
         'valid_from',
         'valid_to',
-        'user_id'
+        'user_id',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'original_price' => 'decimal:2',
         'valid_from' => 'datetime',
-        'valid_to' => 'datetime'
+        'valid_to' => 'datetime',
     ];
 
     public function bundle(): BelongsTo

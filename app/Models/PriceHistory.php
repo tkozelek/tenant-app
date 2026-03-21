@@ -23,7 +23,7 @@ class PriceHistory extends Model
     protected $casts = [
         'price' => 'decimal:2',
         'valid_from' => 'datetime',
-        'valid_to' => 'datetime'
+        'valid_to' => 'datetime',
     ];
 
     public function variant(): BelongsTo
