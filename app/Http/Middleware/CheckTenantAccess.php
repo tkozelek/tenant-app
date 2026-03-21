@@ -19,7 +19,6 @@ class CheckTenantAccess
     {
         $user = Auth::user();
 
-        // Ensure we actually have a logged-in user
         if (! $user) {
             abort(401);
         }
@@ -39,7 +38,7 @@ class CheckTenantAccess
 
         $membership = $tenant->users()
             ->where('users.id', $user->id)
-            ->withPivot('role') // Assuming your pivot table has a 'role' column
+            ->withPivot('role')
             ->first();
 
         if (! $membership) {
