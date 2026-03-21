@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -35,5 +36,22 @@ class GlobalProduct extends Model implements HasMedia
     public function tenantProducts(): HasMany
     {
         return $this->hasMany(TenantProduct::class);
+    }
+
+    public function variants(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            TenantProductVariant::class,
+            TenantProduct::class,
+            'global_product_id',
+            'tenant_product_id',
+            'id',
+            'id'
+        );
+    }
+
+    public function averageVariantPrice(): ?float
+    {
+        return $this->variants()->avg('tenant_product_variants.price');
     }
 }

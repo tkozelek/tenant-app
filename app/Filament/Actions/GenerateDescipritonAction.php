@@ -2,6 +2,7 @@
 
 namespace App\Filament\Actions;
 
+use Closure;
 use Filament\Actions\Action;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Component;
@@ -17,6 +18,8 @@ class GenerateDescipritonAction extends Action
     private ?string $context = 'produkt';
 
     private string $title = 'name';
+
+    private ?Closure $extraContextResolver = null;
 
     public static function getDefaultName(): ?string
     {
@@ -44,6 +47,13 @@ class GenerateDescipritonAction extends Action
         return $this;
     }
 
+    public function extraContext(Closure $fn): static
+    {
+        $this->extraContextResolver = $fn;
+
+        return $this;
+    }
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -67,10 +77,18 @@ class GenerateDescipritonAction extends Action
                     return;
                 }
 
+                $extraContext = '';
+                if ($this->extraContextResolver) {
+                    $resolved = ($this->extraContextResolver)($get);
+                    if (! empty($resolved)) {
+                        $extraContext = ' '.$resolved;
+                    }
+                }
+
                 try {
                     $prompt = $currentContent
-                        ? "Si expert na e-commerce. Tu je návrh popisu pre {$this->context} '{$title}': '{$currentContent}'. Vylepši ho, aby bol profesionálny a pútavý v slovenčine. Vráť VÝHRADNE platný HTML kód."
-                        : "Si expert na e-commerce. Napíš pútavý popis pre {$this->context} '{$title}' v slovenčine. Vráť VÝHRADNE platný HTML kód.";
+                        ? "Si expert na e-commerce. Tu je návrh popisu pre {$this->context} '{$title}': '{$currentContent}'.{$extraContext} Vylepši ho, aby bol profesionálny a pútavý v slovenčine. Vráť VÝHRADNE platný HTML kód."
+                        : "Si expert na e-commerce. Napíš pútavý popis pre {$this->context} '{$title}' v slovenčine.{$extraContext} Vráť VÝHRADNE platný HTML kód.";
 
                     if (config('app.debug')) {
                         $prompt .= ' Debug verzia, vloz len 100 znakov max. But use Headings tags etc for testing. And append DEBUG at the end.';

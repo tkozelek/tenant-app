@@ -12,7 +12,7 @@ class Coupon extends Model
     use HasFactory;
 
     protected $fillable = [
-        'tenant_id', 'code', 'discount_type', 'value',
+        'tenant_id', 'code', 'description', 'discount_type', 'value',
         'min_order_amount', 'usage_limit', 'used_count',
         'starts_at', 'expires_at', 'is_active',
     ];

@@ -2,12 +2,17 @@
 
 namespace App\Filament\Admin\Resources\Coupons\Schemas;
 
+use App\Filament\Actions\GenerateDescipritonAction;
+use App\Models\Category;
+use App\Models\TenantProductVariant;
 use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 
 class CouponForm
@@ -35,6 +40,34 @@ class CouponForm
                                         return $rule->where('tenant_id', request()->input('tenant_id'));
                                     })
                                     ->extraInputAttributes(['onChange' => 'this.value = this.value.toUpperCase()']),
+
+                                RichEditor::make('description')
+                                    ->label('Popis')
+                                    ->nullable()
+                                    ->columnSpanFull()
+                                    ->hintAction(
+                                        GenerateDescipritonAction::make()
+                                            ->context('kupon')
+                                            ->title('code')
+                                            ->references('description')
+                                            ->extraContext(function (Get $get): string {
+                                                $parts = [];
+
+                                                $categoryIds = $get('categories') ?? [];
+                                                if (! empty($categoryIds)) {
+                                                    $names = Category::whereIn('id', $categoryIds)->pluck('name')->join(', ');
+                                                    $parts[] = "Kupon je aplikovatelny na kategorie: {$names}.";
+                                                }
+
+                                                $variantIds = $get('tenantProductVariants') ?? [];
+                                                if (! empty($variantIds)) {
+                                                    $names = TenantProductVariant::whereIn('id', $variantIds)->pluck('name')->join(', ');
+                                                    $parts[] = "Kupon je aplikovatelny na varianty produktov: {$names}.";
+                                                }
+
+                                                return implode(' ', $parts);
+                                            })
+                                    ),
                             ]),
                         Section::make('Detail')
                             ->schema([

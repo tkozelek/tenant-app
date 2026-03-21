@@ -54,14 +54,14 @@ class TenantProductVariantSeeder extends Seeder
     private function generatePriceHistory(TenantProductVariant $variant, float $initialPrice): void
     {
         $price = $initialPrice;
-        $date = Carbon::now()->subMonths(6);
+        $date = Carbon::now()->subMonths(24);
         $now = Carbon::now();
 
         $finalPrice = $initialPrice;
         $finalOriginalPrice = null;
 
         while (true) {
-            $daysToAdd = rand(15, 30);
+            $daysToAdd = rand(5, 15);
 
             if ($date->copy()->addDays($daysToAdd)->isAfter($now)) {
                 break;

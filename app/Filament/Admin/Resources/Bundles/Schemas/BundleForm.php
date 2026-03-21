@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\Bundles\Schemas;
 
 use App\Filament\Actions\GenerateDescipritonAction;
+use App\Models\Category;
 use App\Models\TenantProductVariant;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
@@ -34,7 +35,8 @@ class BundleForm
                                     ->required()
                                     ->label('Tenant')
                                     ->live()
-                                    ->columnSpanFull(),
+                                    ->columnSpanFull()
+                                    ->afterStateUpdated(fn (Set $set) => $set('items', [])),
                                 TextInput::make('name')
                                     ->label('Názov')
                                     ->required()
@@ -50,6 +52,45 @@ class BundleForm
                                             ->context('balik (bundle viacerych produktov)')
                                             ->title('name')
                                             ->references('description')
+                                            ->extraContext(function (Get $get): string {
+                                                $parts = [];
+
+                                                $items = $get('items') ?? [];
+
+                                                $variantIds = collect($items)->pluck('tenant_product_variant_id')->filter()->toArray();
+
+                                                if (! empty($variantIds)) {
+                                                    $variantNames = TenantProductVariant::whereIn('id', $variantIds)->pluck('name', 'id');
+
+                                                    $productsList = [];
+
+                                                    foreach ($items as $item) {
+                                                        $id = $item['tenant_product_variant_id'] ?? null;
+                                                        $qty = $item['quantity'] ?? 1;
+
+                                                        if ($id && isset($variantNames[$id])) {
+                                                            $productsList[] = "{$qty}x {$variantNames[$id]}";
+                                                        }
+                                                    }
+
+                                                    if (! empty($productsList)) {
+                                                        $namesString = implode(', ', $productsList);
+                                                        $parts[] = "Bundle obsahuje tieto produkty: {$namesString}.";
+                                                    }
+                                                }
+
+                                                $origPrice = $get('original_price');
+                                                if ($origPrice) {
+                                                    $parts[] = "Originálna cena: {$origPrice}€.";
+                                                }
+
+                                                $price = $get('price');
+                                                if ($price) {
+                                                    $parts[] = "Cena po zľave: {$price}€.";
+                                                }
+
+                                                return implode(' ', $parts);
+                                            })
                                     )
                                     ->columnSpanFull()
                                     ->label('Popis'),

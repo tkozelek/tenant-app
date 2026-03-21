@@ -7,13 +7,12 @@ use App\Models\Category;
 use App\Models\GlobalProduct;
 use App\Models\GlobalProductRequest;
 use Filament\Actions\Action;
-use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Notifications\Notification;
 use Filament\Schemas\Components\Utilities\Set;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class ApproveAndCreateAction extends Action
@@ -60,27 +59,26 @@ class ApproveAndCreateAction extends Action
                             ->references('description')
                     ),
 
-                FileUpload::make('media')
+                SpatieMediaLibraryFileUpload::make('request_images')
+                    ->collection('request_images')
                     ->multiple()
-                    ->disk('public')
                     ->reorderable()
-                    ->panelLayout('compact')
-                    ->directory('temp-media')
+                    ->image()
+                    ->panelLayout('grid')
+                    ->visibility('public')
+                    ->label('Obrázky zo žiadosti')
+                    ->helperText('Obrázky nahrané tenantom. Budú skopírované ku globálnemu produktu.')
                     ->columnSpanFull(),
             ])
             ->action(function (array $data, GlobalProductRequest $record) {
-                $mediaPaths = $data['media'] ?? [];
-                unset($data['media']);
+                unset($data['request_images']);
 
                 $data['is_active'] = true;
                 $globalProduct = GlobalProduct::create($data);
 
-                foreach ($mediaPaths as $path) {
-                    $globalProduct->addMediaFromDisk($path, 'public')
-                        ->toMediaCollection('global_products');
-
-                    Storage::disk('public')->delete($path);
-                }
+                $record->getMedia('request_images')->each(
+                    fn ($media) => $media->copy($globalProduct, 'global_products')
+                );
 
                 $record->update([
                     'status' => 'approved',
