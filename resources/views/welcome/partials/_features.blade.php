@@ -1,47 +1,47 @@
-<section id="features" class="py-24 bg-gray-50 dark:bg-gray-900/50">
+<section id="features" class="py-24 bg-neutral-50 dark:bg-neutral-900/40">
     <div class="container mx-auto px-4">
-        <div class="text-center max-w-3xl mx-auto mb-16">
-            <h2 class="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-                Všetko, čo potrebujete pre váš e-shop
+
+        <div class="max-w-xl mb-14">
+            <h2 class="text-2xl md:text-3xl font-bold text-neutral-900 dark:text-white mb-3">
+                Čo systém rieši
             </h2>
-            <p class="text-lg text-gray-600 dark:text-gray-400">
-                Naša platforma vám poskytuje robustné nástroje na správu produktov, zákazníkov a predajov v modernom rozhraní.
+            <p class="text-neutral-500 dark:text-neutral-400">
+                Platforma pre obchodníkov, ktorí spravujú viac ako jeden obchod — alebo plánujú rásť.
             </p>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <!-- Feature 1 -->
-            <div class="bg-white dark:bg-gray-900 p-8 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
-                <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-6 text-xl">
-                    <i class="fa-solid fa-bolt"></i>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+            <div class="bg-white dark:bg-neutral-900 p-7 rounded-xl border border-neutral-200 dark:border-neutral-800">
+                <div class="w-10 h-10 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-300 mb-5">
+                    <i class="fa-solid fa-layer-group text-sm"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Rýchly štart</h3>
-                <p class="text-gray-600 dark:text-gray-400">
-                    Vytvorte si účet a začnite predávať v priebehu niekoľkých minút. Žiadne zložité nastavovanie.
+                <h3 class="text-base font-semibold text-neutral-900 dark:text-white mb-2">Globálny katalóg</h3>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed">
+                    Produkty definujete raz a priradíte ich k ľubovoľnému obchodu. Zmena sa prejaví všade naraz.
                 </p>
             </div>
 
-            <!-- Feature 2 -->
-            <div class="bg-white dark:bg-gray-900 p-8 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
-                <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-6 text-xl">
-                    <i class="fa-solid fa-layer-group"></i>
+            <div class="bg-white dark:bg-neutral-900 p-7 rounded-xl border border-neutral-200 dark:border-neutral-800">
+                <div class="w-10 h-10 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-300 mb-5">
+                    <i class="fa-solid fa-store text-sm"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Globálny katalóg</h3>
-                <p class="text-gray-600 dark:text-gray-400">
-                    Zdieľajte produkty naprieč viacerými obchodmi a spravujte ich z jedného centrálneho miesta.
+                <h3 class="text-base font-semibold text-neutral-900 dark:text-white mb-2">Viacero obchodov</h3>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed">
+                    Každý tenant má vlastné prostredie, používateľov a nastavenia. Oddelene, ale pod jednou strechou.
                 </p>
             </div>
 
-            <!-- Feature 3 -->
-            <div class="bg-white dark:bg-gray-900 p-8 rounded-2xl border border-gray-100 dark:border-gray-800 shadow-sm hover:shadow-md transition-shadow">
-                <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-900/30 rounded-xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 mb-6 text-xl">
-                    <i class="fa-solid fa-shield-halved"></i>
+            <div class="bg-white dark:bg-neutral-900 p-7 rounded-xl border border-neutral-200 dark:border-neutral-800">
+                <div class="w-10 h-10 rounded-lg bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-300 mb-5">
+                    <i class="fa-solid fa-chart-line text-sm"></i>
                 </div>
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white mb-3">Bezpečnosť</h3>
-                <p class="text-gray-600 dark:text-gray-400">
-                    Vaše dáta sú u nás v bezpečí. Používame najmodernejšie technológie na ochranu vašich informácií.
+                <h3 class="text-base font-semibold text-neutral-900 dark:text-white mb-2">Prehľad cien</h3>
+                <p class="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed">
+                    História cien produktov s grafmi a tabuľkami. Vidíte, čo sa mení a kedy.
                 </p>
             </div>
+
         </div>
     </div>
 </section>
