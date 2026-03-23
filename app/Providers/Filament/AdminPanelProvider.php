@@ -29,6 +29,7 @@ class AdminPanelProvider extends PanelProvider
             ->default()
             ->id('admin')
             ->path('admin')
+            ->brandUrl(fn () => route('dashboard.index'))
             ->databaseNotifications()
             ->login()
             ->colors([
