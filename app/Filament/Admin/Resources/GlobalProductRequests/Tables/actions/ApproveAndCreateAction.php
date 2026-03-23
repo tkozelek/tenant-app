@@ -85,6 +85,15 @@ class ApproveAndCreateAction extends Action
                     'created_global_product_id' => $globalProduct->id,
                 ]);
 
+                $tenantUsers = $record->tenant->allUsers()->get();
+
+                Notification::make()
+                    ->title('Žiadosť o produkt schválená')
+                    ->body("Váš produkt \"{$record->suggested_name}\" bol schválený a pridaný do globálneho katalógu.")
+                    ->success()
+                    ->icon('heroicon-o-check-badge')
+                    ->sendToDatabase($tenantUsers);
+
                 Notification::make()->title('Globalny produkt vytvoreny, request upraveny.')->success()->send();
             });
     }
