@@ -3,14 +3,21 @@
 namespace App\Filament\Admin\Resources\TenantProducts\Schemas;
 
 use App\Filament\Actions\GenerateDescipritonAction;
+use App\Filament\Admin\Resources\GlobalProducts\GlobalProductResource;
 use App\Models\GlobalProduct;
+use App\Models\TenantProduct;
+use Filament\Actions\Action;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class TenantProductForm
 {
@@ -22,7 +29,18 @@ class TenantProductForm
                     ->schema([
                         TextInput::make('name')
                             ->required()
-                            ->maxLength(255),
+                            ->maxLength(255)
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
+
+                        TextInput::make('slug')
+                            ->required()
+                            ->maxLength(255)
+                            ->rules([
+                                fn (Get $get, ?TenantProduct $record): \Illuminate\Validation\Rules\Unique => Rule::unique('tenant_products', 'slug')
+                                    ->where('tenant_id', $get('tenant_id'))
+                                    ->ignore($record?->id),
+                            ]),
                         RichEditor::make('description')
                             ->required()
                             ->columnSpanFull()
@@ -65,7 +83,14 @@ class TenantProductForm
                                         $set('description', $globalProduct->description);
                                     }
                                 }
-                            }),
+                            })
+                            ->suffixAction(
+                                Action::make('requestGlobalProduct')
+                                    ->label('Vytvoriť nový globálný produkt')
+                                    ->icon('heroicon-o-plus-circle')
+                                    ->color('info')
+                                    ->url(fn (): string => GlobalProductResource::getUrl('create'))
+                            ),
                     ])->columns(),
             ]);
     }
