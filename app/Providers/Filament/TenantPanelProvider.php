@@ -30,8 +30,14 @@ class TenantPanelProvider extends PanelProvider
         return $panel
             ->id('tenant')
             ->path('tenant')
-            ->brandUrl(fn () => route('dashboard.index'))
             ->tenant(Tenant::class, slugAttribute: 'slug')
+            ->searchableTenantMenu()
+            ->brandName(function (): string {
+                $tenantId = getPermissionsTeamId();
+                return Tenant::find($tenantId)?->name ?? 'Tenant';
+            })
+            ->searchableTenantMenu()
+            ->homeUrl(fn() => route('dashboard.index'))
             ->colors([
                 'primary' => Color::Amber,
             ])

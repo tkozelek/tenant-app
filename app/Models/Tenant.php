@@ -3,6 +3,8 @@
 namespace App\Models;
 
 use Filament\Models\Contracts\HasName;
+use Filament\Panel\Concerns\HasBrandName;
+use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -13,8 +15,8 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Tenant extends Model implements HasMedia, HasName
 {
-    /** @use HasFactory<\Database\Factories\TenantFactory> */
     use HasFactory;
+    use HasBrandName;
 
     use InteractsWithMedia;
 
@@ -83,5 +85,10 @@ class Tenant extends Model implements HasMedia, HasName
     public function getTitleImageUrl(): ?string
     {
         return $this->getFirstMediaUrl('titles');
+    }
+
+    public function getBrandName(): string | Htmlable
+    {
+        return "Tenant - {$this->name}";
     }
 }
