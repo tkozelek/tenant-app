@@ -70,23 +70,20 @@ class TenantProduct extends Model implements HasMedia
 
     public function getLowestCurrentPriceAttribute(): ?float
     {
-        return TenantProductVariant::whereHas('tenantProduct', function ($query) {
-            $query->where('global_product_id', $this->id);
-        })
+        return $this->variants()
             ->where('stock_quantity', '>', 0)
-            ->min('price');
+            ->get()
+            ->map(fn ($v) => $v->currentPrice())
+            ->filter()
+            ->min();
     }
 
-    /**
-     * Vráti najlacnejsi variant tenanta
-     */
     public function getCheapestVariant(): ?TenantProductVariant
     {
-        return TenantProductVariant::whereHas('tenantProduct', function ($query) {
-            $query->where('global_product_id', $this->id);
-        })
+        return $this->variants()
             ->where('stock_quantity', '>', 0)
-            ->orderBy('price', 'asc')
+            ->get()
+            ->sortBy(fn ($v) => $v->currentPrice() ?? PHP_INT_MAX)
             ->first();
     }
 }
