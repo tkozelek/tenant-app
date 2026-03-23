@@ -5,49 +5,66 @@ namespace App\Policies;
 use App\Models\Tenant;
 use App\Models\TenantProduct;
 use App\Models\User;
+use Filament\Facades\Filament;
 
 class TenantProductPolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('tenant.access') || $user->hasPermissionTo('products.view_any');
+        if ($user->hasPermissionTo('catalog.manage') || $user->hasPermissionTo('products.view_any')) {
+            return true;
+        }
+
+        $tenant = Filament::getTenant();
+
+        if ($tenant) {
+            return $user->hasPermissionToOnTenant('tenant.products.view_any', $tenant->id);
+        }
+
+        return false;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, TenantProduct $tenantProduct): bool
     {
-        return $user->hasPermissionToOnTenant('tenant.access', $tenantProduct->tenant_id) || $user->hasPermissionTo('products.view_any');
+        return $user->hasPermissionTo('catalog.manage')
+            || $user->hasPermissionTo('products.view_any')
+            || $user->hasPermissionToOnTenant('tenant.products.view_any', $tenantProduct->tenant_id);
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
-        return  $user->hasPermissionTo('products.create') || $user->hasPermissionTo('tenant.products.manage');
+        if ($user->hasPermissionTo('catalog.manage') || $user->hasPermissionTo('products.create')) {
+            return true;
+        }
+
+        $tenant = Filament::getTenant();
+
+        if ($tenant) {
+            return $user->hasPermissionToOnTenant('tenant.products.create', $tenant->id);
+        }
+
+        return false;
     }
 
     public function createForTenant(User $user, Tenant $tenant): bool
     {
-        return  $user->hasPermissionTo('products.create') || $user->hasPermissionToOnTenant('tenant.products.manage', $tenant->id);
+        return $user->hasPermissionTo('catalog.manage')
+            || $user->hasPermissionTo('products.create')
+            || $user->hasPermissionToOnTenant('tenant.products.create', $tenant->id);
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, TenantProduct $tenantProduct): bool
     {
-        return $user->hasPermissionTo('products.update') || $user->hasPermissionToOnTenant('tenant.products.manage', $tenantProduct->tenant_id);
+        return $user->hasPermissionTo('catalog.manage')
+            || $user->hasPermissionTo('products.update')
+            || $user->hasPermissionToOnTenant('tenant.products.update', $tenantProduct->tenant_id);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, TenantProduct $tenantProduct): bool
     {
-        return $user->hasPermissionTo('products.delete') || $user->hasPermissionToOnTenant('tenant.products.manage', $tenantProduct->tenant_id);
+        return $user->hasPermissionTo('catalog.manage')
+            || $user->hasPermissionTo('products.delete')
+            || $user->hasPermissionToOnTenant('tenant.products.delete', $tenantProduct->tenant_id);
     }
 
     public function exportAny(User $user): bool

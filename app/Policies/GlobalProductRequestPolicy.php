@@ -4,56 +4,52 @@ namespace App\Policies;
 
 use App\Models\GlobalProductRequest;
 use App\Models\User;
+use Filament\Facades\Filament;
 
 class GlobalProductRequestPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
     public function viewAny(User $user): bool
     {
         if ($user->hasPermissionTo('catalog.manage')) {
             return true;
         }
 
-        return $user->hasPermissionTo('tenant.products.manage');
+        $tenant = Filament::getTenant();
+
+        if ($tenant) {
+            return $user->hasPermissionToOnTenant('tenant.requests.view_any', $tenant->id);
+        }
+
+        return false;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, GlobalProductRequest $globalProductRequest): bool
     {
-        if ($user->hasPermissionTo('catalog.manage')) {
-            return true;
-        }
-
-        return $user->hasPermissionToOnTenant('tenant.products.manage', $globalProductRequest->tenant_id);
+        return $user->hasPermissionTo('catalog.manage')
+            || $user->hasPermissionToOnTenant('tenant.requests.view_any', $globalProductRequest->tenant_id);
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('tenant.products.manage');
-    }
-
-    /**
-     * Determine whether the user can update the model.
-     */
-    public function update(User $user, GlobalProductRequest $globalProductRequest): bool
-    {
         if ($user->hasPermissionTo('catalog.manage')) {
             return true;
         }
 
-        return $user->hasPermissionToOnTenant('tenant.products.manage', $globalProductRequest->tenant_id);
+        $tenant = Filament::getTenant();
+
+        if ($tenant) {
+            return $user->hasPermissionToOnTenant('tenant.requests.create', $tenant->id);
+        }
+
+        return false;
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
+    public function update(User $user, GlobalProductRequest $globalProductRequest): bool
+    {
+        return $user->hasPermissionTo('catalog.manage')
+            || $user->hasPermissionToOnTenant('tenant.requests.update', $globalProductRequest->tenant_id);
+    }
+
     public function delete(User $user, GlobalProductRequest $globalProductRequest): bool
     {
         return $user->hasPermissionTo('catalog.manage');

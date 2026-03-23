@@ -4,46 +4,55 @@ namespace App\Policies;
 
 use App\Models\TenantProductVariant;
 use App\Models\User;
+use Filament\Facades\Filament;
 
 class TenantProductVariantPolicy
 {
-    /**
-     * Determine whether the user can view any models.
-     */
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('catalog.manage');
+        if ($user->hasPermissionTo('catalog.manage')) {
+            return true;
+        }
+
+        $tenant = Filament::getTenant();
+
+        if ($tenant) {
+            return $user->hasPermissionToOnTenant('tenant.variants.view_any', $tenant->id);
+        }
+
+        return false;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, TenantProductVariant $variant): bool
     {
-        return $user->hasPermissionTo('catalog.manage') || $user->hasPermissionToOnTenant('tenant.manage', $variant->product->tenant_id);
+        return $user->hasPermissionTo('catalog.manage')
+            || $user->hasPermissionToOnTenant('tenant.variants.view_any', $variant->product->tenant_id);
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('catalog.manage') || $user->hasPermissionTo('tenant.products.manage');
+        if ($user->hasPermissionTo('catalog.manage')) {
+            return true;
+        }
+
+        $tenant = Filament::getTenant();
+
+        if ($tenant) {
+            return $user->hasPermissionToOnTenant('tenant.variants.create', $tenant->id);
+        }
+
+        return false;
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
     public function update(User $user, TenantProductVariant $variant): bool
     {
-        return $user->hasPermissionTo('catalog.manage') || $user->hasPermissionToOnTenant('tenant.products.manage', $variant->product->tenant_id);
+        return $user->hasPermissionTo('catalog.manage')
+            || $user->hasPermissionToOnTenant('tenant.variants.update', $variant->product->tenant_id);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, TenantProductVariant $variant): bool
     {
-        return $user->hasPermissionTo('catalog.manage') || $user->hasPermissionToOnTenant('tenant.products.manage', $variant->product->tenant_id);
+        return $user->hasPermissionTo('catalog.manage')
+            || $user->hasPermissionToOnTenant('tenant.variants.delete', $variant->product->tenant_id);
     }
 }

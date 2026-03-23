@@ -85,15 +85,50 @@ class RoleSeeder extends Seeder
             'coupons.import',
         ];
 
-        $tenantPermissions = [
-            'tenant.owner',
+        $tenantGeneralPermissions = [
             'tenant.access',
             'tenant.settings',
             'tenant.update',
             'tenant.users.manage',
-            'tenant.products.manage',
             'tenant.reports.view',
         ];
+
+        $tenantProductPermissions = [
+            'tenant.products.view_any',
+            'tenant.products.create',
+            'tenant.products.update',
+            'tenant.products.delete',
+        ];
+
+        $tenantVariantPermissions = [
+            'tenant.variants.view_any',
+            'tenant.variants.create',
+            'tenant.variants.update',
+            'tenant.variants.delete',
+        ];
+
+        $tenantRequestPermissions = [
+            'tenant.requests.view_any',
+            'tenant.requests.create',
+            'tenant.requests.update',
+            'tenant.requests.delete',
+        ];
+
+        $tenantCouponPermissions = [
+            'tenant.coupons.view_any',
+            'tenant.coupons.create',
+            'tenant.coupons.update',
+            'tenant.coupons.delete',
+            'tenant.coupons.export',
+        ];
+
+        $tenantPermissions = array_merge(
+            $tenantGeneralPermissions,
+            $tenantProductPermissions,
+            $tenantVariantPermissions,
+            $tenantRequestPermissions,
+            $tenantCouponPermissions,
+        );
 
         $allPermissions = array_merge(
             $platformPermissions,
@@ -162,11 +197,13 @@ class RoleSeeder extends Seeder
                 'description' => 'Zabezpečuje organizáciu prevádzky, kompletne spravuje produkty, kategórie a prezerá štatistiky skladu.',
             ]
         );
-        $shopManager->syncPermissions([
-            'tenant.access',
-            'tenant.products.manage',
-            'tenant.reports.view',
-        ]);
+        $shopManager->syncPermissions(array_merge(
+            $tenantGeneralPermissions,
+            $tenantProductPermissions,
+            $tenantVariantPermissions,
+            $tenantRequestPermissions,
+            $tenantCouponPermissions,
+        ));
 
         $productStaff = Role::firstOrCreate(
             [
@@ -177,10 +214,12 @@ class RoleSeeder extends Seeder
                 'description' => 'Zodpovedá za evidenciu, pridávanie a aktualizáciu informácií o produktoch v systéme.',
             ]
         );
-        $productStaff->syncPermissions([
-            'tenant.access',
-            'tenant.products.manage',
-        ]);
+        $productStaff->syncPermissions(array_merge(
+            ['tenant.access', 'tenant.reports.view'],
+            $tenantProductPermissions,
+            $tenantVariantPermissions,
+            $tenantRequestPermissions,
+        ));
 
         $warehouseStaff = Role::firstOrCreate(
             [
@@ -193,7 +232,9 @@ class RoleSeeder extends Seeder
         );
         $warehouseStaff->syncPermissions([
             'tenant.access',
-            'tenant.products.manage',
+            'tenant.products.view_any',
+            'tenant.variants.view_any',
+            'tenant.variants.update',
         ]);
 
         $user = User::firstOrCreate(
