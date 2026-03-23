@@ -31,6 +31,7 @@ class TenantProductSeeder extends Seeder
 
                 $tenantProduct = TenantProduct::create([
                     'tenant_id' => $tenantId,
+                    'slug' => str($name)->slug(),
                     'global_product_id' => $globalProduct?->id,
                     'global_product_request_id' => null,
                     'name' => $name,

@@ -34,10 +34,11 @@ class TenantPanelProvider extends PanelProvider
             ->searchableTenantMenu()
             ->brandName(function (): string {
                 $tenantId = getPermissionsTeamId();
+
                 return Tenant::find($tenantId)?->name ?? 'Tenant';
             })
             ->searchableTenantMenu()
-            ->homeUrl(fn() => route('dashboard.index'))
+            ->homeUrl(fn () => route('dashboard.index'))
             ->colors([
                 'primary' => Color::Amber,
             ])

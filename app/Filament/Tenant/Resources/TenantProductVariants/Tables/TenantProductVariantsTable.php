@@ -20,12 +20,14 @@ class TenantProductVariantsTable
 
         return $table->toolbarActions([
             ExportAction::make()
+                ->label('Export')
                 ->exporter(TenantProductVariantExporter::class)
                 ->modifyQueryUsing(fn ($query) => $query->whereHas(
                     'product',
                     fn ($q) => $q->where('tenant_id', Filament::getTenant()?->id)
                 )),
             ImportAction::make()
+                ->label('Import')
                 ->importer(TenantProductVariantImporter::class)
                 ->options(fn () => ['tenant_id' => Filament::getTenant()?->id]),
             BulkActionGroup::make([

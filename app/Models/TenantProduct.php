@@ -6,19 +6,37 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
 class TenantProduct extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\TenantProductFactory> */
-    use HasFactory, InteractsWithMedia;
+    use HasFactory, InteractsWithMedia, LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'slug', 'description', 'is_active'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('tenant_product');
+    }
+
+    public function tapActivity(Activity $activity): void
+    {
+        $activity->tenant_id = $this->tenant_id;
+    }
 
     protected $fillable = [
         'tenant_id',
         'global_product_id',
         'global_product_request_id',
         'name',
+        'slug',
         'description',
         'is_active',
     ];

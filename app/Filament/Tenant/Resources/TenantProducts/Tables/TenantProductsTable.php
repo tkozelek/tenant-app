@@ -69,9 +69,11 @@ class TenantProductsTable
             ])
             ->toolbarActions([
                 ExportAction::make()
+                    ->label('Export')
                     ->exporter(TenantProductExporter::class)
                     ->modifyQueryUsing(fn ($query) => $query->where('tenant_id', Filament::getTenant()?->id)),
                 ImportAction::make()
+                    ->label('Import')
                     ->importer(TenantProductImporter::class)
                     ->options(fn () => ['tenant_id' => Filament::getTenant()?->id]),
                 BulkActionGroup::make([

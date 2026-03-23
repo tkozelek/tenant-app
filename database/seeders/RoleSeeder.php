@@ -91,6 +91,7 @@ class RoleSeeder extends Seeder
             'tenant.update',
             'tenant.users.manage',
             'tenant.reports.view',
+            'tenant.activity_log.view',
         ];
 
         $tenantProductPermissions = [

@@ -15,12 +15,23 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
 
 class User extends Authenticatable implements FilamentUser, HasName, HasTenants
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, HasRoles, Notifiable;
+    use HasFactory, HasRoles, LogsActivity, Notifiable;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['first_name', 'last_name', 'email'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('user');
+    }
 
     /**
      * The attributes that are mass assignable.
@@ -142,7 +153,21 @@ class User extends Authenticatable implements FilamentUser, HasName, HasTenants
 
     public function getFilamentName(): string
     {
-        return "{$this->first_name} {$this->last_name}";
+        $name = "{$this->first_name} {$this->last_name}";
+
+        if (app('filament')->getTenant()) {
+            $tenant = app('filament')->getTenant();
+
+            $role = $this->roles()->wherePivot('tenant_id', $tenant->id)->first();
+
+            if ($role) {
+                $name .= ' ('.str($role->name)->title().')';
+            } elseif ($this->id === $tenant->owner_id) {
+                $name .= ' (Owner)';
+            }
+        }
+
+        return $name;
     }
 
     public function getTenants(Panel $panel): array|Collection
@@ -153,6 +178,8 @@ class User extends Authenticatable implements FilamentUser, HasName, HasTenants
     public function canAccessTenant(Model $tenant): bool
     {
         return $tenant->owner_id === $this->id
-            || $this->tenants()->whereKey($tenant)->exists();
+            || once(function () use ($tenant) {
+                return $this->tenants()->whereKey($tenant)->exists();
+            });
     }
 }

@@ -3,7 +3,6 @@
 namespace App\Filament\Admin\Resources\Bundles\Schemas;
 
 use App\Filament\Actions\GenerateDescipritonAction;
-use App\Models\Category;
 use App\Models\TenantProductVariant;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;

@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 
@@ -17,7 +20,21 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 class TenantProductVariant extends Model implements HasMedia
 {
     /** @use HasFactory<\Database\Factories\TenantProductVariantFactory> */
-    use HasFactory, InteractsWithMedia;
+    use HasFactory, InteractsWithMedia, LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'sku', 'ean', 'price', 'original_price', 'stock_quantity'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('variant');
+    }
+
+    public function tapActivity(Activity $activity): void
+    {
+        $activity->tenant_id = $this->product?->tenant_id;
+    }
 
     protected $fillable = [
         'name',

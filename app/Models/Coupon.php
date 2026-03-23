@@ -6,10 +6,27 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Models\Activity;
+use Spatie\Activitylog\Traits\LogsActivity;
 
 class Coupon extends Model
 {
-    use HasFactory;
+    use HasFactory, LogsActivity;
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['code', 'discount_type', 'value', 'min_order_amount', 'usage_limit', 'starts_at', 'expires_at', 'is_active'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('coupon');
+    }
+
+    public function tapActivity(Activity $activity): void
+    {
+        $activity->tenant_id = $this->tenant_id;
+    }
 
     protected $fillable = [
         'tenant_id', 'code', 'description', 'discount_type', 'value',

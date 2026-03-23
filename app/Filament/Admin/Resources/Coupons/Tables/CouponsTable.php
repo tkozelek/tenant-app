@@ -2,10 +2,12 @@
 
 namespace App\Filament\Admin\Resources\Coupons\Tables;
 
+use App\Filament\Exports\CouponExporter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
+use Filament\Actions\ExportBulkAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\Filter;
@@ -96,6 +98,9 @@ class CouponsTable
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
+                    ExportBulkAction::make()
+                        ->exporter(CouponExporter::class)
+                        ->authorize('exportAny'),
                 ]),
             ]);
     }
