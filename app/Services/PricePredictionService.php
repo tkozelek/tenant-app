@@ -10,9 +10,14 @@ class PricePredictionService
 {
     public function predict(Model $record, int $daysAhead = 60): array
     {
-        $histories = $record->priceHistories()->orderBy('valid_from')->get();
+        $histories = $record->priceHistories()
+            ->reorder()
+            ->latest('valid_from')
+            ->limit(500)
+            ->get()
+            ->sortBy('valid_from')
+            ->values();
 
-        // aspon 3 data
         if ($histories->count() < 3) {
             return ['labels' => [], 'values' => []];
         }
