@@ -23,7 +23,7 @@ class QuantityPriceRepeater
                 $minQuantity = $state['min_quantity'] ?? 0;
                 $maxQuantity = $state['max_quantity'] ?? '';
 
-                return sprintf('%s ks - %s => %s €', $minQuantity, $maxQuantity, $state['unit_price']);
+                return sprintf('%s ks - %s => %s €', $minQuantity, $maxQuantity, $state['price']);
             })
             ->rules([
                 fn () => function (string $attribute, $value, \Closure $fail) {
@@ -55,6 +55,10 @@ class QuantityPriceRepeater
                         $min = (int) ($item['min_quantity'] ?? 0);
                         $max = ! empty($item['max_quantity']) ? (int) $item['max_quantity'] : null;
                         $isLast = ($index === $totalItems - 1);
+
+                        if ($index === 0 && $min !== 1) {
+                            $fail('Prvá cenová hladina musí začínať od 1 ks.');
+                        }
 
                         // last one
                         if ($isLast && $max !== null) {
@@ -121,7 +125,7 @@ class QuantityPriceRepeater
                         },
                     ]),
 
-                TextInput::make('unit_price')
+                TextInput::make('price')
                     ->label('Cena za kus')
                     ->required()
                     ->numeric()

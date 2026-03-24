@@ -2,7 +2,8 @@
 
 namespace App\Filament\Admin\Widgets;
 
-use App\Models\TenantProductVariant;
+use App\Models\GlobalProduct;
+use App\Models\PriceHistory;
 use App\Services\PricePredictionService;
 use Carbon\Carbon;
 use Filament\Forms\Components\Select;
@@ -10,21 +11,21 @@ use Filament\Schemas\Schema;
 use Filament\Widgets\ChartWidget;
 use Filament\Widgets\ChartWidget\Concerns\HasFiltersSchema;
 
-class PriceHistoryChart extends ChartWidget
+class GlobalProductPriceHistoryChart extends ChartWidget
 {
     use HasFiltersSchema;
 
-    protected ?string $heading = 'Vyvoj ceny';
-
-    // https://filamentphp.com/docs/5.x/widgets/charts
-
-    public ?TenantProductVariant $record = null;
+    protected ?string $heading = 'Vývoj ceny pod produktov';
 
     protected static bool $isDiscovered = false;
 
+    protected static bool $isLazy = false;
+
     protected ?string $maxHeight = '400px';
 
-    //    protected string $color = 'success';
+    protected int|string|array $columnSpan = 'full';
+
+    public ?GlobalProduct $record = null;
 
     protected function getData(): array
     {
@@ -32,60 +33,75 @@ class PriceHistoryChart extends ChartWidget
             return ['datasets' => [], 'labels' => []];
         }
 
+        $variantIds = $this->record->variants()->pluck('tenant_product_variants.id');
+
+        if ($variantIds->isEmpty()) {
+            return ['datasets' => [], 'labels' => []];
+        }
+
+        $period = $this->filters['period'] ?? 'all';
+        $isLongPeriod = in_array($period, ['365', 'all']);
+
+        $baseQuery = PriceHistory::query()
+            ->whereIn('tenant_product_variant_id', $variantIds);
+
+        if ($period !== 'all') {
+            $baseQuery->where('valid_from', '>=', Carbon::now()->subDays((int) $period));
+        }
+
+        // Aggregate at DB level to avoid loading individual rows
+        $dailyAggregates = (clone $baseQuery)
+            ->selectRaw('DATE(valid_from) as date, AVG(price) as avg_price')
+            ->groupBy('date')
+            ->orderBy('date')
+            ->get();
+
+        if ($dailyAggregates->isEmpty()) {
+            return ['datasets' => [], 'labels' => []];
+        }
+
         $predictionService = app(PricePredictionService::class);
 
-        $query = $this->record->priceHistories()->orderBy('valid_from');
-        $startDate = null;
+        $grouped = $dailyAggregates
+            ->groupBy(fn ($row) => $isLongPeriod
+                ? Carbon::parse($row->date)->startOfWeek()->format('d.m.Y')
+                : Carbon::parse($row->date)->format('d.m.Y')
+            )
+            ->map(fn ($group) => round($group->avg('avg_price'), 2));
 
-        $history = $this->filters['history'] ?? 'all';
-        // date filter
-        if ($history !== 'all') {
-            $startDate = Carbon::now()->subDays((int) $history);
-            $query->where('valid_from', '>=', $startDate);
-        }
-
-        $histories = $query->get();
-
-        $priceData = [];
-        $originalPriceData = [];
-        $labels = [];
-
-        // ak je date filter, nech neoreze zaciatok
-        if ($startDate) {
-            $previousPrice = $this->record->priceHistories()
-                ->where('valid_from', '<', $startDate)
-                ->orderByDesc('valid_from')
-                ->first();
-
-            if ($previousPrice) {
-                $priceData[] = $previousPrice->price;
-                $originalPriceData[] = $previousPrice->original_price;
-                $labels[] = $startDate->format('d.m.Y H:i');
-            }
-        }
-
-        foreach ($histories as $history) {
-            $priceData[] = $history->price;
-            $originalPriceData[] = $history->original_price;
-            $labels[] = Carbon::parse($history->valid_from)->format('d.m.Y H:i');
-        }
+        $labels = $grouped->keys()->toArray();
+        $priceData = $grouped->values()->toArray();
 
         if (! empty($priceData)) {
             $priceData[] = end($priceData);
-            $originalPriceData[] = end($originalPriceData);
-            $labels[] = Carbon::now()->format('d.m.Y H:i');
+            $labels[] = Carbon::now()->format('d.m.Y');
         }
 
-        // predikcia - dlzka sa berie z filtersSchema selectu, max 90 dni
-        $predictionDays = min(90, max(14, (int) ($this->filters['prediction_days'] ?? 60)));
-        $prediction = $predictionService->predict($this->record, $predictionDays);
+        // For prediction: use most recent 500 days of full history, aggregated at DB level
+        $allHistories = PriceHistory::query()
+            ->selectRaw('DATE(valid_from) as date, AVG(price) as avg_price')
+            ->whereIn('tenant_product_variant_id', $variantIds)
+            ->groupBy('date')
+            ->orderByDesc('date')
+            ->limit(500)
+            ->get()
+            ->sortBy('date')
+            ->values()
+            ->map(fn ($row) => [
+                'timestamp' => Carbon::parse($row->date)->startOfWeek()->unix(),
+                'price' => round((float) $row->avg_price, 2),
+            ])
+            ->toArray();
 
+        $predictionDays = min(90, max(14, (int) ($this->filters['prediction_days'] ?? 60)));
+        $prediction = $predictionService->predictFromDataPoints($allHistories, $predictionDays);
+
+        // chartjs mapovanie hodnot.. treba spravit array rovnakej dlzky + nech pokracuje.. idk why
         $predictionDataset = array_fill(0, count($labels) - 1, null);
         $predictionDataset[] = ! empty($priceData) ? (float) end($priceData) : null;
 
         foreach ($prediction['values'] as $value) {
             $priceData[] = null;
-            $originalPriceData[] = null;
             $predictionDataset[] = $value;
         }
 
@@ -94,7 +110,7 @@ class PriceHistoryChart extends ChartWidget
         return [
             'datasets' => [
                 [
-                    'label' => 'Cena (€)',
+                    'label' => 'Priemerná cena (€)',
                     'data' => $priceData,
                     'stepped' => true,
                     'fill' => 'origin',
@@ -107,22 +123,6 @@ class PriceHistoryChart extends ChartWidget
                     'pointBorderWidth' => 2,
                     'pointRadius' => 4,
                     'pointHoverRadius' => 6,
-                    'spanGaps' => false,
-                ],
-                [
-                    'label' => 'Orig. cena (€)',
-                    'data' => $originalPriceData,
-                    'stepped' => true,
-                    'fill' => false,
-                    'tension' => 0,
-                    'borderColor' => '#94a3b8',
-                    'borderDash' => [5, 5],
-                    'borderWidth' => 1.5,
-                    'pointBorderColor' => '#94a3b8',
-                    'pointBackgroundColor' => '#ffffff',
-                    'pointBorderWidth' => 1.5,
-                    'pointRadius' => 3,
-                    'pointHoverRadius' => 5,
                     'spanGaps' => false,
                 ],
                 [
@@ -174,27 +174,26 @@ class PriceHistoryChart extends ChartWidget
     public function filtersSchema(Schema $schema): Schema
     {
         return $schema->components([
+            Select::make('period')
+                ->label('Obdobie')
+                ->options([
+                    'all' => 'Cela historia',
+                    '30' => 'Poslednych 30 dno',
+                    '90' => 'Posledne 3 mesiace',
+                    '365' => 'Posledny rok',
+                ])
+                ->default('all')
+                ->selectablePlaceholder(false),
+
             Select::make('prediction_days')
-                ->label('Dlzka predikcie')
+                ->label('Dĺžka predikcie')
                 ->options([
                     '14' => '14 dni',
                     '30' => '30 dni',
                     '60' => '60 dni',
                     '90' => '90 dni',
                 ])
-                ->default('14')
-                ->selectablePlaceholder(false),
-
-            Select::make('history')
-                ->label('Historia cien')
-                ->options([
-                    'all' => 'Cela historia',
-                    '30' => 'Poslednych 30 dni',
-                    '90' => 'Posledne 3 mesiace',
-                    '180' => 'Posledne 6 mesiace',
-                    '365' => 'Posledny rok',
-                ])
-                ->default('all')
+                ->default('30')
                 ->selectablePlaceholder(false),
         ]);
     }

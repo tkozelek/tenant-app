@@ -3,22 +3,24 @@
 namespace App\Filament\Admin\Widgets;
 
 use App\Models\TenantProductVariant;
+use App\Services\StockRecommendationService;
 use Carbon\Carbon;
 use Filament\Widgets\ChartWidget;
 
 class StockHistoryChart extends ChartWidget
 {
-    protected ?string $heading = 'Vývoj zásob';
+    protected ?string $heading = 'Vyvoj zasob';
 
     public ?TenantProductVariant $record = null;
 
     protected static bool $isDiscovered = false;
 
-    protected int | string | array $columnSpan = 'full';
+    protected int|string|array $columnSpan = 'full';
 
     protected static bool $isLazy = false;
 
     protected ?string $maxHeight = '400px';
+
     public ?string $filter = 'all';
 
     protected string $color = 'warning';
@@ -27,9 +29,10 @@ class StockHistoryChart extends ChartWidget
 
     protected function getData(): array
     {
-        if (!$this->record) {
+        if (! $this->record) {
             return [];
         }
+
         $query = $this->record->stockHistories()->orderBy('created_at');
         $runningTotal = 0;
 
@@ -46,10 +49,7 @@ class StockHistoryChart extends ChartWidget
         $history = $query->get();
 
         if ($history->isEmpty()) {
-            return [
-                'datasets' => [],
-                'labels' => [],
-            ];
+            return ['datasets' => [], 'labels' => []];
         }
 
         $chartData = [];
@@ -61,19 +61,35 @@ class StockHistoryChart extends ChartWidget
             $labels[] = Carbon::parse($entry->created_at)->format('d.m.Y H:i');
         }
 
+        $recommendation = app(StockRecommendationService::class)->recommend($this->record);
+        $recommendedLine = array_fill(0, count($labels), $recommendation['level']);
+
         return [
             'datasets' => [
                 [
-                    'label' => 'Počet kusov na sklade',
+                    'label' => 'Pocet kusov',
                     'data' => $chartData,
-
-                    'stepped' => false,
-                    'fill' => true,
-                    'tension' => 0.2,
-
+                    'fill' => 'origin',
+                    'tension' => 0.3,
+                    'borderColor' => '#6366f1',
+                    'backgroundColor' => '#6366f11f',
+                    'borderWidth' => 2,
+                    'pointBorderColor' => '#6366f1',
+                    'pointBackgroundColor' => '#ffffff',
                     'pointBorderWidth' => 2,
                     'pointRadius' => 4,
                     'pointHoverRadius' => 6,
+                ],
+                [
+                    'label' => $recommendation['description'],
+                    'data' => $recommendedLine,
+                    'fill' => false,
+                    'tension' => 0,
+                    'borderColor' => '#ef4444',
+                    'borderDash' => [6, 4],
+                    'borderWidth' => 1.5,
+                    'pointRadius' => 0,
+                    'pointHoverRadius' => 0,
                 ],
             ],
             'labels' => $labels,
@@ -84,9 +100,24 @@ class StockHistoryChart extends ChartWidget
     {
         return [
             'maintainAspectRatio' => false,
-            'animation' => [
-                'duration' => 0,
+            'animation' => ['duration' => 300],
+            'scales' => [
+                'y' => [
+                    'grace' => '5%',
+                    'grid' => ['color' => '#94a3b814'],
+                ],
+                'x' => [
+                    'grid' => ['color' => '#94a3b814'],
+                ],
             ],
+            'plugins' => [
+                'legend' => [
+                    'position' => 'top',
+                    'labels' => ['usePointStyle' => true, 'padding' => 16],
+                ],
+                'tooltip' => ['mode' => 'index', 'intersect' => false],
+            ],
+            'interaction' => ['mode' => 'nearest', 'axis' => 'x', 'intersect' => false],
         ];
     }
 
@@ -98,10 +129,10 @@ class StockHistoryChart extends ChartWidget
     protected function getFilters(): ?array
     {
         return [
-            'all' => 'Celá história',
-            '30' => 'Posledných 30 dní',
-            '90' => 'Posledné 3 mesiace',
-            '365' => 'Posledný rok',
+            'all' => 'Cela historia',
+            '30' => 'Poslednych 30 dni',
+            '90' => 'Posledne 3 mesiace',
+            '365' => 'Posledny rok',
         ];
     }
 }
