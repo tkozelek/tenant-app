@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\TenantProducts\RelationManagers;
 
+use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustPriceAction;
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustStockAction;
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\HistoryAction;
 use App\Filament\Admin\Resources\TenantProductVariants\Schemas\TenantProductVariantForm;
@@ -43,6 +44,7 @@ class VariantsRelationManager extends RelationManager
                     ->label('Upraviť'),
                 DeleteAction::make()
                     ->label('Zmazať'),
+                AdjustPriceAction::make(),
                 AdjustStockAction::make(),
                 HistoryAction::make(),
             ])

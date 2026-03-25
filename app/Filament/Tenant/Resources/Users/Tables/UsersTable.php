@@ -88,6 +88,7 @@ class UsersTable
                             ->wherePivot('tenant_id', $tenantId)
                             ->detach();
                     })
+                    ->visible(fn (User $record): bool => $record->id !== Filament::getTenant()?->owner_id)
                     ->requiresConfirmation(),
             ])
             ->toolbarActions([

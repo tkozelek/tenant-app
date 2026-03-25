@@ -22,8 +22,10 @@ class TenantProductVariantExporter extends Exporter
             ExportColumn::make('sku')
                 ->label('SKU'),
             ExportColumn::make('ean'),
-            ExportColumn::make('price'),
-            ExportColumn::make('original_price'),
+            ExportColumn::make('current_price')
+                ->state(fn ($record) => $record->current_price),
+            ExportColumn::make('current_original_price')
+                ->state(fn ($record) => $record->current_original_price),
             ExportColumn::make('stock_quantity'),
             ExportColumn::make('created_at'),
             ExportColumn::make('updated_at'),

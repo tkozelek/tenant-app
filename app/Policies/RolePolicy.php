@@ -2,28 +2,45 @@
 
 namespace App\Policies;
 
+use App\Models\Role;
 use App\Models\User;
 
 class RolePolicy
 {
     public function viewAny(User $user): bool
     {
-        return $user->hasPermissionTo('roles.view_any');
+        if ($user->hasPermissionToOnFilamentTenant('tenant.users.manage')) {
+            return true;
+        }
+
+        return $user->hasAnyPermission('roles.view_any');
     }
 
     public function create(User $user): bool
     {
-        return $user->hasPermissionTo('roles.create');
+        if ($user->hasPermissionToOnFilamentTenant('tenant.users.manage')) {
+            return true;
+        }
+
+        return $user->hasAnyPermission('roles.create');
     }
 
-    public function update(User $user): bool
+    public function update(User $user, Role $role): bool
     {
-        return $user->hasPermissionTo('roles.update');
+        if ($user->hasPermissionToOnFilamentTenant('tenant.users.manage')) {
+            return true;
+        }
+
+        return $user->hasAnyPermission('roles.update');
     }
 
-    public function delete(User $user): bool
+    public function delete(User $user, Role $role): bool
     {
-        return $user->hasPermissionTo('roles.delete');
+        if ($user->hasPermissionToOnFilamentTenant('tenant.users.manage')) {
+            return true;
+        }
+
+        return $user->hasAnyPermission('roles.delete');
     }
 
     public function exportAny(User $user): bool

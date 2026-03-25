@@ -2,13 +2,13 @@
 
 namespace App\Filament\Admin\Widgets;
 
-use App\Models\TenantProductVariant;
 use App\Services\PricePredictionService;
 use Carbon\Carbon;
 use Filament\Forms\Components\Select;
 use Filament\Schemas\Schema;
 use Filament\Widgets\ChartWidget;
 use Filament\Widgets\ChartWidget\Concerns\HasFiltersSchema;
+use Illuminate\Database\Eloquent\Model;
 
 class PriceHistoryChart extends ChartWidget
 {
@@ -18,7 +18,7 @@ class PriceHistoryChart extends ChartWidget
 
     // https://filamentphp.com/docs/5.x/widgets/charts
 
-    public ?TenantProductVariant $record = null;
+    public ?Model $record = null;
 
     protected static bool $isDiscovered = false;
 
@@ -75,21 +75,23 @@ class PriceHistoryChart extends ChartWidget
             $originalPriceData[] = end($originalPriceData);
             $labels[] = Carbon::now()->format('d.m.Y H:i');
         }
+        $predictionDataset = [];
+        if (count($priceData) > 1) {
+            // predikcia - dlzka sa berie z filtersSchema selectu, max 90 dni
+            $predictionDays = min(90, max(14, (int) ($this->filters['prediction_days'] ?? 60)));
+            $prediction = $predictionService->predict($this->record, $predictionDays);
 
-        // predikcia - dlzka sa berie z filtersSchema selectu, max 90 dni
-        $predictionDays = min(90, max(14, (int) ($this->filters['prediction_days'] ?? 60)));
-        $prediction = $predictionService->predict($this->record, $predictionDays);
+            $predictionDataset = array_fill(0, count($labels) - 1, null);
+            $predictionDataset[] = ! empty($priceData) ? (float) end($priceData) : null;
 
-        $predictionDataset = array_fill(0, count($labels) - 1, null);
-        $predictionDataset[] = ! empty($priceData) ? (float) end($priceData) : null;
+            foreach ($prediction['values'] as $value) {
+                $priceData[] = null;
+                $originalPriceData[] = null;
+                $predictionDataset[] = $value;
+            }
 
-        foreach ($prediction['values'] as $value) {
-            $priceData[] = null;
-            $originalPriceData[] = null;
-            $predictionDataset[] = $value;
+            $labels = array_merge($labels, $prediction['labels']);
         }
-
-        $labels = array_merge($labels, $prediction['labels']);
 
         return [
             'datasets' => [

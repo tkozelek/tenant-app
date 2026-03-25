@@ -6,6 +6,7 @@ use App\Filament\Exports\RoleExporter;
 use Filament\Actions\EditAction;
 use Filament\Actions\ExportBulkAction;
 use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 
 class RolesTable
@@ -23,6 +24,12 @@ class RolesTable
                     ->searchable()
                     ->sortable(),
 
+                TextColumn::make('tenant.name')
+                    ->label('Tenant')
+                    ->badge()
+                    ->color('info')
+                    ->placeholder('Global'),
+
                 TextColumn::make('permissions_count')
                     ->counts('permissions')
                     ->label('Počet povolení')
@@ -30,7 +37,11 @@ class RolesTable
                     ->color('success'),
             ])
             ->filters([
-                //
+                SelectFilter::make('tenant')
+                    ->label('Tenant')
+                    ->relationship('tenant', 'name')
+                    ->searchable()
+                    ->preload(),
             ])
             ->recordActions([
                 EditAction::make(),

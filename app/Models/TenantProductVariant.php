@@ -4,11 +4,13 @@ namespace App\Models;
 
 use App\Observers\TenantProductVariantObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
@@ -25,7 +27,7 @@ class TenantProductVariant extends Model implements HasMedia
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'sku', 'ean', 'price', 'original_price', 'stock_quantity'])
+            ->logOnly(['name', 'sku', 'ean', 'stock_quantity'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->useLogName('variant');
@@ -41,16 +43,12 @@ class TenantProductVariant extends Model implements HasMedia
         'tenant_product_id',
         'sku',
         'ean',
-        'price',
-        'original_price',
         'stock_quantity',
     ];
 
     protected function casts(): array
     {
         return [
-            'price' => 'decimal:2',
-            'original_price' => 'decimal:2',
             'stock_quantity' => 'integer',
         ];
     }
@@ -83,7 +81,64 @@ class TenantProductVariant extends Model implements HasMedia
 
     public function quantityPrices(): HasMany
     {
-        return $this->hasMany(ProductQuantityPrice::class, 'tenant_product_variant_id');
+        return $this->hasMany(ProductQuantityPrice::class, 'tenant_product_variant_id')
+            ->orderBy('min_quantity');
+    }
+
+    public function quantityPriceHistory(): HasMany
+    {
+        return $this->hasMany(ProductQuantityPrice::class, 'tenant_product_variant_id')
+            ->withTrashed()
+            ->orderBy('valid_from')
+            ->orderBy('min_quantity');
+    }
+
+    public function activePriceHistory(): HasOne
+    {
+        return $this->hasOne(PriceHistory::class, 'tenant_product_variant_id')
+            ->where('valid_from', '<=', now())
+            ->where(function ($query) {
+                $query->whereNull('valid_to')
+                    ->orWhere('valid_to', '>=', now());
+            })
+            ->orderBy('valid_from', 'desc')
+            ->orderBy('created_at', 'desc');
+    }
+
+    protected function currentPrice(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): ?float => $this->activePriceHistory?->price !== null
+                ? (float) $this->activePriceHistory->price
+                : null
+        );
+    }
+
+    protected function currentOriginalPrice(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): ?float => $this->activePriceHistory?->original_price !== null
+                ? (float) $this->activePriceHistory->original_price
+                : null
+        );
+    }
+
+    protected function currentPriceFormatted(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): string => $this->currentPrice !== null
+                ? number_format($this->currentPrice, 2, ',', ' ').' €'
+                : '-'
+        );
+    }
+
+    protected function currentOriginalPriceFormatted(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): string => $this->currentOriginalPrice !== null
+                ? number_format($this->currentOriginalPrice, 2, ',', ' ').' €'
+                : '-'
+        );
     }
 
     public function globalProduct(): HasOneThrough

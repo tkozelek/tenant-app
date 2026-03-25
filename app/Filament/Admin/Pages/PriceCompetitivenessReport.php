@@ -3,7 +3,6 @@
 namespace App\Filament\Admin\Pages;
 
 use App\Models\GlobalProduct;
-use App\Models\PriceHistory;
 use BackedEnum;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
@@ -12,6 +11,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 
 class PriceCompetitivenessReport extends Page implements HasTable
@@ -29,25 +29,7 @@ class PriceCompetitivenessReport extends Page implements HasTable
     public function table(Table $table): Table
     {
         return $table
-            ->query(
-                GlobalProduct::query()
-                    ->withCount([
-                        // count tenant_id co maju v ponuke
-                        'tenantProducts as tenant_count' => fn ($query) => $query->select(DB::raw('count(distinct tenant_id)')),
-                    ])
-                    ->withMin('variants as min_price', 'price')
-                    ->withMax('variants as max_price', 'price')
-                    ->withAvg('variants as avg_price', 'price')
-                    ->addSelect([
-                        // bublame hore
-                        // price history - variants - tenant products - global_prod.id
-                        'price_change_count' => PriceHistory::selectRaw('count(*)')
-                            ->join('tenant_product_variants', 'tenant_product_variants.id', '=', 'price_history.tenant_product_variant_id')
-                            ->join('tenant_products', 'tenant_products.id', '=', 'tenant_product_variants.tenant_product_id')
-                            ->whereColumn('tenant_products.global_product_id', 'global_products.id'),
-                    ])
-                    ->has('variants')
-            )
+            ->query($this->getTableQuery())
             ->columns([
                 TextColumn::make('name')
                     ->label('Produkt')
@@ -108,6 +90,29 @@ class PriceCompetitivenessReport extends Page implements HasTable
                     ->multiple(),
             ])
             ->defaultSort('name');
+    }
+
+    protected function getTableQuery(): Builder
+    {
+        $priceStats = DB::table('price_history as ph')
+            ->selectRaw('
+                tp.global_product_id,
+                MIN(ph.price) as min_price,
+                MAX(ph.price) as max_price,
+                AVG(ph.price) as avg_price,
+                COUNT(ph.id) as price_change_count,
+                COUNT(DISTINCT tp.tenant_id) as tenant_count
+            ')
+            ->join('tenant_product_variants as tpv', 'tpv.id', '=', 'ph.tenant_product_variant_id')
+            ->join('tenant_products as tp', 'tp.id', '=', 'tpv.tenant_product_id')
+            ->where('ph.valid_from', '<=', now())
+            ->where(fn ($q) => $q->whereNull('ph.valid_to')->orWhere('ph.valid_to', '>=', now()))
+            ->groupBy('tp.global_product_id');
+
+        return GlobalProduct::query()
+            ->select('global_products.*')
+            ->leftJoinSub($priceStats, 'price_stats', 'global_products.id', '=', 'price_stats.global_product_id')
+            ->whereNotNull('price_stats.min_price');
     }
 
     public function getView(): string

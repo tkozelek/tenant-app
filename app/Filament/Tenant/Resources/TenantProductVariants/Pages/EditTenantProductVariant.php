@@ -7,7 +7,6 @@ use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustS
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\HistoryAction;
 use App\Filament\Tenant\Resources\TenantProducts\TenantProductResource;
 use App\Filament\Tenant\Resources\TenantProductVariants\TenantProductVariantResource;
-use App\Filament\Tenant\Widgets\TenantPriceHistoryChart;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
@@ -36,12 +35,5 @@ class EditTenantProductVariant extends EditRecord
     public function getHeading(): string|Htmlable|null
     {
         return 'Upraviť '.$this->record->name;
-    }
-
-    protected function getFooterWidgets(): array
-    {
-        return [
-            TenantPriceHistoryChart::make(['record' => $this->record]),
-        ];
     }
 }

@@ -2,11 +2,14 @@
 
 namespace App\Models;
 
+use App\Observers\PriceHistoryObserver;
+use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+#[ObservedBy([PriceHistoryObserver::class])]
 class PriceHistory extends Model
 {
     protected $table = 'price_history';
@@ -22,6 +25,7 @@ class PriceHistory extends Model
 
     protected $casts = [
         'price' => 'decimal:2',
+        'original_price' => 'decimal:2',
         'valid_from' => 'datetime',
         'valid_to' => 'datetime',
     ];
@@ -39,7 +43,8 @@ class PriceHistory extends Model
     #[Scope]
     public function active(Builder $query): Builder
     {
-        return $query->whereNull('valid_to');
+        return $query->where('valid_from', '<=', now())
+            ->where(fn ($q) => $q->whereNull('valid_to')->orWhere('valid_to', '>=', now()));
     }
 
     #[Scope]

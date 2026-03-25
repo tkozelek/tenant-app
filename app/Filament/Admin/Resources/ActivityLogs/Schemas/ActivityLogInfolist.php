@@ -14,7 +14,7 @@ class ActivityLogInfolist
     {
         return $schema
             ->components([
-                Section::make('Event Details')
+                Section::make('Event detaily')
                     ->columns(3)
                     ->schema([
                         TextEntry::make('event')

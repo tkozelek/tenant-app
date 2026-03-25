@@ -3,10 +3,12 @@
 namespace App\Filament\Admin\Resources\GlobalProducts\Tables;
 
 use App\Filament\Exports\GlobalProductExporter;
+use App\Filament\Imports\GlobalProductImporter;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ExportBulkAction;
+use Filament\Actions\ImportAction;
 use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
 use Filament\Tables\Columns\TextColumn;
@@ -56,6 +58,11 @@ class GlobalProductsTable
             ])
             ->recordActions([
                 EditAction::make(),
+            ])
+            ->headerActions([
+                ImportAction::make()
+                    ->importer(GlobalProductImporter::class)
+                    ->authorize('importAny'),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

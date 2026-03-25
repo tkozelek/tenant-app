@@ -1,6 +1,6 @@
 <x-dropdown align="top" width="48">
     <x-slot name="trigger">
-        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 bg-white dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-700 dark:hover:text-gray-200 hover:text-gray-700 focus:outline-none transition ease-in-out duration-150">
+        <button class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-neutral-500 bg-white dark:bg-neutral-600 dark:text-neutral-200 dark:hover:bg-neutral-700 dark:hover:text-neutral-200 hover:text-neutral-700 focus:outline-none transition ease-in-out duration-150">
             <div>{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</div>
 
             <div class="ms-1">

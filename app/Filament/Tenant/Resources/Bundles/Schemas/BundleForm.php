@@ -99,7 +99,7 @@ class BundleForm
                                             return '0.00';
                                         }
 
-                                        $prices = TenantProductVariant::whereIn('id', $ids)->get()->pluck('price', 'id');
+                                        $prices = TenantProductVariant::whereIn('id', $ids)->get()->pluck('current_price', 'id');
 
                                         $total = 0;
                                         foreach ($items as $item) {

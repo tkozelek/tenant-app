@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -68,22 +69,41 @@ class TenantProduct extends Model implements HasMedia
         return $this->hasMany(TenantProductVariant::class);
     }
 
+    public function priceHistories(): HasManyThrough
+    {
+        return $this->hasManyThrough(PriceHistory::class, TenantProductVariant::class, 'tenant_product_id', 'tenant_product_variant_id');
+    }
+
     public function getLowestCurrentPriceAttribute(): ?float
     {
+        $activePriceSubquery = PriceHistory::query()
+            ->select('price')
+            ->whereColumn('tenant_product_variant_id', 'tenant_product_variants.id')
+            ->active()
+            ->latest('valid_from')
+            ->limit(1);
+
         return $this->variants()
             ->where('stock_quantity', '>', 0)
-            ->get()
-            ->map(fn ($v) => $v->currentPrice())
+            ->addSelect(['active_price' => $activePriceSubquery])
+            ->pluck('active_price')
             ->filter()
             ->min();
     }
 
     public function getCheapestVariant(): ?TenantProductVariant
     {
+        $activePriceSubquery = PriceHistory::query()
+            ->select('price')
+            ->whereColumn('tenant_product_variant_id', 'tenant_product_variants.id')
+            ->active()
+            ->latest('valid_from')
+            ->limit(1);
+
         return $this->variants()
             ->where('stock_quantity', '>', 0)
-            ->get()
-            ->sortBy(fn ($v) => $v->currentPrice() ?? PHP_INT_MAX)
+            ->addSelect(['active_price' => $activePriceSubquery])
+            ->orderByRaw('active_price IS NULL, active_price ASC')
             ->first();
     }
 }

@@ -37,7 +37,7 @@ class CreateApiToken extends CreateRecord
     {
         Notification::make()
             ->title('Token bol vytvorený')
-            ->body('Skopírujte si token teraz — nebude znovu zobrazený: **'.$this->plainTextToken.'**')
+            ->body('Skopírujte si token teraz — nebude znovu zobrazený: '.$this->plainTextToken)
             ->success()
             ->persistent()
             ->send();

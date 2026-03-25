@@ -5,13 +5,13 @@
 
     $activeClasses = 'border-indigo-400 text-indigo-800 bg-indigo-50
                       focus:text-indigo-800 focus:bg-indigo-100 focus:border-indigo-700
-                      dark:text-gray-200 dark:bg-gray-600 dark:focus:bg-gray-500 dark:focus:text-gray-200';
+                      dark:text-neutral-200 dark:bg-neutral-600 dark:focus:bg-neutral-500 dark:focus:text-neutral-200';
 
-    $inactiveClasses = 'border-transparent text-gray-600
-                        hover:text-gray-900 hover:bg-gray-50 hover:border-gray-300
-                        focus:text-gray-900 focus:bg-gray-50 focus:border-gray-300
-                        dark:text-gray-200 dark:hover:text-gray-200 dark:hover:bg-gray-600
-                        dark:focus:bg-gray-500 dark:focus:text-gray-200';
+    $inactiveClasses = 'border-transparent text-neutral-600
+                        hover:text-neutral-900 hover:bg-neutral-50 hover:border-neutral-300
+                        focus:text-neutral-900 focus:bg-neutral-50 focus:border-neutral-300
+                        dark:text-neutral-200 dark:hover:text-neutral-200 dark:hover:bg-neutral-600
+                        dark:focus:bg-neutral-500 dark:focus:text-neutral-200';
 
     $classes = $baseClasses . ' ' . ($active ? $activeClasses : $inactiveClasses);
 @endphp

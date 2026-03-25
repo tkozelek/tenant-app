@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\TenantProductVariants\Pages;
 
+use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustPriceAction;
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustStockAction;
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\HistoryAction;
 use App\Filament\Admin\Resources\TenantProducts\TenantProductResource;
@@ -26,6 +27,7 @@ class EditTenantProductVariant extends EditRecord
                 ->icon('heroicon-o-arrow-uturn-left')
                 ->url(fn ($record): string => TenantProductResource::getUrl('edit', ['record' => $record->tenant_product_id])),
             HistoryAction::make(),
+            AdjustPriceAction::make(),
             AdjustStockAction::make()
                 ->after(fn () => $this->refreshFormData(['stock_quantity'])),
         ];

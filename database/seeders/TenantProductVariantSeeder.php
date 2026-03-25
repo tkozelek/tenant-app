@@ -25,6 +25,8 @@ class TenantProductVariantSeeder extends Seeder
             $globalProductAttrs = $product->globalProduct?->globalProductAttributes ?? collect();
             $basePrice = fake()->randomFloat(2, 50, 1500);
 
+            $productName = $product->globalProduct?->name ?? 'Unknown';
+
             $colorAttrs = $farbaAttribute
                 ? $globalProductAttrs->where('attribute_id', $farbaAttribute->id)->values()
                 : collect();
@@ -35,9 +37,9 @@ class TenantProductVariantSeeder extends Seeder
 
             if ($colorAttrs->isNotEmpty()) {
                 foreach ($colorAttrs as $colorGpa) {
-                    TenantProductVariant::withoutEvents(function () use ($product, $colorGpa, $farbaAttribute, $storageAttribute, $storageAttr, $basePrice) {
+                    TenantProductVariant::withoutEvents(function () use ($product, $colorGpa, $farbaAttribute, $storageAttribute, $storageAttr, $basePrice, $productName) {
                         $variant = $product->variants()->create([
-                            'name' => $colorGpa->attributeValue?->value ?? 'Variant',
+                            'name' => "{$productName} - {$colorGpa->attributeValue->value}",
                             'sku' => strtoupper(Str::random(8)),
                             'ean' => fake()->ean13(),
                             'stock_quantity' => 0,

@@ -82,6 +82,7 @@ class TenantProductForm
                                     $globalProduct = GlobalProduct::find($state);
                                     if ($globalProduct) {
                                         $set('name', $globalProduct->name);
+                                        $set('slug', $globalProduct->slug);
                                         $set('description', $globalProduct->description);
                                     }
                                 }

@@ -2,9 +2,7 @@
 
 namespace App\Filament\Tenant\Pages;
 
-use App\Models\User;
 use BackedEnum;
-use Filament\Facades\Filament;
 use Filament\Pages\Page;
 use Filament\Support\Icons\Heroicon;
 use UnitEnum;
@@ -12,8 +10,6 @@ use UnitEnum;
 class ApiDocumentation extends Page
 {
     protected static ?string $title = 'API Dokumentácia';
-
-    protected static ?string $navigationLabel = 'Dokumentácia';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBookOpen;
 
@@ -23,10 +19,7 @@ class ApiDocumentation extends Page
 
     public static function canAccess(): bool
     {
-        /** @var User $user */
-        $user = Filament::auth()->user();
-
-        return $user?->hasPermissionTo('tenant.view_api_docs') ?? false;
+        return auth()->user()->hasPermissionToOnFilamentTenant('tenant.view_api_docs');
     }
 
     public function getView(): string

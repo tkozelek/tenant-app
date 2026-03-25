@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -40,9 +41,50 @@ class Category extends Model
         return $this->hasMany(Category::class, 'parent_id');
     }
 
+    public function globalProducts(): HasMany
+    {
+        return $this->hasMany(GlobalProduct::class, 'category_id');
+    }
+
+    public function allDescendants(): Collection
+    {
+        $descendants = new Collection;
+
+        foreach ($this->children()->with('children')->get() as $child) {
+            $descendants->push($child);
+            $descendants = $descendants->merge($child->allDescendants());
+        }
+
+        return $descendants;
+    }
+
+    public function subtreeCategoryIds(): array
+    {
+        return $this->allDescendants()
+            ->pluck('id')
+            ->prepend($this->id)
+            ->all();
+    }
+
+    public function allGlobalProducts(): \Illuminate\Database\Eloquent\Builder
+    {
+        return GlobalProduct::query()->whereIn('category_id', $this->subtreeCategoryIds());
+    }
+
     public function attributes(): BelongsToMany
     {
         return $this->belongsToMany(Attribute::class, 'category_attribute');
+    }
+
+    public function allAttributes(): \Illuminate\Support\Collection
+    {
+        $categoryIds = $this->subtreeCategoryIds();
+
+        return Attribute::query()
+            ->whereHas('categories', fn ($q) => $q->whereIn('categories.id', $categoryIds))
+            ->get()
+            ->unique('id')
+            ->values();
     }
 
     public function coupons(): BelongsToMany

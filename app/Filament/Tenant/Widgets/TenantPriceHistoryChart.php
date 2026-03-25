@@ -70,19 +70,22 @@ class TenantPriceHistoryChart extends ChartWidget
             $labels[] = Carbon::now()->format('d.m.Y H:i');
         }
 
-        $predictionDays = min(90, max(14, (int) ($this->filters['prediction_days'] ?? 60)));
-        $prediction = $predictionService->predict($this->record, $predictionDays);
+        $predictionDataset = [];
+        if (count($priceData) > 1) {
+            $predictionDays = min(90, max(14, (int) ($this->filters['prediction_days'] ?? 60)));
+            $prediction = $predictionService->predict($this->record, $predictionDays);
 
-        $predictionDataset = array_fill(0, count($labels) - 1, null);
-        $predictionDataset[] = ! empty($priceData) ? (float) end($priceData) : null;
+            $predictionDataset = array_fill(0, count($labels) - 1, null);
+            $predictionDataset[] = ! empty($priceData) ? (float) end($priceData) : null;
 
-        foreach ($prediction['values'] as $value) {
-            $priceData[] = null;
-            $originalPriceData[] = null;
-            $predictionDataset[] = $value;
+            foreach ($prediction['values'] as $value) {
+                $priceData[] = null;
+                $originalPriceData[] = null;
+                $predictionDataset[] = $value;
+            }
+
+            $labels = array_merge($labels, $prediction['labels']);
         }
-
-        $labels = array_merge($labels, $prediction['labels']);
 
         return [
             'datasets' => [

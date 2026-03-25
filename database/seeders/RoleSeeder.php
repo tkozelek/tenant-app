@@ -85,13 +85,33 @@ class RoleSeeder extends Seeder
             'coupons.import',
         ];
 
+        $reportPermissions = [
+            'reports.expiring_prices',
+            'reports.price_movement',
+        ];
+
+        $apiTokenPermissions = [
+            'api_tokens.view_any',
+            'api_tokens.create',
+            'api_tokens.delete',
+        ];
+
         $tenantGeneralPermissions = [
             'tenant.access',
             'tenant.settings',
             'tenant.update',
             'tenant.users.manage',
-            'tenant.reports.view',
+            'tenant.roles.manage',
+            'tenant.api_tokens.manage',
             'tenant.activity_log.view',
+            'tenant.view_api_docs',
+        ];
+
+        $tenantReportPermissions = [
+            'tenant.reports.expiring_prices',
+            'tenant.reports.price_movement',
+            'tenant.reports.stock_health',
+            'tenant.reports.coupon_performance',
         ];
 
         $tenantProductPermissions = [
@@ -125,6 +145,7 @@ class RoleSeeder extends Seeder
 
         $tenantPermissions = array_merge(
             $tenantGeneralPermissions,
+            $tenantReportPermissions,
             $tenantProductPermissions,
             $tenantVariantPermissions,
             $tenantRequestPermissions,
@@ -141,13 +162,14 @@ class RoleSeeder extends Seeder
             $categoryPermissions,
             $attributePermissions,
             $productPermissions,
+            $reportPermissions,
+            $apiTokenPermissions,
         );
 
         foreach ($allPermissions as $permission) {
             Permission::firstOrCreate(['name' => $permission]);
         }
 
-        // 1. Super Admin — unrestricted access to everything
         $superAdmin = Role::firstOrCreate(
             [
                 'name' => 'Super Administrátor',
@@ -159,91 +181,104 @@ class RoleSeeder extends Seeder
         );
         $superAdmin->syncPermissions(Permission::all());
 
-        // 2. Platform Admin — manages all platform resources except creating/deleting users
         $platformAdmin = Role::firstOrCreate(
             [
                 'name' => 'Administrátor platformy',
                 config('permission.column_names.team_foreign_key') => null,
             ],
             [
-                'description' => 'Spravuje celú platformu, jednotlivé prevádzky (nájomcov), používateľov a globálny katalóg produktov. Nemá prístup k použivateľom.',
+                'description' => 'Spravuje celú platformu, prevádzky a globálny katalóg. Nemá právo vytvárať ani mazať používateľov.',
             ]
         );
         $platformAdmin->syncPermissions(array_merge(
             $platformPermissions,
+            $tenantsPermissions,
             $tenantPermissions,
             $couponsPermissions,
-            ['users.view_any'],
+            $reportPermissions,
+            $apiTokenPermissions,
+            ['users.view_any', 'users.update', 'users.export'],
             $rolePermissions,
             $categoryPermissions,
             $attributePermissions,
             $productPermissions,
         ));
 
-        $tenantOwner = Role::firstOrCreate(
-        // 3. Tenant Manager — manages tenant businesses and their operations
+        $tenantManager = Role::firstOrCreate(
             [
-                'name' => 'Majiteľ prevádzky',
+                'name' => 'Správca prevádzok',
                 config('permission.column_names.team_foreign_key') => null,
             ],
             [
-                'description' => 'Hlavný správca konkrétnej prevádzky s plným prístupom k jej nastaveniam, používateľom a skladovým zásobám.',
+                'description' => 'Spravuje prevádzky a ich prevádzkové dáta. Nemá prístup ku globálnemu katalógu ani správe používateľov.',
             ]
         );
-        $tenantOwner->syncPermissions($tenantPermissions);
-
-        $shopManager = Role::firstOrCreate(
-        // 4. Catalog Manager — manages the global product catalog
-            [
-                'name' => 'Manažér prevádzky',
-                config('permission.column_names.team_foreign_key') => null,
-            ],
-            [
-                'description' => 'Zabezpečuje organizáciu prevádzky, kompletne spravuje produkty, kategórie a prezerá štatistiky skladu.',
-            ]
-        );
-        $shopManager->syncPermissions(array_merge(
-            $tenantGeneralPermissions,
-            $tenantProductPermissions,
-            $tenantVariantPermissions,
-            $tenantRequestPermissions,
-            $tenantCouponPermissions,
+        $tenantManager->syncPermissions(array_merge(
+            ['platform.access'],
+            $tenantsPermissions,
+            $tenantPermissions,
+            ['users.view_any'],
+            $reportPermissions,
         ));
 
-        $productStaff = Role::firstOrCreate(
-        // 5. User & Role Manager — manages user accounts and role assignments
+        $catalogManager = Role::firstOrCreate(
             [
-                'name' => 'Správca produktov',
+                'name' => 'Správca katalógu',
                 config('permission.column_names.team_foreign_key') => null,
             ],
             [
-                'description' => 'Zodpovedá za evidenciu, pridávanie a aktualizáciu informácií o produktoch v systéme.',
+                'description' => 'Spravuje globálny katalóg produktov, kategórie, atribúty a požiadavky na nové produkty.',
             ]
         );
-        $productStaff->syncPermissions(array_merge(
-            ['tenant.access', 'tenant.reports.view'],
-            $tenantProductPermissions,
-            $tenantVariantPermissions,
-            $tenantRequestPermissions,
+        $catalogManager->syncPermissions(array_merge(
+            ['platform.access', 'catalog.manage'],
+            $productPermissions,
+            $categoryPermissions,
+            $attributePermissions,
         ));
 
-        $warehouseStaff = Role::firstOrCreate(
-        // 6. Coupon Manager — manages platform-wide coupons
+        $userManager = Role::firstOrCreate(
             [
-                'name' => 'Pracovník skladu',
+                'name' => 'Správca používateľov',
                 config('permission.column_names.team_foreign_key') => null,
             ],
             [
-                'description' => 'Má na starosti fyzickú kontrolu a dennú aktualizáciu skladových zásob produktov.',
+                'description' => 'Spravuje používateľské účty a ich roly v systéme. Nemá prístup k prevádzkovým ani katalógovým dátam.',
             ]
         );
-        $warehouseStaff->syncPermissions([
-            'tenant.access',
-            'tenant.products.view_any',
-            'tenant.variants.view_any',
-            'tenant.variants.update',
-        ]);
-        // 7. Report Analyst — read-only access to platform reports
+        $userManager->syncPermissions(array_merge(
+            ['platform.access'],
+            $userPermissions,
+            $rolePermissions,
+        ));
+
+        $couponManager = Role::firstOrCreate(
+            [
+                'name' => 'Správca kupónov',
+                config('permission.column_names.team_foreign_key') => null,
+            ],
+            [
+                'description' => 'Spravuje zľavové kupóny naprieč celou platformou.',
+            ]
+        );
+        $couponManager->syncPermissions(array_merge(
+            ['platform.access', 'tenants.view_any'],
+            $couponsPermissions,
+        ));
+
+        $reportAnalyst = Role::firstOrCreate(
+            [
+                'name' => 'Analytik',
+                config('permission.column_names.team_foreign_key') => null,
+            ],
+            [
+                'description' => 'Má prístup iba k reportom a štatistikám platformy. Nemôže upravovať žiadne dáta.',
+            ]
+        );
+        $reportAnalyst->syncPermissions(array_merge(
+            ['platform.access', 'tenants.view_any', 'products.view_any'],
+            $reportPermissions,
+        ));
 
         $user = User::firstOrCreate(
             ['email' => 'tommyside@centrum.sk'],
@@ -257,6 +292,5 @@ class RoleSeeder extends Seeder
         setPermissionsTeamId(null);
 
         $user->assignRole($superAdmin);
-
     }
 }

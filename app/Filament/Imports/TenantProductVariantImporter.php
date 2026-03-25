@@ -33,13 +33,6 @@ class TenantProductVariantImporter extends Importer
                 ->rules(['required', 'max:100']),
             ImportColumn::make('ean')
                 ->rules(['max:50']),
-            ImportColumn::make('price')
-                ->requiredMapping()
-                ->numeric()
-                ->rules(['required', 'decimal:0,2']),
-            ImportColumn::make('original_price')
-                ->numeric()
-                ->rules(['decimal:0,2']),
             ImportColumn::make('stock_quantity')
                 ->numeric()
                 ->rules(['integer']),

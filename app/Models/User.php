@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Filament\Facades\Filament;
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasName;
 use Filament\Models\Contracts\HasTenants;
@@ -14,7 +15,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\DB;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Traits\HasRoles;
@@ -75,22 +75,6 @@ class User extends Authenticatable implements FilamentUser, HasName, HasTenants
         );
     }
 
-    /**
-     * Check if the user belongs to a specific tenant (team).
-     */
-    public function belongsToTeam($tenant): bool
-    {
-        if ($tenant instanceof Tenant && $this->id === $tenant->owner_id) {
-            return true;
-        }
-
-        return DB::table(config('permission.table_names.model_has_roles'))
-            ->where('model_id', $this->id)
-            ->where('model_type', self::class)
-            ->where('tenant_id', $tenant->id ?? $tenant)
-            ->exists();
-    }
-
     public function isOwnerOfTenant(int $tenantId): bool
     {
         return $this->ownedTenants()->where('id', $tenantId)->exists();
@@ -98,6 +82,10 @@ class User extends Authenticatable implements FilamentUser, HasName, HasTenants
 
     public function hasPermissionToOnTenant(string $permission, $tenant): bool
     {
+        if (! $tenant) {
+            return false;
+        }
+
         $tenantId = is_numeric($tenant) ? $tenant : $tenant->id;
 
         if ($this->isOwnerOfTenant($tenantId)) {
@@ -117,6 +105,11 @@ class User extends Authenticatable implements FilamentUser, HasName, HasTenants
         return $result;
     }
 
+    public function hasPermissionToOnFilamentTenant(string $permission): bool
+    {
+        return $this->hasPermissionToOnTenant($permission, Filament::getTenant()?->id);
+    }
+
     public function ownedTenants(): HasMany
     {
         return $this->hasMany(Tenant::class, 'owner_id');
@@ -131,11 +124,6 @@ class User extends Authenticatable implements FilamentUser, HasName, HasTenants
             'tenant_id'
         )
             ->withPivot('role_id', 'model_type');
-    }
-
-    public function shops(): BelongsToMany
-    {
-        return $this->tenants();
     }
 
     public function canAccessPanel(Panel $panel): bool

@@ -3,6 +3,7 @@
 namespace App\Filament\Tenant\Pages;
 
 use App\Models\Coupon;
+use App\Models\User;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
@@ -25,6 +26,15 @@ class CouponPerformanceReport extends Page implements HasTable
     protected static string|\UnitEnum|null $navigationGroup = 'Reporty';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTicket;
+
+    public static function canAccess(): bool
+    {
+        /** @var User $user */
+        $user = Filament::auth()->user();
+        $tenant = Filament::getTenant();
+
+        return $user?->hasPermissionToOnTenant('tenant.reports.coupon_performance', $tenant) ?? false;
+    }
 
     public function table(Table $table): Table
     {

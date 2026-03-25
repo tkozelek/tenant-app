@@ -46,7 +46,7 @@ class UserForm
                                     $query->where(function ($q) {
                                         $q->whereNull('tenant_id')
                                             ->whereDoesntHave('permissions', fn ($q) => $q->where('name', 'platform.access'));
-                                    })->orWhere('tenant_id', Filament::getTenant()?->id);
+                                    })->orWhere('tenant_id', Filament::getTenant()?->id)->orderBy('id');
                                 })
                                 ->pluck('name', 'id')
                                 ->toArray()

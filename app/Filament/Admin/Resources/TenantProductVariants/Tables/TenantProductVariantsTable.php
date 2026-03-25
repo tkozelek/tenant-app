@@ -2,6 +2,8 @@
 
 namespace App\Filament\Admin\Resources\TenantProductVariants\Tables;
 
+use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustPriceAction;
+use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustStockAction;
 use App\Filament\Exports\TenantProductVariantExporter;
 use App\Models\TenantProductVariant;
 use Filament\Actions\BulkActionGroup;
@@ -17,6 +19,7 @@ class TenantProductVariantsTable
     public static function configure(Table $table, bool $showTenant = false): Table
     {
         return $table
+            ->modifyQueryUsing(fn ($query) => $query->with(['variantAttributes.attribute', 'variantAttributes.attributeValue', 'quantityPrices']))
             ->columns([
                 SpatieMediaLibraryImageColumn::make('media')
                     ->collection('tenant_product_variants')
@@ -27,6 +30,7 @@ class TenantProductVariantsTable
                 TextColumn::make('product.tenant.name')
                     ->label('Tenant')
                     ->visible($showTenant)
+                    ->limit(15)
                     ->searchable()
                     ->sortable()
                     ->color('info'),
@@ -34,6 +38,7 @@ class TenantProductVariantsTable
                 TextColumn::make('name')
                     ->label('Nazov')
                     ->searchable()
+                    ->limit(15)
                     ->sortable()
                     ->copyable()
                     ->weight('bold'),
@@ -48,31 +53,29 @@ class TenantProductVariantsTable
                 TextColumn::make('variantAttributesList')
                     ->label('Atribúty')
                     ->badge()
+                    ->limitList(0)
                     ->getStateUsing(function (TenantProductVariant $record) {
                         return $record->variantAttributes->map(function ($pivot) {
-                            $attrName = $pivot->attribute?->name ?? '??';
+                            //                            $attrName = $pivot->attribute?->name ?? '??';
                             $value = $pivot->attributeValue?->value ?? $pivot->custom_value;
                             $unit = $pivot->attribute?->unit ?? '';
 
-                            return "{$attrName}: {$value}{$unit}";
+                            return "{$value}{$unit}";
                         })->toArray();
                     })
-                    ->limitList(2)
                     ->tooltip(function (TextColumn $column): ?string {
                         $state = $column->getState();
-                        if (is_array($state) && count($state) > 2) {
+                        if (is_array($state) && count($state) > 0) {
                             return implode(', ', $state);
                         }
 
                         return null;
                     }),
 
-                TextColumn::make('price')
+                TextColumn::make('current_price')
                     ->label('Cena')
-                    ->money('EUR')
-                    ->sortable()
-                    ->icon(fn (TenantProductVariant $record): ?string => $record->quantityPrices->isNotEmpty() ? 'heroicon-m-rectangle-stack' : null
-                    )
+                    ->state(fn (TenantProductVariant $record): string => $record->current_price_formatted)
+                    ->icon(fn (TenantProductVariant $record): ?string => $record->quantityPrices->isNotEmpty() ? 'heroicon-m-rectangle-stack' : null)
                     ->iconPosition('after')
                     ->iconColor('success')
                     ->tooltip(function (TenantProductVariant $record): ?string {
@@ -84,16 +87,16 @@ class TenantProductVariantsTable
                         $tooltipLines = [];
                         foreach ($prices as $qp) {
                             $maxText = $qp->max_quantity ? "do {$qp->max_quantity} ks" : 'a viac';
-                            $formattedPrice = number_format($qp->unit_price, 2, ',', ' ');
+                            $formattedPrice = number_format($qp->price, 2, ',', ' ');
                             $tooltipLines[] = "Od {$qp->min_quantity} ks {$maxText} -> {$formattedPrice} €";
                         }
 
                         return implode(', ', $tooltipLines);
                     }),
 
-                TextColumn::make('original_price')
+                TextColumn::make('current_original_price')
                     ->label('Pôvodná cena')
-                    ->money('EUR')
+                    ->state(fn (TenantProductVariant $record): string => $record->current_original_price_formatted)
                     ->color('gray')
                     ->extraAttributes(['style' => 'text-decoration: line-through;'])
                     ->toggleable(isToggledHiddenByDefault: true),
@@ -113,6 +116,8 @@ class TenantProductVariantsTable
                 //
             ])
             ->recordActions([
+                AdjustPriceAction::make(),
+                AdjustStockAction::make(),
                 EditAction::make(),
             ])
             ->toolbarActions([

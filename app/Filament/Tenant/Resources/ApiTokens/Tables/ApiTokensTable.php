@@ -4,11 +4,12 @@ namespace App\Filament\Tenant\Resources\ApiTokens\Tables;
 
 use App\Enums\ApiPermission;
 use App\Models\ApiToken;
+use Filament\Actions\Action;
+use Filament\Actions\BulkAction;
 use Filament\Actions\BulkActionGroup;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\DeleteBulkAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Collection;
 
 class ApiTokensTable
 {
@@ -53,13 +54,26 @@ class ApiTokensTable
             ])
             ->defaultSort('created_at', 'desc')
             ->recordActions([
-                DeleteAction::make()
+                Action::make('revoke')
                     ->label('Zrušiť')
-                    ->authorize('delete'),
+                    ->icon('heroicon-o-x-circle')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->authorize('delete')
+                    ->hidden(fn (ApiToken $record): bool => $record->expires_at?->isPast() ?? false)
+                    ->action(fn (ApiToken $record) => $record->update(['expires_at' => now()])),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([
-                    DeleteBulkAction::make()->label('Zrušiť'),
+                    BulkAction::make('revoke')
+                        ->label('Zrušiť')
+                        ->icon('heroicon-o-x-circle')
+                        ->color('danger')
+                        ->requiresConfirmation()
+                        ->action(fn (Collection $records) => $records->each(
+                            fn (ApiToken $record) => $record->update(['expires_at' => now()])
+                        ))
+                        ->deselectRecordsAfterCompletion(),
                 ]),
             ]);
     }

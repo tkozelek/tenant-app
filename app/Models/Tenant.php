@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\MediaLibrary\HasMedia;
@@ -17,7 +18,7 @@ use Spatie\MediaLibrary\InteractsWithMedia;
 
 class Tenant extends Model implements HasMedia, HasName
 {
-    use HasBrandName, HasFactory, InteractsWithMedia, LogsActivity;
+    use HasApiTokens, HasBrandName, HasFactory, InteractsWithMedia, LogsActivity;
 
     public function getActivitylogOptions(): LogOptions
     {

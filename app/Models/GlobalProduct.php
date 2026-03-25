@@ -44,6 +44,12 @@ class GlobalProduct extends Model implements HasMedia
         return $this->belongsTo(Category::class);
     }
 
+    public function globalProductAttributes(): HasMany
+    {
+        return $this->hasMany(GlobalProductAttribute::class)
+            ->with(['attribute', 'attributeValue']);
+    }
+
     public function tenantProducts(): HasMany
     {
         return $this->hasMany(TenantProduct::class);

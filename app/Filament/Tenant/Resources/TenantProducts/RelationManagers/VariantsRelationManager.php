@@ -2,6 +2,7 @@
 
 namespace App\Filament\Tenant\Resources\TenantProducts\RelationManagers;
 
+use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustPriceAction;
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustStockAction;
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\HistoryAction;
 use App\Filament\Admin\Resources\TenantProductVariants\Schemas\TenantProductVariantForm;
@@ -38,6 +39,7 @@ class VariantsRelationManager extends RelationManager
             ->recordActions([
                 EditAction::make(),
                 HistoryAction::make(),
+                AdjustPriceAction::make(),
                 AdjustStockAction::make()
                     ->after(fn (RelationManager $livewire) => $livewire->dispatch('refresh')),
                 DeleteAction::make(),
