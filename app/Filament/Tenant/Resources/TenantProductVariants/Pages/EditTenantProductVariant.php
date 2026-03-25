@@ -2,10 +2,12 @@
 
 namespace App\Filament\Tenant\Resources\TenantProductVariants\Pages;
 
+use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustPriceAction;
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustStockAction;
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\HistoryAction;
 use App\Filament\Tenant\Resources\TenantProducts\TenantProductResource;
 use App\Filament\Tenant\Resources\TenantProductVariants\TenantProductVariantResource;
+use App\Filament\Tenant\Widgets\TenantPriceHistoryChart;
 use Filament\Actions\Action;
 use Filament\Actions\DeleteAction;
 use Filament\Resources\Pages\EditRecord;
@@ -25,6 +27,7 @@ class EditTenantProductVariant extends EditRecord
                 ->icon('heroicon-o-arrow-uturn-left')
                 ->url(fn (): string => TenantProductResource::getUrl('edit', ['record' => $this->record->tenant_product_id])),
             HistoryAction::make(),
+            AdjustPriceAction::make(),
             AdjustStockAction::make()
                 ->after(fn () => $this->refreshFormData(['stock_quantity'])),
         ];
@@ -33,5 +36,12 @@ class EditTenantProductVariant extends EditRecord
     public function getHeading(): string|Htmlable|null
     {
         return 'Upraviť '.$this->record->name;
+    }
+
+    protected function getFooterWidgets(): array
+    {
+        return [
+            TenantPriceHistoryChart::make(['record' => $this->record]),
+        ];
     }
 }

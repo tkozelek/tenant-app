@@ -147,6 +147,7 @@ class RoleSeeder extends Seeder
             Permission::firstOrCreate(['name' => $permission]);
         }
 
+        // 1. Super Admin — unrestricted access to everything
         $superAdmin = Role::firstOrCreate(
             [
                 'name' => 'Super Administrátor',
@@ -158,6 +159,7 @@ class RoleSeeder extends Seeder
         );
         $superAdmin->syncPermissions(Permission::all());
 
+        // 2. Platform Admin — manages all platform resources except creating/deleting users
         $platformAdmin = Role::firstOrCreate(
             [
                 'name' => 'Administrátor platformy',
@@ -179,6 +181,7 @@ class RoleSeeder extends Seeder
         ));
 
         $tenantOwner = Role::firstOrCreate(
+        // 3. Tenant Manager — manages tenant businesses and their operations
             [
                 'name' => 'Majiteľ prevádzky',
                 config('permission.column_names.team_foreign_key') => null,
@@ -190,6 +193,7 @@ class RoleSeeder extends Seeder
         $tenantOwner->syncPermissions($tenantPermissions);
 
         $shopManager = Role::firstOrCreate(
+        // 4. Catalog Manager — manages the global product catalog
             [
                 'name' => 'Manažér prevádzky',
                 config('permission.column_names.team_foreign_key') => null,
@@ -207,6 +211,7 @@ class RoleSeeder extends Seeder
         ));
 
         $productStaff = Role::firstOrCreate(
+        // 5. User & Role Manager — manages user accounts and role assignments
             [
                 'name' => 'Správca produktov',
                 config('permission.column_names.team_foreign_key') => null,
@@ -223,6 +228,7 @@ class RoleSeeder extends Seeder
         ));
 
         $warehouseStaff = Role::firstOrCreate(
+        // 6. Coupon Manager — manages platform-wide coupons
             [
                 'name' => 'Pracovník skladu',
                 config('permission.column_names.team_foreign_key') => null,
@@ -237,6 +243,7 @@ class RoleSeeder extends Seeder
             'tenant.variants.view_any',
             'tenant.variants.update',
         ]);
+        // 7. Report Analyst — read-only access to platform reports
 
         $user = User::firstOrCreate(
             ['email' => 'tommyside@centrum.sk'],

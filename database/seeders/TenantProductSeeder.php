@@ -29,17 +29,21 @@ class TenantProductSeeder extends Seeder
 
                 $name = ucfirst($productName);
 
-                $tenantProduct = TenantProduct::create([
-                    'tenant_id' => $tenantId,
-                    'slug' => str($name)->slug(),
-                    'global_product_id' => $globalProduct?->id,
-                    'global_product_request_id' => null,
-                    'name' => $name,
-                    'description' => $productDesc,
-                    'is_active' => fake()->boolean(80),
-                ]);
+                $tenantProduct = TenantProduct::firstOrCreate(
+                    [
+                        'tenant_id' => $tenantId,
+                        'slug' => str($name)->slug(),
+                    ],
+                    [
+                        'global_product_id' => $globalProduct?->id,
+                        'global_product_request_id' => null,
+                        'name' => $name,
+                        'description' => $productDesc,
+                        'is_active' => fake()->boolean(80),
+                    ]
+                );
 
-                if (! fake()->boolean(90)) {
+                if ($tenantProduct->wasRecentlyCreated && ! fake()->boolean(90)) {
                     try {
                         $placeholderText = urlencode($name);
                         $tenantProduct->addMediaFromUrl("https://placehold.co/600x400.jpeg?text={$placeholderText}")

@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Attribute;
 use App\Models\TenantProduct;
 use App\Models\TenantProductVariant;
 use Carbon\Carbon;
@@ -12,41 +13,74 @@ class TenantProductVariantSeeder extends Seeder
 {
     public function run(): void
     {
-        $products = TenantProduct::all();
+        $farbaAttribute = Attribute::where('slug', 'farba')->first();
+        $storageAttribute = Attribute::where('slug', 'kapacita-uloziska')->first();
+
+        $products = TenantProduct::with([
+            'globalProduct.globalProductAttributes.attribute',
+            'globalProduct.globalProductAttributes.attributeValue',
+        ])->get();
 
         foreach ($products as $product) {
-            $numberOfVariants = rand(1, 3);
+            $globalProductAttrs = $product->globalProduct?->globalProductAttributes ?? collect();
+            $basePrice = fake()->randomFloat(2, 50, 1500);
 
-            for ($v = 0; $v < $numberOfVariants; $v++) {
-                $basePrice = fake()->randomFloat(2, 50, 1500);
-                $hasDiscount = fake()->boolean(30);
-                // https://laravel.com/docs/12.x/eloquent#muting-events
-                $variant = TenantProductVariant::withoutEvents(function () use ($product, $v, $basePrice, $hasDiscount) {
+            $colorAttrs = $farbaAttribute
+                ? $globalProductAttrs->where('attribute_id', $farbaAttribute->id)->values()
+                : collect();
 
-                    $newVariant = $product->variants()->create([
-                        'name' => $product->name." - {$v}",
+            $storageAttr = $storageAttribute
+                ? $globalProductAttrs->where('attribute_id', $storageAttribute->id)->first()
+                : null;
+
+            if ($colorAttrs->isNotEmpty()) {
+                foreach ($colorAttrs as $colorGpa) {
+                    TenantProductVariant::withoutEvents(function () use ($product, $colorGpa, $farbaAttribute, $storageAttribute, $storageAttr, $basePrice) {
+                        $variant = $product->variants()->create([
+                            'name' => $colorGpa->attributeValue?->value ?? 'Variant',
+                            'sku' => strtoupper(Str::random(8)),
+                            'ean' => fake()->ean13(),
+                            'stock_quantity' => 0,
+                        ]);
+
+                        $variant->variantAttributes()->create([
+                            'attribute_id' => $farbaAttribute->id,
+                            'attribute_value_id' => $colorGpa->attribute_value_id,
+                            'custom_value' => null,
+                        ]);
+
+                        if ($storageAttr && $storageAttribute) {
+                            $variant->variantAttributes()->create([
+                                'attribute_id' => $storageAttribute->id,
+                                'attribute_value_id' => $storageAttr->attribute_value_id,
+                                'custom_value' => $storageAttr->custom_value,
+                            ]);
+                        }
+
+                        $this->generatePriceHistory($variant, $basePrice);
+                        $this->generateStockHistory($variant);
+                    });
+                }
+            } else {
+                TenantProductVariant::withoutEvents(function () use ($product, $storageAttribute, $storageAttr, $basePrice) {
+                    $variant = $product->variants()->create([
+                        'name' => 'Štandardná',
                         'sku' => strtoupper(Str::random(8)),
                         'ean' => fake()->ean13(),
-                        'price' => $hasDiscount ? ($basePrice * 0.8) : $basePrice,
-                        'original_price' => $hasDiscount ? $basePrice : null,
                         'stock_quantity' => 0,
                     ]);
 
-                    $this->generatePriceHistory($newVariant, $basePrice);
-                    $this->generateStockHistory($newVariant);
-
-                    return $newVariant;
-                });
-
-                if (! fake()->boolean(90)) {
-                    try {
-                        $placeholderText = urlencode($product->name.' - '.($v + 1));
-                        $variant->addMediaFromUrl("https://placehold.co/600x400.jpeg?text={$placeholderText}")
-                            ->toMediaCollection('tenant_product_variants');
-                    } catch (\Exception $e) {
-                        $this->command->warn("Failed to download img for: {$variant->sku}");
+                    if ($storageAttr && $storageAttribute) {
+                        $variant->variantAttributes()->create([
+                            'attribute_id' => $storageAttribute->id,
+                            'attribute_value_id' => $storageAttr->attribute_value_id,
+                            'custom_value' => $storageAttr->custom_value,
+                        ]);
                     }
-                }
+
+                    $this->generatePriceHistory($variant, $basePrice);
+                    $this->generateStockHistory($variant);
+                });
             }
         }
     }
@@ -54,11 +88,8 @@ class TenantProductVariantSeeder extends Seeder
     private function generatePriceHistory(TenantProductVariant $variant, float $initialPrice): void
     {
         $price = $initialPrice;
-        $date = Carbon::now()->subMonths(24);
+        $date = Carbon::now()->subMonths(6);
         $now = Carbon::now();
-
-        $finalPrice = $initialPrice;
-        $finalOriginalPrice = null;
 
         while (true) {
             $daysToAdd = rand(5, 15);
@@ -68,21 +99,18 @@ class TenantProductVariantSeeder extends Seeder
             }
 
             $date->addDays($daysToAdd);
-            $priceChangePercentage = rand(-15, 20) / 100;
-            $price *= (1 + $priceChangePercentage);
-            $price = round($price, 2);
+            $price = round($price * (1 + rand(-15, 20) / 100), 2);
 
             if ($price <= 0) {
                 $price = $initialPrice;
             }
 
+            $finalOriginalPrice = null;
+            $finalPrice = $price;
+
             if (fake()->boolean(30)) {
                 $finalOriginalPrice = $price;
-                $discountMultiplier = rand(70, 90) / 100;
-                $finalPrice = round($price * $discountMultiplier, 2);
-            } else {
-                $finalOriginalPrice = null;
-                $finalPrice = $price;
+                $finalPrice = round($price * (rand(70, 90) / 100), 2);
             }
 
             $variant->priceHistories()->create([
@@ -93,10 +121,6 @@ class TenantProductVariantSeeder extends Seeder
                 'updated_at' => $date,
             ]);
         }
-        $variant->update([
-            'price' => $price,
-            'original_price' => $finalOriginalPrice,
-        ]);
     }
 
     private function generateStockHistory(TenantProductVariant $variant): void

@@ -16,6 +16,14 @@ class AttributeSeeder extends Seeder
     {
         $attributes = [
             [
+                'name' => 'Kapacita úložiska',
+                'type' => 'select',
+                'unit' => null,
+                'is_filterable' => true,
+                'categories' => ['smartfony', 'tablety', 'notebooky', 'pc-zostavy'],
+                'values' => ['64 GB', '128 GB', '256 GB', '512 GB', '1 TB', '2 TB'],
+            ],
+            [
                 'name' => 'Operačný systém',
                 'type' => 'select',
                 'unit' => null,

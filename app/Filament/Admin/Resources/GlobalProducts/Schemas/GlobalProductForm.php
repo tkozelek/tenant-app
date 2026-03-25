@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\GlobalProducts\Schemas;
 
 use App\Filament\Actions\GenerateDescipritonAction;
+use App\Filament\Components\ProductAttributesSection;
 use App\Models\GlobalProduct;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -13,6 +14,7 @@ use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
+use Livewire\Component;
 
 class GlobalProductForm
 {
@@ -26,7 +28,6 @@ class GlobalProductForm
                             ->required()
                             ->maxLength(255)
                             ->live(onBlur: true)
-                            // after update zmen slug pole na slugifienutu verziu name textu
                             ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
 
                         TextInput::make('slug')
@@ -39,10 +40,11 @@ class GlobalProductForm
                             ->required()
                             ->searchable()
                             ->preload()
-                            ->label('Category'),
+                            ->live()
+                            ->label('Kategória'),
 
                         Toggle::make('is_active')
-                            ->label('Active')
+                            ->label('Aktívny')
                             ->default(true)
                             ->inline(false),
 
@@ -55,7 +57,13 @@ class GlobalProductForm
                                     ->context('produkt')
                             ),
                     ]),
-                Section::make('Media')
+
+                ProductAttributesSection::make(
+                    relationship: 'globalProductAttributes',
+                    categoryIdResolver: fn (Component $livewire): ?int => $livewire->data['category_id'] ?? null,
+                ),
+
+                Section::make('Médiá')
                     ->schema([
                         SpatieMediaLibraryFileUpload::make('media')
                             ->collection('global_products')

@@ -24,6 +24,8 @@ class TenantProductVariantResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
+    protected static ?int $navigationSort = 50;
+
     protected static bool $isScopedToTenant = false;
 
     public static function getEloquentQuery(): Builder

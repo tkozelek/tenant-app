@@ -3,6 +3,7 @@
 namespace App\Filament\Tenant\Pages;
 
 use App\Models\TenantProductVariant;
+use App\Models\User;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Pages\Page;
@@ -24,6 +25,15 @@ class StockHealthReport extends Page implements HasTable
     protected static string|\UnitEnum|null $navigationGroup = 'Reporty';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
+
+    public static function canAccess(): bool
+    {
+        /** @var User $user */
+        $user = Filament::auth()->user();
+        $tenant = Filament::getTenant();
+
+        return $user?->hasPermissionToOnTenant('tenant.reports.stock_health', $tenant) ?? false;
+    }
 
     public function table(Table $table): Table
     {
@@ -96,10 +106,9 @@ class StockHealthReport extends Page implements HasTable
                     ->color('gray')
                     ->sortable(),
 
-                TextColumn::make('price')
+                TextColumn::make('current_price')
                     ->label('Cena')
-                    ->money('EUR')
-                    ->sortable(),
+                    ->state(fn ($record) => $record->current_price_formatted),
             ])
             ->filters([
                 SelectFilter::make('status')
