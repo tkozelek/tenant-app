@@ -14,6 +14,7 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\DB;
 
 class PriceMovementReport extends Page implements HasTable
 {
@@ -135,6 +136,7 @@ class PriceMovementReport extends Page implements HasTable
         return TenantProductVariant::query()
             ->select('tenant_product_variants.*')
             ->selectRaw('ps.change_count, ps.min_price, ps.max_price, ps.price_range, ps.last_changed_at, ps.first_price, ps.last_price')
+            // join cez vyssie uvedeny raw select
             ->joinSub($priceStats, 'ps', 'tenant_product_variants.id', '=', 'ps.tenant_product_variant_id')
             ->with(['product.tenant']);
     }

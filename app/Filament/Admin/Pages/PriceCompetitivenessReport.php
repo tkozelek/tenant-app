@@ -111,8 +111,9 @@ class PriceCompetitivenessReport extends Page implements HasTable
 
         return GlobalProduct::query()
             ->select('global_products.*')
-            ->leftJoinSub($priceStats, 'price_stats', 'global_products.id', '=', 'price_stats.global_product_id')
-            ->whereNotNull('price_stats.min_price');
+            ->selectRaw('price_stats.min_price, price_stats.max_price, price_stats.avg_price, price_stats.price_change_count, price_stats.tenant_count')
+            ->joinSub($priceStats, 'price_stats', 'global_products.id', '=', 'price_stats.global_product_id')
+            ->with(['category']);
     }
 
     public function getView(): string

@@ -92,8 +92,8 @@ class ExpiringPricesReport extends Page implements HasTable
                 TextColumn::make('days_left')
                     ->label('Zostatok')
                     ->state(fn (PriceHistory $record): string => now()->diffInHours($record->valid_to) < 24
-                        ? now()->diffInHours($record->valid_to).'h'
-                        : now()->diffInDays($record->valid_to).' dni'
+                        ? number_format(now()->diffInHours($record->valid_to), 2).'h'
+                        : number_format(now()->diffInDays($record->valid_to), 2).' dni'
                     )
                     ->badge()
                     ->color(fn (PriceHistory $record): string => $record->valid_to->lt(now()->addDays(2))
