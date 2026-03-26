@@ -4,6 +4,8 @@ namespace App\Filament\Admin\Resources\TenantProductVariants\Schemas;
 
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\components\VariantAttributesSection;
 use App\Filament\Admin\Resources\TenantProductVariants\Schemas\actions\QuantityPriceRepeater;
+use App\Filament\Components\MarketPriceStatsSection;
+use App\Filament\Components\PriceMakingSection;
 use App\Models\Tenant;
 use App\Models\TenantProduct;
 use App\Models\TenantProductVariant;
@@ -95,47 +97,9 @@ class TenantProductVariantForm
                             ->columnSpan(2),
                     ])->columns(2),
 
-                Section::make('Cenotvorba')
-                    ->schema([
-                        TextEntry::make('current_price_display')
-                            ->label('Aktualna cena')
-                            ->state(fn (?TenantProductVariant $record): string => $record?->current_price_formatted ?? '-')
-                            ->hiddenOn('create'),
+                MarketPriceStatsSection::make(),
 
-                        TextEntry::make('current_original_price_display')
-                            ->label('Povodna cena')
-                            ->state(fn (?TenantProductVariant $record): string => $record?->current_original_price_formatted ?? '-')
-                            ->hiddenOn('create'),
-
-                        TextInput::make('initial_price')
-                            ->label('Cena')
-                            ->numeric()
-                            ->prefix('€')
-                            ->step('0.01')
-                            ->visibleOn('create'),
-
-                        TextInput::make('initial_original_price')
-                            ->label('Povodna cena (pred zlavou)')
-                            ->numeric()
-                            ->prefix('€')
-                            ->step('0.01')
-                            ->helperText('Vyplnte, ak je produkt v zlave.')
-                            ->visibleOn('create'),
-
-                        DateTimePicker::make('initial_valid_from')
-                            ->label('Platne od')
-                            ->default(now())
-                            ->helperText('Pre okamzitu zmenu nechajte aktualny cas.')
-                            ->visibleOn('create'),
-
-                        DateTimePicker::make('initial_valid_to')
-                            ->label('Platne do')
-                            ->after('initial_valid_from')
-                            ->helperText('Nepovinne. Ak je vyplnene, cena sa automaticky deaktivuje po tomto datume.')
-                            ->visibleOn('create'),
-
-                        QuantityPriceRepeater::make(),
-                    ]),
+                PriceMakingSection::make(),
 
                 VariantAttributesSection::make(),
 
