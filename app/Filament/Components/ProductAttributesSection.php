@@ -4,7 +4,6 @@ namespace App\Filament\Components;
 
 use App\Models\Attribute;
 use App\Models\AttributeValue;
-use App\Models\Category;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
@@ -14,12 +13,6 @@ use Filament\Schemas\Components\Utilities\Set;
 
 class ProductAttributesSection
 {
-    /**
-     * Build an attributes repeater section.
-     *
-     * @param  string  $relationship  The HasMany relationship name on the record (e.g. 'variantAttributes' or 'globalProductAttributes').
-     * @param  callable(\Illuminate\Livewire\Component): int|null  $categoryIdResolver  Returns the category ID given the Livewire component.
-     */
     public static function make(string $relationship, callable $categoryIdResolver): Section
     {
         return Section::make('Atribúty a parametre')
@@ -44,25 +37,22 @@ class ProductAttributesSection
 
                         Select::make('attribute_value_id')
                             ->label('Hodnota')
-                            ->options(fn (Get $get, $livewire) => self::valueOptions($get('attribute_id'), $categoryIdResolver($livewire)))
-                            ->visible(fn (Get $get, $livewire) => self::attributeType($get('attribute_id'), $categoryIdResolver($livewire)) === 'select')
-                            ->required(fn (Get $get, $livewire) => self::attributeType($get('attribute_id'), $categoryIdResolver($livewire)) === 'select'),
+                            ->options(fn (Get $get) => self::valueOptions($get('attribute_id')))
+                            ->visible(fn (Get $get) => self::attributeType($get('attribute_id')) === 'select')
+                            ->required(fn (Get $get) => self::attributeType($get('attribute_id')) === 'select'),
 
                         TextInput::make('custom_value')
-                            ->label(fn (Get $get, $livewire) => 'Hodnota '.self::resolveAttribute($get('attribute_id'), $categoryIdResolver($livewire))?->unit)
-                            ->visible(fn (Get $get, $livewire) => self::attributeType($get('attribute_id'), $categoryIdResolver($livewire)) !== 'select')
-                            ->required(fn (Get $get, $livewire) => self::attributeType($get('attribute_id'), $categoryIdResolver($livewire)) !== 'select')
-                            ->numeric(fn (Get $get, $livewire) => self::attributeType($get('attribute_id'), $categoryIdResolver($livewire)) === 'number')
-                            ->helperText(fn (Get $get, $livewire) => self::attributeType($get('attribute_id'), $categoryIdResolver($livewire)) === 'bool' ? 'Zadajte 1 alebo 0' : null),
+                            ->label(fn (Get $get) => 'Hodnota '.Attribute::find($get('attribute_id'))?->unit)
+                            ->visible(fn (Get $get) => self::attributeType($get('attribute_id')) !== 'select')
+                            ->required(fn (Get $get) => self::attributeType($get('attribute_id')) !== 'select')
+                            ->numeric(fn (Get $get) => self::attributeType($get('attribute_id')) === 'number')
+                            ->helperText(fn (Get $get) => self::attributeType($get('attribute_id')) === 'bool' ? 'Zadajte 1 alebo 0' : null),
                     ])
                     ->columns()
                     ->columnSpanFull(),
             ]);
     }
 
-    // ── Helpers ──────────────────────────────────────────────────────────────
-
-    /** @return array<int, string> */
     private static function attributeOptions(?int $categoryId): array
     {
         if (! $categoryId) {
@@ -75,10 +65,9 @@ class ProductAttributesSection
             ->all();
     }
 
-    /** @return array<int, string> */
-    private static function valueOptions(?int $attributeId, ?int $categoryId): array
+    private static function valueOptions(?int $attributeId): array
     {
-        if (! $attributeId || ! $categoryId) {
+        if (! $attributeId) {
             return [];
         }
 
@@ -88,17 +77,8 @@ class ProductAttributesSection
             ->all();
     }
 
-    private static function resolveAttribute(?int $attributeId, ?int $categoryId): ?Attribute
+    private static function attributeType(?int $attributeId): ?string
     {
-        if (! $attributeId || ! $categoryId) {
-            return null;
-        }
-
-        return Attribute::find($attributeId);
-    }
-
-    private static function attributeType(?int $attributeId, ?int $categoryId): ?string
-    {
-        return self::resolveAttribute($attributeId, $categoryId)?->type;
+        return Attribute::find($attributeId)?->type;
     }
 }

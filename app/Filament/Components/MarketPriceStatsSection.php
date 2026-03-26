@@ -57,21 +57,31 @@ class MarketPriceStatsSection
             ])->columns(4);
     }
 
+    private static array $statsCache = [];
+
     private static function stats(int $tenantProductId): ?object
     {
+        if (array_key_exists($tenantProductId, self::$statsCache)) {
+            return self::$statsCache[$tenantProductId];
+        }
+
         $globalProductId = TenantProduct::find($tenantProductId)?->global_product_id;
 
         if (! $globalProductId) {
-            return null;
+            return self::$statsCache[$tenantProductId] = null;
         }
 
-        return PriceHistory::query()
+        $stats = PriceHistory::query()
             ->join('tenant_product_variants as v', 'v.id', '=', 'price_history.tenant_product_variant_id')
             ->join('tenant_products as tp', 'tp.id', '=', 'v.tenant_product_id')
             ->where('tp.global_product_id', $globalProductId)
             ->where('price_history.valid_from', '<=', now())
             ->where(fn ($q) => $q->whereNull('price_history.valid_to')->orWhere('price_history.valid_to', '>=', now()))
-            ->selectRaw('ROUND(AVG(price_history.price), 2) as avg_price, MIN(price_history.price) as min_price, MAX(price_history.price) as max_price, COUNT(*) as total')
+            ->selectRaw('AVG(price_history.price) as avg_price, MIN(price_history.price) as min_price, MAX(price_history.price) as max_price, COUNT(*) as total')
             ->first();
+
+        self::$statsCache[$tenantProductId] = $stats;
+
+        return $stats;
     }
 }
