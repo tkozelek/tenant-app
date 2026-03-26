@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md sticky top-0 z-50 border-b border-neutral-200 dark:border-neutral-800 transition-colors duration-300">
+<nav x-data="{ open: false, mobileSearch: false }" class="bg-white/80 dark:bg-neutral-950/80 backdrop-blur-md sticky top-0 z-50 border-b border-neutral-200 dark:border-neutral-800 transition-colors duration-300">
     <div class="container mx-auto px-4 sm:px-6 lg:px-8">
         <div class="flex justify-between h-16">
             <div class="flex">
@@ -13,6 +13,10 @@
                         @include('layouts.partials.navlinks')
                     @endauth
                 </div>
+            </div>
+
+            <div class="hidden sm:flex sm:flex-1 sm:items-center sm:justify-end px-2">
+                <x-nav-search />
             </div>
 
             <div class="hidden sm:flex sm:items-center sm:ms-6 space-x-4">
@@ -30,12 +34,18 @@
                 @endauth
             </div>
 
-            <div class="-me-2 flex items-center sm:hidden">
-                <button @click="open = ! open" class="inline-flex items-center justify-center p-2 rounded-md text-neutral-400 hover:text-neutral-500 hover:bg-neutral-100 dark:text-neutral-500 dark:hover:text-neutral-400 dark:hover:bg-neutral-800 focus:outline-none transition duration-150 ease-in-out">
-                    <svg class="h-6 w-6" stroke="currentColor" fill="none" viewBox="0 0 24 24">
-                        <path :class="{'hidden': open, 'inline-flex': ! open }" class="inline-flex" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
-                        <path :class="{'hidden': ! open, 'inline-flex': open }" class="hidden" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
+            <div class="-me-2 flex items-center gap-1 sm:hidden">
+                <button @click="mobileSearch = true" class="inline-flex items-center justify-center p-2 rounded-md text-neutral-400 hover:text-neutral-500 hover:bg-neutral-100 dark:text-neutral-500 dark:hover:text-neutral-400 dark:hover:bg-neutral-800 focus:outline-none transition duration-150 ease-in-out">
+                    <i class="fa-solid fa-magnifying-glass h-5 w-5 text-base"></i>
+                </button>
+                <button
+                    @click="open = ! open"
+                    class="inline-flex items-center justify-center p-2 rounded-md text-neutral-400 hover:text-white hover:bg-neutral-800 focus:outline-none transition"
+                >
+                    <span class="w-5 h-5 flex items-center justify-center">
+                        <i x-show="!open" class="fa-solid fa-bars"></i>
+                        <i x-show="open" x-cloak class="fa-solid fa-x"></i>
+                    </span>
                 </button>
             </div>
         </div>
@@ -53,6 +63,31 @@
                     Registrácia
                 </x-responsive-nav-link>
             @endauth
+        </div>
+    </div>
+
+    <div
+        x-show="mobileSearch"
+        @keydown.escape.window="mobileSearch = false"
+        x-transition:enter="transition ease-out duration-200"
+        x-transition:enter-start="opacity-0"
+        x-transition:enter-end="opacity-100"
+        x-transition:leave="transition ease-in duration-150"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        x-cloak
+        class="fixed inset-0 z-[100] bg-neutral-950 sm:hidden flex flex-col"
+    >
+        <div class="flex items-center gap-3 px-4 h-16 border-b border-neutral-800 shrink-0">
+            <div class="flex-1">
+                <livewire:tenant.search-input key="mobile" />
+            </div>
+            <button
+                @click="mobileSearch = false"
+                class="shrink-0 p-2 text-neutral-400 hover:text-white transition-colors"
+            >
+                <i class="fa-solid fa-xmark"></i>
+            </button>
         </div>
     </div>
 </nav>

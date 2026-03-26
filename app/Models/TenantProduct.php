@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
@@ -52,6 +53,11 @@ class TenantProduct extends Model implements HasMedia
     public function tenant(): BelongsTo
     {
         return $this->belongsTo(Tenant::class);
+    }
+
+    public function category(): HasOneThrough
+    {
+        return $this->hasOneThrough(Category::class, GlobalProduct::class, 'id', 'id', 'global_product_id', 'category_id');
     }
 
     public function globalProduct(): BelongsTo
