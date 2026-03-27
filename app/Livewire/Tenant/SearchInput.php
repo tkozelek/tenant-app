@@ -56,11 +56,10 @@ class SearchInput extends Component
 
         return array_map(fn (Category $category) => [
             'type' => 'category',
-            'label' => 'Kategória',
+            'label' => 'Kategoria',
             'name' => $category->name,
             'sub' => null,
-            'price' => null,
-            'url' => null,
+            'url' => route('products.show', $category),
         ], $categories->all());
     }
 
@@ -78,8 +77,7 @@ class SearchInput extends Component
             'label' => 'Global',
             'name' => $product->name,
             'sub' => $product->category?->name,
-            'price' => null,
-            'url' => null,
+            'url' => route('products.product', $product),
         ], $products->all());
     }
 
@@ -87,8 +85,8 @@ class SearchInput extends Component
     {
         $products = TenantProduct::query()
             ->where('is_active', true)
-            ->with('category')
             ->where('name', 'like', "%{$this->search}%")
+            ->with('tenant')
             ->limit(3)
             ->get();
 
@@ -96,9 +94,8 @@ class SearchInput extends Component
             'type' => 'tenant_product',
             'label' => 'Tenant p.',
             'name' => $product->name,
-            'sub' => $product->category?->name,
-            'price' => null,
-            'url' => null,
+            'sub' => $product->tenant?->name,
+            'url' => route('tenant.show', $product->tenant),
         ], $products->all());
     }
 
