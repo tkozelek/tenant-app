@@ -9,6 +9,9 @@
                 </div>
 
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
+                    <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
+                        Produkty
+                    </x-nav-link>
                     @auth()
                         @include('layouts.partials.navlinks')
                     @endauth
@@ -53,6 +56,9 @@
 
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden border-t border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-950">
         <div class="pt-2 pb-3 space-y-1">
+            <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
+                Produkty
+            </x-responsive-nav-link>
             @auth()
                 @include('layouts.partials.phone.phone')
             @else

@@ -18,7 +18,7 @@ class ProductController extends Controller
             ->get();
 
         // nacitam najnovsie aktivne produkty
-        $products = GlobalProduct::where('is_active', true)->with('category')->latest()->paginate(12);
+        $products = GlobalProduct::where('is_active', true)->with(['category', 'media'])->latest()->paginate(12);
 
         return view('products.index', compact('categories', 'products'));
     }
