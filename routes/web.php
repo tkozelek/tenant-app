@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\TenantUserController;
@@ -10,6 +11,11 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/produkty', [ProductController::class, 'index'])->name('products.index');
+Route::get('/produkty/{category:slug}', [ProductController::class, 'show'])->name('products.show');
+Route::get('/produkt/{globalProduct:slug}', [ProductController::class, 'product'])->name('products.product');
+Route::get('/hladat', [ProductController::class, 'search'])->name('products.search');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');

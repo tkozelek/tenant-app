@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1/{tenant:slug}')
     ->middleware('api.auth')
+    ->name('api.v1.')
     ->group(function () {
         Route::apiResource('products', ProductController::class)->only(['index', 'show']);
         Route::apiResource('products.variants', VariantController::class)->only(['index', 'show']);
