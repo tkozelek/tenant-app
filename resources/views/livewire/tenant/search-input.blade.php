@@ -15,6 +15,7 @@
             wire:model.live.debounce.300ms="search"
             @focus="open = true"
             @input="open = true"
+            @keydown.enter.prevent="if($el.value.length >= 2) window.location.href = '{{ route('products.search') }}?q=' + encodeURIComponent($el.value)"
             type="text"
             placeholder="Hľadať..."
             class="w-full pl-8 pr-3 py-2 bg-neutral-800 border border-neutral-700 rounded-lg text-sm text-white placeholder-neutral-500 focus:outline-none focus:ring-1 focus:ring-neutral-500 focus:border-neutral-500 transition-colors"
