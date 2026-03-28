@@ -3,6 +3,7 @@
 namespace App\Filament\Admin\Resources\GlobalProducts\RelationManagers;
 
 use App\Filament\Admin\Resources\GlobalProducts\RelationManagers\Schemas\TenantProductRelationForm;
+use App\Filament\Admin\Resources\TenantProducts\TenantProductResource;
 use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
@@ -30,11 +31,13 @@ class TenantProductsRelationManager extends RelationManager
     {
         return $table
             ->recordTitleAttribute('name')
+            ->recordUrl(fn ($record) => TenantProductResource::getUrl('edit', ['record' => $record]))
             ->columns([
                 TextColumn::make('tenant.name')
                     ->label('Tenant')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->url(fn ($record) => route('tenant.show', $record->tenant)),
 
                 TextColumn::make('name')
                     ->label('Nazvo produktu')
