@@ -1,9 +1,9 @@
 @props(['product'])
 
 <a href="{{ route('products.product', $product) }}"
-   class="group block bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden hover:border-neutral-600 hover:shadow-lg transition-all duration-300">
+   class="group block bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden hover:border-neutral-600 hover:shadow-lg transition-all duration-300">
 
-    <div class="relative aspect-4/3 overflow-hidden bg-neutral-800">
+    <div class="relative aspect-[3/2] overflow-hidden bg-neutral-800">
         @if($product->getFirstMediaUrl('global_products'))
             <img src="{{ $product->getFirstMediaUrl('global_products') }}"
                  alt="{{ $product->name }}"

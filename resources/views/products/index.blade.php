@@ -28,7 +28,7 @@
 
         <h2 class="text-2xl font-bold text-white mt-5 mb-5">Najnovšie produkty</h2>
 
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4">
             @foreach($products as $product)
                 <x-global-product-card :product="$product" />
             @endforeach
