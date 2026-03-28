@@ -85,14 +85,6 @@ class TenantProductVariant extends Model implements HasMedia
             ->orderBy('min_quantity');
     }
 
-    public function quantityPriceHistory(): HasMany
-    {
-        return $this->hasMany(ProductQuantityPrice::class, 'tenant_product_variant_id')
-            ->withTrashed()
-            ->orderBy('valid_from')
-            ->orderBy('min_quantity');
-    }
-
     public function activePriceHistory(): HasOne
     {
         return $this->hasOne(PriceHistory::class, 'tenant_product_variant_id')

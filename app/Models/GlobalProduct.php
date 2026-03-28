@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -67,8 +68,15 @@ class GlobalProduct extends Model implements HasMedia
         );
     }
 
-    public function averageVariantPrice(): ?float
+    protected function minPrice(): Attribute
     {
-        return $this->variants()->avg('tenant_product_variants.price');
+        return Attribute::make(
+            get: function (): ?float {
+                return $this->variants
+                    ->pluck('activePriceHistory')
+                    ->filter()
+                    ->min('price');
+            }
+        );
     }
 }

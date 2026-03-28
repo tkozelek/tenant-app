@@ -32,7 +32,7 @@ class ProductController extends Controller
 
         $products = $category->allGlobalProducts()
             ->where('is_active', true)
-            ->with(['category', 'media', 'globalProductAttributes.attribute', 'globalProductAttributes.attributeValue'])
+            ->with(['category', 'media', 'globalProductAttributes.attribute', 'globalProductAttributes.attributeValue', 'variants.activePriceHistory'])
             ->withCount('tenantProducts')
             ->latest()
             ->paginate(12);
