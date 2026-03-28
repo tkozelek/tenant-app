@@ -49,10 +49,17 @@ class Category extends Model
     public function allDescendants(): Collection
     {
         $descendants = new Collection;
+        $parentIds = [$this->id];
 
-        foreach ($this->children()->with('children')->get() as $child) {
-            $descendants->push($child);
-            $descendants = $descendants->merge($child->allDescendants());
+        while (!empty($parentIds)) {
+            $children = Category::query()->whereIn('parent_id', $parentIds)->get();
+
+            if ($children->isEmpty()) {
+                break;
+            }
+
+            $descendants = $descendants->merge($children);
+            $parentIds = $children->pluck('id')->all();
         }
 
         return $descendants;
@@ -82,6 +89,7 @@ class Category extends Model
 
         return Attribute::query()
             ->whereHas('categories', fn ($q) => $q->whereIn('categories.id', $categoryIds))
+            ->with(['attributeValues' => fn ($q) => $q->orderBy('sort_order')])
             ->get()
             ->unique('id')
             ->values();

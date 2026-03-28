@@ -2,9 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\GlobalProduct;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class ProductController extends Controller
@@ -28,20 +30,30 @@ class ProductController extends Controller
         // nacitam rodicovsku kategoriu a deti
         $category->load('parent', 'children');
 
-        // nacitam aktivne produkty z tejto kategorie aj podkategorii
         $products = $category->allGlobalProducts()
             ->where('is_active', true)
             ->with(['category', 'media', 'globalProductAttributes.attribute', 'globalProductAttributes.attributeValue'])
             ->latest()
             ->paginate(12);
 
-//        dump('PRODUCTS', $products->pluck('name', 'id'));
-
-        // nacitam atributy ktore su oznacene ako filtrovatelne
-        $attributes = $category->allAttributes()
+        $attributes = $category->allAttributes()// collection
             ->where('is_filterable', true);
 
-        return view('products.show', compact('category', 'products', 'attributes'));
+        $attributeRanges = [];
+        foreach ($attributes->where('type', 'number') as $attr) { // filter nad collection/ bez db
+            $range = DB::table('global_product_attributes')
+                ->where('attribute_id', $attr->id)
+                ->whereNotNull('custom_value')
+                ->selectRaw('MIN(CAST(custom_value AS DECIMAL(10,2))) as min_val, MAX(CAST(custom_value AS DECIMAL(10,2))) as max_val')
+                ->first();
+
+            $attributeRanges[$attr->id] = [
+                'min' => (float) ($range->min_val ?? 0),
+                'max' => (float) ($range->max_val ?? 100),
+            ];
+        }
+
+        return view('products.show', compact('category', 'products', 'attributes', 'attributeRanges'));
     }
 
     public function product(GlobalProduct $globalProduct): View
