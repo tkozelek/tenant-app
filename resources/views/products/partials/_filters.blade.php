@@ -2,6 +2,8 @@
     <div class="border-b border-neutral-800 pb-5 last:border-0">
         <h4 class="text-sm font-semibold text-white mb-3">
             {{ $attribute->name }}
+                <span class="text-neutral-500 font-normal">({{ $attribute->unit }})</span>
+            @endif
         </h4>
 
         @if($attribute->type === 'select')
@@ -51,6 +53,14 @@
                 <div x-ref="slider" class="mx-1 me-3"></div>
             </div>
 
+        @elseif($attribute->type === 'bool')
+            <label class="flex items-center gap-2.5 cursor-pointer group/check">
+                <input type="checkbox"
+                       class="w-4 h-4 rounded border-neutral-600 bg-neutral-800 text-white focus:ring-neutral-500 focus:ring-offset-0 cursor-pointer">
+                <span class="text-sm text-neutral-400 group-hover/check:text-white transition-colors">
+                    Ano
+                </span>
+            </label>
         @endif
     </div>
 @endforeach
