@@ -41,6 +41,7 @@ class GlobalProductForm
                             ->searchable()
                             ->preload()
                             ->live()
+                            ->afterStateUpdated(fn (Set $set) => $set('globalProductAttributes', []))
                             ->label('Kategória'),
 
                         Toggle::make('is_active')
@@ -61,6 +62,7 @@ class GlobalProductForm
                 ProductAttributesSection::make(
                     relationship: 'globalProductAttributes',
                     categoryIdResolver: fn (Component $livewire): ?int => $livewire->data['category_id'] ?? null,
+                    multipleValues: true,
                 ),
 
                 Section::make('Médiá')
