@@ -13,6 +13,10 @@ class TenantController extends Controller
 {
     public function show(Tenant $tenant)
     {
+        if (! $tenant->is_public && (! auth()->check() || ! auth()->user()->canAccessTenant($tenant))) {
+            abort(404);
+        }
+
         $products = $tenant->products()
             ->where('is_active', true)
             ->with(['globalProduct.media', 'globalProduct.category', 'variants.activePriceHistory'])
