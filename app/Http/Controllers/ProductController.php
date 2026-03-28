@@ -63,12 +63,15 @@ class ProductController extends Controller
             'media',
             'globalProductAttributes.attribute',
             'globalProductAttributes.attributeValue',
-            'tenantProducts.tenant',
+            'tenantProducts.tenant.media',
             'tenantProducts.variants.activePriceHistory',
             'tenantProducts.variants.variantAttributes',
         ]);
 
-        return view('products.product', compact('globalProduct'));
+        $groupedAttributes = $globalProduct->globalProductAttributes
+            ->groupBy(fn ($row) => $row->attribute?->name);
+
+        return view('products.product', compact('globalProduct', 'groupedAttributes'));
     }
 
     public function search(Request $request): View

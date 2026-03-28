@@ -3,6 +3,7 @@
 
     <div class="container mx-auto px-4 py-6">
         <h1 class="text-2xl font-bold text-white mb-2">Vysledky vyhladavania</h1>
+        <p class="text-neutral-500 mb-8">pre "{{ $query }}"</p>
 
         @if($categories->count() > 0)
             <div class="mb-8">
