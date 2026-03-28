@@ -13,7 +13,17 @@ class TenantController extends Controller
 {
     public function show(Tenant $tenant)
     {
-        return view('tenant.landing', ['tenant' => $tenant]);
+        $products = $tenant->products()
+            ->where('is_active', true)
+            ->with(['globalProduct.media', 'globalProduct.category', 'variants.activePriceHistory'])
+            ->latest()
+            ->take(6)
+            ->get();
+
+        return view('tenant.landing', [
+            'tenant' => $tenant,
+            'products' => $products,
+        ]);
     }
 
     public function create()
