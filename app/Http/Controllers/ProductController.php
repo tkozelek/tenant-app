@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Attribute;
 use App\Models\Category;
 use App\Models\GlobalProduct;
+use App\Models\PriceHistory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
@@ -20,7 +20,7 @@ class ProductController extends Controller
             ->get();
 
         // nacitam najnovsie aktivne produkty
-        $products = GlobalProduct::where('is_active', true)->with(['category', 'media'])->latest()->paginate(12);
+        $products = GlobalProduct::where('is_active', true)->with(['category', 'media'])->withCount('tenantProducts')->latest()->paginate(12);
 
         return view('products.index', compact('categories', 'products'));
     }
@@ -33,6 +33,7 @@ class ProductController extends Controller
         $products = $category->allGlobalProducts()
             ->where('is_active', true)
             ->with(['category', 'media', 'globalProductAttributes.attribute', 'globalProductAttributes.attributeValue'])
+            ->withCount('tenantProducts')
             ->latest()
             ->paginate(12);
 
@@ -71,7 +72,21 @@ class ProductController extends Controller
         $groupedAttributes = $globalProduct->globalProductAttributes
             ->groupBy(fn ($row) => $row->attribute?->name);
 
-        return view('products.product', compact('globalProduct', 'groupedAttributes'));
+        $variantIds = $globalProduct->variants()->pluck('tenant_product_variants.id');
+
+        $priceHistory = PriceHistory::query()
+            ->whereIn('tenant_product_variant_id', $variantIds)
+            ->select(
+                DB::raw('YEARWEEK(valid_from, 1) as week_key'),
+                DB::raw("DATE_FORMAT(MIN(valid_from), '%d.%m.%Y') as week_label"),
+                DB::raw('ROUND(AVG(price), 2) as avg_price'),
+                DB::raw('ROUND(MIN(price), 2) as min_price'),
+            )
+            ->groupBy('week_key')
+            ->orderBy('week_key')
+            ->get();
+
+        return view('products.product', compact('globalProduct', 'groupedAttributes', 'priceHistory'));
     }
 
     public function search(Request $request): View
