@@ -19,6 +19,11 @@
         <span class="text-xs text-neutral-500 font-medium uppercase tracking-wider">{{ $product->category?->name }}</span>
         <h3 class="font-semibold text-white mt-1 line-clamp-2 group-hover:text-neutral-300 transition-colors">
             {{ $product->name }}
+            @if(isset($product->tenant_products_count))
+                <span class="text-xs text-neutral-500 mt-2 inline-block">
+                {{ $product->tenant_products_count }}
+            </span>
+            @endif
         </h3>
 
         @if($product->relationLoaded('globalProductAttributes') && $product->globalProductAttributes->count())
