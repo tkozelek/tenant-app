@@ -15,21 +15,26 @@ class ProductAttributesSection
 {
     public static function make(string $relationship, callable $categoryIdResolver, bool $multipleValues = false): Section
     {
+        $attributeSelector = Select::make('attribute_id')
+            ->label('Atribút')
+            ->options(fn ($livewire) => self::attributeOptions($categoryIdResolver($livewire))) // ziska z parenta kategoriu,
+            ->required()
+            ->live()
+            ->afterStateUpdated(function (Set $set) {
+                $set('attribute_value_id', null);
+                $set('custom_value', null);
+            });
+
+        if ($multipleValues) {
+            $attributeSelector->disableOptionsWhenSelectedInSiblingRepeaterItems();
+        }
+
         $repeater = Repeater::make($relationship)
             ->label('')
             ->defaultItems(0)
             ->addActionLabel('Pridať atribút')
             ->schema([
-                Select::make('attribute_id')
-                    ->label('Atribút')
-                    ->options(fn ($livewire) => self::attributeOptions($categoryIdResolver($livewire))) // ziska z parenta kategoriu, 
-                    ->required()
-                    ->live()
-                    ->afterStateUpdated(function (Set $set) {
-                        $set('attribute_value_id', null);
-                        $set('custom_value', null);
-                    })
-                    ->disableOptionsWhenSelectedInSiblingRepeaterItems(),
+                $attributeSelector,
 
                 Select::make('attribute_value_id')
                     ->label('Hodnota')
