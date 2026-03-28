@@ -58,8 +58,13 @@
                                     <span class="text-red-400">Vypredané</span>
                                 @endif
                             </td>
-                            <td class="px-5 py-3 text-right font-semibold text-white">
-                                {{ $variant->current_price_formatted }}
+                            <td class="px-5 py-3 text-right">
+                                @if($variant->currentOriginalPrice && $variant->currentOriginalPrice > $variant->currentPrice)
+                                    <span class="text-xs text-neutral-500 line-through mr-1">{{ $variant->current_original_price_formatted }}</span>
+                                    <span class="font-semibold text-red-400">{{ $variant->current_price_formatted }}</span>
+                                @else
+                                    <span class="font-semibold text-white">{{ $variant->current_price_formatted }}</span>
+                                @endif
                             </td>
                         </tr>
                     @endforeach
