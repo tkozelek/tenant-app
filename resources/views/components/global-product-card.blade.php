@@ -3,9 +3,9 @@
 <a href="{{ route('products.product', $product) }}"
    class="group block bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden hover:border-neutral-600 hover:shadow-lg transition-all duration-300">
 
-    <div class="relative aspect-[4/3] overflow-hidden bg-neutral-800">
-        @if($product->getFirstMediaUrl())
-            <img src="{{ $product->getFirstMediaUrl() }}"
+    <div class="relative aspect-4/3 overflow-hidden bg-neutral-800">
+        @if($product->getFirstMediaUrl('global_products'))
+            <img src="{{ $product->getFirstMediaUrl('global_products') }}"
                  alt="{{ $product->name }}"
                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
         @else
