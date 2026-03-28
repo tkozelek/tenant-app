@@ -12,7 +12,18 @@
 
         {{-- https://www.penguinui.com/components/tabs --}}
         <div
-            x-data="{ tab: '{{ $globalProduct->tenantProducts->count() > 0 ? 'tenants' : ($priceHistory->isNotEmpty() ? 'price' : 'parameters') }}' }"
+            x-data="{
+                tab: '{{ $globalProduct->tenantProducts->count() > 0 ? 'tenants' : ($priceHistory->isNotEmpty() ? 'price' : 'parameters') }}',
+                highlightedTenant: null,
+                init() {
+                    // fragment: #tenant-{tenant_id}
+                    const hash = window.location.hash.substring(1);
+                    if (hash.startsWith('tenant-')) {
+                        this.tab = 'tenants';
+                        this.highlightedTenant = hash;
+                    }
+                }
+            }"
             class="mt-10">
 
             <div class="text-sm font-medium text-center text-neutral-400 border-b border-neutral-800">

@@ -3,11 +3,13 @@
 @php
     $lowestPrice = $tenantProduct->variants
         ->map(fn ($v) => $v->current_price)
-        ->filter()
         ->min();
 @endphp
 
-<div x-data="{ open: false }" class="bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden">
+<div x-data="{ open: highlightedTenant === 'tenant-{{ $tenantProduct->tenant_id }}' }"
+     :class="highlightedTenant === 'tenant-{{ $tenantProduct->tenant_id }}' && 'ring-1 ring-white/20'"
+     id="tenant-{{ $tenantProduct->tenant_id }}"
+     class="bg-neutral-900 border border-neutral-800 rounded-lg overflow-hidden transition-all">
     <button @click="open = !open" class="w-full flex items-center justify-between px-5 py-4 text-left hover:bg-neutral-800 transition-colors">
         <div class="flex items-center gap-4">
             <div class="w-10 h-10 rounded-lg bg-neutral-800 border border-neutral-700 overflow-hidden shrink-0 flex items-center justify-center">
