@@ -9,7 +9,7 @@
 
         <x-slot name="content">
             <div class="">
-                @can('assignRoles', $tenant)
+                @can('manageRoles', $tenant)
                     <x-dropdown-link :href="route('tenant-user.index', $tenant->slug)"
                                      class="flex items-center px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                         <i class="fa-solid fa-users-gear w-5 mr-2 text-indigo-500 dark:text-indigo-400"></i>
