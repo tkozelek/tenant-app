@@ -12,8 +12,9 @@ class QuantityPriceRepeater
     {
         return Repeater::make('quantityPrices')
             ->relationship()
-            ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
+            ->mutateRelationshipDataBeforeCreateUsing(function (array $data): array {
                 $data['valid_from'] = now();
+
                 return $data;
             })
             ->label('Množstevné ceny (Prepisujú základnú cenu)')

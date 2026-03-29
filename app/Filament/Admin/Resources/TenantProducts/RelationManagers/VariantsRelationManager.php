@@ -7,6 +7,7 @@ use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustS
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\HistoryAction;
 use App\Filament\Admin\Resources\TenantProductVariants\Schemas\TenantProductVariantForm;
 use App\Filament\Admin\Resources\TenantProductVariants\Tables\TenantProductVariantsTable;
+use App\Filament\Admin\Resources\TenantProductVariants\TenantProductVariantResource;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
@@ -40,7 +41,7 @@ class VariantsRelationManager extends RelationManager
             ->recordActions([
                 EditAction::make()
                     ->modalWidth(Width::SevenExtraLarge)
-                    ->modalHeading(fn ($record) => 'Upraviť variantu '.$record?->name)
+                    ->url(fn ($record) => TenantProductVariantResource::getUrl('edit', ['record' => $record]))
                     ->label('Upraviť'),
                 DeleteAction::make()
                     ->label('Zmazať'),
