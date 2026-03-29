@@ -13,17 +13,21 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Spatie\Activitylog\Models\Activity;
+use App\Models\Activity;
+use App\Policies\ActivityLogPolicy;
 
 class ActivityLogResource extends Resource
 {
     protected static ?string $model = Activity::class;
+
+    protected static ?string $policy = ActivityLogPolicy::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
     protected static ?int $navigationSort = 99;
 
     protected static bool $isScopedToTenant = false;
+
 
     public static function getEloquentQuery(): Builder
     {

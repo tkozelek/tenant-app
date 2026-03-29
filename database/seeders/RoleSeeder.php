@@ -85,6 +85,15 @@ class RoleSeeder extends Seeder
             'coupons.import',
         ];
 
+        $bundlesPermissions = [
+            'bundles.view_any',
+            'bundles.create',
+            'bundles.update',
+            'bundles.delete',
+            'bundles.export',
+            'bundles.import',
+        ];
+
         $reportPermissions = [
             'reports.expiring_prices',
             'reports.price_movement',
@@ -164,6 +173,7 @@ class RoleSeeder extends Seeder
             $productPermissions,
             $reportPermissions,
             $apiTokenPermissions,
+            $bundlesPermissions,
         );
 
         foreach ($allPermissions as $permission) {
@@ -202,6 +212,7 @@ class RoleSeeder extends Seeder
             $categoryPermissions,
             $attributePermissions,
             $productPermissions,
+            $bundlesPermissions,
         ));
 
         $tenantManager = Role::firstOrCreate(
@@ -235,6 +246,7 @@ class RoleSeeder extends Seeder
             $productPermissions,
             $categoryPermissions,
             $attributePermissions,
+            $bundlesPermissions,
         ));
 
         $userManager = Role::firstOrCreate(

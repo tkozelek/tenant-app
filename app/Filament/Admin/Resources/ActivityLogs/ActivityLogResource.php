@@ -7,6 +7,7 @@ use App\Filament\Admin\Resources\ActivityLogs\Pages\ViewActivityLog;
 use App\Filament\Admin\Resources\ActivityLogs\Schemas\ActivityLogInfolist;
 use App\Filament\Admin\Resources\ActivityLogs\Tables\ActivityLogsTable;
 use App\Models\Activity;
+use App\Policies\ActivityLogPolicy;
 use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
@@ -16,6 +17,8 @@ use Filament\Tables\Table;
 class ActivityLogResource extends Resource
 {
     protected static ?string $model = Activity::class;
+
+    protected static ?string $policy = ActivityLogPolicy::class;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 

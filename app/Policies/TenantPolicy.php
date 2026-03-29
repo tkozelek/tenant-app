@@ -19,28 +19,18 @@ class TenantPolicy
             return true;
         }
 
-        return true;
+        return false;
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, Tenant $tenant): bool
     {
         if ($user->hasPermissionTo('tenants.view_any')) {
             return true;
         }
 
-        if ($tenant->owner_id === $user->id) {
-            return true;
-        }
-
         return $user->hasPermissionToOnTenant('tenant.access', $tenant->id);
     }
 
-    /**
-     * Determine whether the user can create models.
-     */
     public function create(User $user): bool
     {
         if ($user->hasPermissionTo('tenants.create')) {
@@ -50,25 +40,20 @@ class TenantPolicy
         return false;
     }
 
-    /**
-     * Determine whether the user can update the model.
-     */
+    public function manageRoles(User $user, Tenant $tenant): bool
+    {
+        return $user->hasPermissionToOnTenant('tenant.users.manage', $tenant);
+    }
+
     public function update(User $user, Tenant $tenant): bool
     {
         if ($user->hasPermissionTo('tenants.update')) {
             return true;
         }
 
-        if ($tenant->owner_id === $user->id) {
-            return true;
-        }
-
         return $user->hasPermissionToOnTenant('tenant.settings', $tenant->id);
     }
 
-    /**
-     * Determine whether the user can delete the model.
-     */
     public function delete(User $user, Tenant $tenant): bool
     {
         if ($tenant->owner_id === $user->id) {
@@ -78,39 +63,23 @@ class TenantPolicy
         return false;
     }
 
-    /**
-     * Determine whether the user can restore the model.
-     */
     public function restore(User $user, Tenant $tenant): bool
     {
         return $this->delete($user, $tenant);
     }
 
-    /**
-     * Determine whether the user can permanently delete the model.
-     */
     public function forceDelete(User $user, Tenant $tenant): bool
     {
         return $this->delete($user, $tenant);
     }
 
-    /**
-     * Determine whether the user can manage the tenant (general gate).
-     */
     public function manageTenant(User $user, Tenant $tenant): bool
     {
         return $this->update($user, $tenant);
     }
 
-    /**
-     * Determine whether the user can assign roles in the tenant.
-     */
     public function assignRoles(User $user, Tenant $tenant): bool
     {
-        if ($tenant->owner_id === $user->id) {
-            return true;
-        }
-
         if ($user->hasPermissionTo('tenant.users.manage')) {
             return true;
         }
@@ -118,17 +87,11 @@ class TenantPolicy
         return $user->hasPermissionToOnTenant('tenant.users.manage', $tenant);
     }
 
-    /**
-     * Determine whether the user can export any models.
-     */
     public function exportAny(User $user): bool
     {
         return $user->hasPermissionTo('tenants.export');
     }
 
-    /**
-     * Determine whether the user can import any models.
-     */
     public function importAny(User $user): bool
     {
         return $user->hasPermissionTo('tenants.import');

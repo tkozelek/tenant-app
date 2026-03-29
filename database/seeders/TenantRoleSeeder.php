@@ -64,6 +64,13 @@ class TenantRoleSeeder extends Seeder
             'tenant.coupons.export',
         ];
 
+        $tenantBundlePermissions = [
+            'tenant.bundles.view_any',
+            'tenant.bundles.create',
+            'tenant.bundles.update',
+            'tenant.bundles.delete',
+        ];
+
         $tenantApiTokenPermissions = [
             'tenant.api_tokens.manage',
         ];
@@ -75,6 +82,7 @@ class TenantRoleSeeder extends Seeder
             $tenantVariantPermissions,
             $tenantRequestPermissions,
             $tenantCouponPermissions,
+            $tenantBundlePermissions,
             $tenantApiTokenPermissions,
         );
 
@@ -109,6 +117,7 @@ class TenantRoleSeeder extends Seeder
             $tenantVariantPermissions,
             $tenantRequestPermissions,
             $tenantCouponPermissions,
+            $tenantBundlePermissions,
         ));
 
         $productManager = Role::firstOrCreate(
@@ -126,6 +135,7 @@ class TenantRoleSeeder extends Seeder
             $tenantProductPermissions,
             $tenantVariantPermissions,
             $tenantRequestPermissions,
+            $tenantBundlePermissions,
         ));
 
         $variantManager = Role::firstOrCreate(
@@ -138,7 +148,7 @@ class TenantRoleSeeder extends Seeder
             ]
         );
         $variantManager->syncPermissions(array_merge(
-            ['tenant.access', 'tenant.products.view_any'],
+            ['tenant.access', 'tenant.products.view_any', 'tenant.bundles.view_any'],
             $tenantVariantPermissions,
         ));
 
@@ -168,7 +178,7 @@ class TenantRoleSeeder extends Seeder
             ]
         );
         $tenantCouponManager->syncPermissions(array_merge(
-            ['tenant.access'],
+            ['tenant.access', 'tenant.bundles.view_any'],
             $tenantCouponPermissions,
         ));
 
@@ -197,7 +207,7 @@ class TenantRoleSeeder extends Seeder
             ]
         );
         $tenantAnalyst->syncPermissions(array_merge(
-            ['tenant.access', 'tenant.products.view_any', 'tenant.variants.view_any'],
+            ['tenant.access', 'tenant.products.view_any', 'tenant.variants.view_any', 'tenant.bundles.view_any'],
             $tenantReportPermissions,
         ));
 
