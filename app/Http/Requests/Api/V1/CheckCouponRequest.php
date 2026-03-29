@@ -16,6 +16,8 @@ class CheckCouponRequest extends FormRequest
         return [
             'code' => ['required', 'string'],
             'order_amount' => ['nullable', 'numeric', 'min:0'],
+            'variant_id' => ['nullable', 'integer', 'exists:tenant_product_variants,id'],
+            'category_id' => ['nullable', 'integer', 'exists:categories,id'],
         ];
     }
 }

@@ -65,4 +65,59 @@ class Coupon extends Model
             now()->between($this->starts_at, $this->expires_at) &&
             ($this->usage_limit === null || $this->used_count < $this->usage_limit);
     }
+
+    public function appliesToVariant(TenantProductVariant $variant): bool
+    {
+        $hasVariantRestrictions = $this->productVariants()->exists();
+        $hasCategoryRestrictions = $this->categories()->exists();
+
+        if (! $hasVariantRestrictions && ! $hasCategoryRestrictions) {
+            return true;
+        }
+
+        if ($hasVariantRestrictions && $this->productVariants()->where('tenant_product_variants.id', $variant->id)->exists()) {
+            return true;
+        }
+
+        if ($hasCategoryRestrictions) {
+            $category = $variant->load('product.globalProduct.category')->product?->globalProduct?->category;
+
+            if ($category) {
+                $applicableCategoryIds = $this->categories()
+                    ->pluck('categories.id')
+                    ->flatMap(fn (int $id) => Category::find($id)?->subtreeCategoryIds() ?? [$id])
+                    ->unique()
+                    ->all();
+
+                if (in_array($category->id, $applicableCategoryIds)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function appliesToCategory(Category $category): bool
+    {
+        $hasCategoryRestrictions = $this->categories()->exists();
+
+        if (! $this->productVariants()->exists() && ! $hasCategoryRestrictions) {
+            return true;
+        }
+
+        if ($hasCategoryRestrictions) {
+            $applicableCategoryIds = $this->categories()
+                ->pluck('categories.id')
+                ->flatMap(fn (int $id) => Category::find($id)?->subtreeCategoryIds() ?? [$id])
+                ->unique()
+                ->all();
+
+            if (in_array($category->id, $applicableCategoryIds)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

@@ -7,8 +7,10 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Api\V1\CheckCouponRequest;
 use App\Http\Requests\Api\V1\UseCouponRequest;
 use App\Http\Resources\Api\V1\CouponResource;
+use App\Models\Category;
 use App\Models\Coupon;
 use App\Models\Tenant;
+use App\Models\TenantProductVariant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -39,6 +41,8 @@ class CouponController extends Controller
         );
 
         abort_unless($coupon->tenant_id === $tenant->id, 404);
+
+        $coupon->load(['productVariants', 'categories']);
 
         return new CouponResource($coupon);
     }
@@ -79,6 +83,30 @@ class CouponController extends Controller
             ]);
         }
 
+        if ($variantId = $request->validated('variant_id')) {
+            $variant = TenantProductVariant::find($variantId);
+
+            if (! $variant || ! $coupon->appliesToVariant($variant)) {
+                return response()->json([
+                    'valid' => false,
+                    'message' => 'Coupon is not valid for the specified product variant.',
+                    'coupon' => new CouponResource($coupon),
+                ]);
+            }
+        }
+
+        if ($categoryId = $request->validated('category_id')) {
+            $category = Category::find($categoryId);
+
+            if (! $category || ! $coupon->appliesToCategory($category)) {
+                return response()->json([
+                    'valid' => false,
+                    'message' => 'Coupon is not valid for the specified category.',
+                    'coupon' => new CouponResource($coupon),
+                ]);
+            }
+        }
+
         return response()->json([
             'valid' => true,
             'coupon' => new CouponResource($coupon),
@@ -117,6 +145,28 @@ class CouponController extends Controller
                 'message' => 'Order amount does not meet the minimum required amount.',
                 'min_order_amount' => $coupon->min_order_amount,
             ], 422);
+        }
+
+        if ($variantId = $request->validated('variant_id')) {
+            $variant = TenantProductVariant::find($variantId);
+
+            if (! $variant || ! $coupon->appliesToVariant($variant)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Coupon is not valid for the specified product variant.',
+                ], 422);
+            }
+        }
+
+        if ($categoryId = $request->validated('category_id')) {
+            $category = Category::find($categoryId);
+
+            if (! $category || ! $coupon->appliesToCategory($category)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Coupon is not valid for the specified category.',
+                ], 422);
+            }
         }
 
         $coupon->increment('used_count');
