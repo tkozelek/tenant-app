@@ -43,7 +43,7 @@ class ProductController extends Controller
             'tenantProducts.variants.activePriceHistory',
             'tenantProducts.variants.activeQuantityPrices',
             'tenantProducts.variants.activeCoupons',
-            'category.coupons',
+            'category.activeCoupons',
             'variants.media',
             'variants.variantAttributes',
             'variants.bundles.tenant',
@@ -80,7 +80,7 @@ class ProductController extends Controller
 
         $lowestPrice = $lowestPricePerTenant->filter()->min();
 
-        $categoryCoupons = $globalProduct->category?->coupons->filter(fn ($c) => $c->isValid()) ?? collect();
+        $categoryCoupons = $globalProduct->category?->activeCoupons->filter() ?? collect();
 
         $variantIds = $globalProduct->variants()->pluck('tenant_product_variants.id');
 

@@ -99,4 +99,13 @@ class Category extends Model
     {
         return $this->belongsToMany(Coupon::class, 'coupon_category');
     }
+
+    public function activeCoupons(): BelongsToMany
+    {
+        return $this->belongsToMany(Coupon::class, 'coupon_category')
+            ->where('is_active', true)
+            ->where('starts_at', '<=', now())
+            ->where('expires_at', '>=', now())
+            ->where(fn ($q) => $q->whereNull('usage_limit')->orWhereColumn('used_count', '<', 'usage_limit'));
+    }
 }

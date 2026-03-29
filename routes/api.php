@@ -15,6 +15,7 @@ Route::prefix('v1/{tenant:slug}')
     ->group(function () {
         Route::apiResource('products', ProductController::class)->only(['index', 'show']);
         Route::apiResource('products.variants', VariantController::class)->only(['index', 'show']);
+        Route::get('variants/{sku}', [VariantController::class, 'findBySku'])->name('variants.find-by-sku');
 
         Route::post('variants/{variant}/stock', [StockController::class, 'store']);
         Route::get('variants/{variant}/price-history', [PriceHistoryController::class, 'variant']);

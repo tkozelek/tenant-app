@@ -41,7 +41,7 @@ class ApiTokenPolicy
             return true;
         }
 
-        return $user->hasPermissionTo(['api_tokens.delete']);
+        return $user->hasPermissionTo('api_tokens.delete');
     }
 
     private function canEditToken(User $user): bool

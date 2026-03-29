@@ -18,12 +18,12 @@ class VariantController extends Controller
         abort_unless(
             $request->attributes->get('api_token')->can(ApiPermission::ProductsRead->value),
             403,
-            'Missing permission: '.ApiPermission::ProductsRead->value
+            'Missing permission'
         );
 
         abort_unless($product->tenant_id === $tenant->id, 404);
 
-        return ProductVariantResource::collection($product->variants()->with(['quantityPrices', 'activePriceHistory'])->get());
+        return ProductVariantResource::collection($product->variants()->with(['activeQuantityPrices', 'activePriceHistory', 'variantAttributes'])->get());
     }
 
     public function show(Request $request, Tenant $tenant, TenantProduct $product, TenantProductVariant $variant): ProductVariantResource
@@ -31,13 +31,30 @@ class VariantController extends Controller
         abort_unless(
             $request->attributes->get('api_token')->can(ApiPermission::ProductsRead->value),
             403,
-            'Missing permission: '.ApiPermission::ProductsRead->value
+            'Missing permission'
         );
 
         abort_unless($product->tenant_id === $tenant->id, 404);
         abort_unless($variant->tenant_product_id === $product->id, 404);
 
-        $variant->load('quantityPrices');
+        $variant->load(['activeQuantityPrices', 'activePriceHistory', 'variantAttributes']);
+
+        return new ProductVariantResource($variant);
+    }
+
+    public function findBySku(Request $request, Tenant $tenant, string $sku): ProductVariantResource
+    {
+        abort_unless(
+            $request->attributes->get('api_token')->can(ApiPermission::ProductsRead->value),
+            403,
+            'Missing permission'
+        );
+
+        $variant = TenantProductVariant::query()
+            ->whereHas('product', fn ($q) => $q->where('tenant_id', $tenant->id))
+            ->where('sku', $sku)
+            ->with(['activeQuantityPrices', 'activePriceHistory', 'variantAttributes'])
+            ->firstOrFail();
 
         return new ProductVariantResource($variant);
     }

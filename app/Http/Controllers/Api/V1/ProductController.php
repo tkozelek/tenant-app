@@ -23,7 +23,7 @@ class ProductController extends Controller
         $products = TenantProduct::query()
             ->where('tenant_id', $tenant->id)
             ->where('is_active', true)
-            ->with(['variants.quantityPrices', 'variants.activePriceHistory'])
+            ->with(['variants.activeQuantityPrices', 'variants.activePriceHistory', 'variants.variantAttributes'])
             ->paginate(25);
 
         return ProductResource::collection($products);
@@ -39,7 +39,7 @@ class ProductController extends Controller
 
         abort_unless($product->tenant_id === $tenant->id, 404);
 
-        $product->load(['variants.quantityPrices', 'variants.activePriceHistory']);
+        $product->load(['variants.activeQuantityPrices', 'variants.activePriceHistory', 'variants.variantAttributes']);
 
         return new ProductResource($product);
     }

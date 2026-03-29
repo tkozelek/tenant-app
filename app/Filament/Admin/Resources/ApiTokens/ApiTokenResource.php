@@ -25,14 +25,6 @@ class ApiTokenResource extends Resource
 
     protected static ?int $navigationSort = 100;
 
-    public static function canAccess(): bool
-    {
-        $user = auth()->user();
-        $tenant = Filament::getTenant();
-
-        return $user?->hasPermissionToOnTenant('tenant.view_api_docs', $tenant) ?? false;
-    }
-
     public static function form(Schema $schema): Schema
     {
         return ApiTokenForm::configure($schema);
