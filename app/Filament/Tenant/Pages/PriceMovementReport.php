@@ -109,10 +109,7 @@ class PriceMovementReport extends Page implements HasTable
                         '30' => 'Poslednych 30 dni',
                         '90' => 'Poslednych 90 dni',
                     ])
-                    ->query(fn ($query, array $data) => $data['value']
-                        ? $query->where('ps.last_changed_at', '>=', now()->subDays((int) $data['value']))
-                        : $query
-                    ),
+                    ->query(fn ($query) => $query),
             ])
             ->defaultSort('change_count', 'desc');
     }
@@ -120,6 +117,7 @@ class PriceMovementReport extends Page implements HasTable
     protected function getTableQuery(): \Illuminate\Database\Eloquent\Builder
     {
         $tenantId = Filament::getTenant()->id;
+        $days = $this->tableFilters['activity']['value'] ?? null;
 
         $priceStats = DB::table('price_history as ph')
             ->selectRaw('
@@ -135,6 +133,7 @@ class PriceMovementReport extends Page implements HasTable
             ->join('tenant_product_variants as tpv', 'tpv.id', '=', 'ph.tenant_product_variant_id')
             ->join('tenant_products as tp', 'tp.id', '=', 'tpv.tenant_product_id')
             ->where('tp.tenant_id', $tenantId)
+            ->when($days, fn ($q) => $q->where('ph.created_at', '>=', now()->subDays((int) $days)))
             ->groupBy('ph.tenant_product_variant_id')
             ->havingRaw('COUNT(ph.id) >= 2');
 

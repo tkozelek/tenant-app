@@ -109,16 +109,15 @@ class PriceMovementReport extends Page implements HasTable
                         '30' => 'Poslednych 30 dni',
                         '90' => 'Poslednych 90 dni',
                     ])
-                    ->query(fn ($query, array $data) => $data['value']
-                        ? $query->where('last_changed_at', '>=', now()->subDays((int) $data['value']))
-                        : $query
-                    ),
+                    ->query(fn ($query) => $query),
             ])
             ->defaultSort('change_count', 'desc');
     }
 
     protected function getTableQuery(): \Illuminate\Database\Eloquent\Builder
     {
+        $days = $this->tableFilters['activity']['value'] ?? null;
+
         $priceStats = DB::table('price_history as ph')
             ->selectRaw('
                 ph.tenant_product_variant_id,
@@ -130,13 +129,12 @@ class PriceMovementReport extends Page implements HasTable
                 (SELECT ph2.price FROM price_history ph2 WHERE ph2.tenant_product_variant_id = ph.tenant_product_variant_id ORDER BY ph2.created_at ASC LIMIT 1) as first_price,
                 (SELECT ph3.price FROM price_history ph3 WHERE ph3.tenant_product_variant_id = ph.tenant_product_variant_id ORDER BY ph3.created_at DESC LIMIT 1) as last_price
             ')
+            ->when($days, fn ($q) => $q->where('ph.created_at', '>=', now()->subDays((int) $days)))
             ->groupBy('ph.tenant_product_variant_id')
-            ->havingRaw('COUNT(ph.id) > 1'); // asopn nejaka zmena ceny, viac ako jeden znaznam
 
         return TenantProductVariant::query()
             ->select('tenant_product_variants.*')
             ->selectRaw('ps.change_count, ps.min_price, ps.max_price, ps.price_range, ps.last_changed_at, ps.first_price, ps.last_price')
-            // join cez vyssie uvedeny raw select
             ->joinSub($priceStats, 'ps', 'tenant_product_variants.id', '=', 'ps.tenant_product_variant_id')
             ->with(['product.tenant']);
     }
