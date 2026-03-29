@@ -10,11 +10,13 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
 
 #[ObservedBy([BundleObserver::class])]
-class Bundle extends Model
+class Bundle extends Model implements HasMedia
 {
-    use LogsActivity;
+    use InteractsWithMedia, LogsActivity;
 
     public function getActivitylogOptions(): LogOptions
     {

@@ -10,7 +10,6 @@ class BundleItem extends Model
     protected $fillable = [
         'tenant_product_variant_id',
         'bundle_id',
-        'variant_id',
         'quantity',
     ];
 

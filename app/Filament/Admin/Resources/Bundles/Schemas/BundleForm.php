@@ -7,6 +7,7 @@ use App\Models\TenantProductVariant;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Infolists\Components\TextEntry;
@@ -97,6 +98,15 @@ class BundleForm
                                     ->default(true)
                                     ->required(),
                             ])->columns(),
+                        Section::make('Media')
+                            ->schema([
+                                SpatieMediaLibraryFileUpload::make('media')
+                                    ->collection('bundles')
+                                    ->multiple()
+                                    ->reorderable()
+                                    ->panelLayout('compact')
+                                    ->columnSpanFull(),
+                            ]),
                     ]),
                 Group::make()
                     ->schema([

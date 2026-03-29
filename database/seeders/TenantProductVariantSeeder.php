@@ -66,7 +66,7 @@ class TenantProductVariantSeeder extends Seeder
             } else {
                 TenantProductVariant::withoutEvents(function () use ($product, $storageAttribute, $storageAttr, $basePrice) {
                     $variant = $product->variants()->create([
-                        'name' => 'Štandardná',
+                        'name' => 'Random filler product',
                         'sku' => strtoupper(Str::random(8)),
                         'ean' => fake()->ean13(),
                         'stock_quantity' => 0,
