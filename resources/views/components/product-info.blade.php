@@ -1,13 +1,4 @@
-@props(['product'])
-
-@php
-    $lowestPrice = $product->relationLoaded('tenantProducts')
-        ? $product->tenantProducts
-            ->flatMap->variants
-            ->map(fn ($v) => $v->current_price)
-            ->min()
-        : null;
-@endphp
+@props(['product', 'lowestPrice' => null])
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
     <div>

@@ -8,7 +8,7 @@
             ['label' => $globalProduct->name],
         ]"/>
 
-        <x-product-info :product="$globalProduct"/>
+        <x-product-info :product="$globalProduct" :lowestPrice="$lowestPrice"/>
 
         {{-- https://www.penguinui.com/components/tabs --}}
         <div
@@ -59,7 +59,7 @@
             @if($globalProduct->tenantProducts->count() > 0)
                 <div x-show="tab === 'tenants'" x-transition class="mt-6 space-y-3">
                     @foreach($globalProduct->tenantProducts as $tenantProduct)
-                        <x-tenant-product-accordion :tenantProduct="$tenantProduct"/>
+                        <x-tenant-product-accordion :tenantProduct="$tenantProduct" :lowestPrice="$lowestPricePerTenant[$tenantProduct->id] ?? null"/>
                     @endforeach
                 </div>
             @endif

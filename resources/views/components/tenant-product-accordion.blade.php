@@ -1,10 +1,4 @@
-@props(['tenantProduct'])
-
-@php
-    $lowestPrice = $tenantProduct->variants
-        ->map(fn ($v) => $v->current_price)
-        ->min();
-@endphp
+@props(['tenantProduct', 'lowestPrice' => null])
 
 <x-accordion
     open="highlightedTenant === 'tenant-{{ $tenantProduct->tenant_id }}'"
@@ -64,7 +58,19 @@
                         @endif
                     </td>
                     <td class="px-5 py-3 text-right">
-                        @if($variant->currentOriginalPrice && $variant->currentOriginalPrice > $variant->currentPrice)
+                        @if($variant->relationLoaded('activeQuantityPrices') && $variant->activeQuantityPrices->isNotEmpty())
+                            <div class="flex flex-col items-end gap-0.5">
+                                @foreach($variant->activeQuantityPrices as $tier)
+                                    <span class="text-xs text-neutral-400">
+                                        {{ $tier->min_quantity }}{{ $tier->max_quantity ? '–'.$tier->max_quantity : '+' }} ks:
+                                        <span class="text-white font-semibold">{{ number_format((float) $tier->price, 2, ',', ' ') }} €</span>
+                                    </span>
+                                @endforeach
+                                @if($variant->current_price)
+                                    <span class="text-xs text-neutral-500 mt-0.5">bežná: {{ $variant->current_price_formatted }}</span>
+                                @endif
+                            </div>
+                        @elseif($variant->currentOriginalPrice && $variant->currentOriginalPrice > $variant->currentPrice)
                             <span class="text-xs text-neutral-500 line-through mr-1">{{ $variant->current_original_price_formatted }}</span>
                             <span class="font-semibold text-red-400">{{ $variant->current_price_formatted }}</span>
                         @else

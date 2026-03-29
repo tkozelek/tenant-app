@@ -2,7 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Bundle;
 use App\Models\Category;
 use App\Models\GlobalProduct;
 use App\Models\PriceHistory;
@@ -40,10 +39,11 @@ class ProductController extends Controller
             'media',
             'globalProductAttributes.attribute',
             'globalProductAttributes.attributeValue',
+            'tenantProducts' => fn ($q) => $q->where('is_active', true),
             'tenantProducts.tenant.media',
             'tenantProducts.variants.activePriceHistory',
-            'tenantProducts.variants.media',
-            'variants.activePriceHistory',
+            'tenantProducts.variants.activeQuantityPrices',
+            'variants.media',
             'variants.variantAttributes',
             'variants.bundles.tenant',
             'variants.bundles.media',
@@ -60,21 +60,40 @@ class ProductController extends Controller
             ->unique('id')
             ->values();
 
+        $lowestPricePerTenant = $globalProduct->tenantProducts
+            ->mapWithKeys(function ($tenantProduct) {
+                $lowest = $tenantProduct->variants
+                    ->map(function ($v) {
+                        $prices = collect([$v->current_price]);
+                        if ($v->relationLoaded('activeQuantityPrices')) {
+                            $prices = $prices->merge($v->activeQuantityPrices->pluck('price'));
+                        }
+
+                        return $prices->filter()->min();
+                    })
+                    ->filter()
+                    ->min();
+
+                return [$tenantProduct->id => $lowest];
+            });
+
+        $lowestPrice = $lowestPricePerTenant->filter()->min();
+
         $variantIds = $globalProduct->variants()->pluck('tenant_product_variants.id');
 
         $priceHistory = PriceHistory::query()
             ->whereIn('tenant_product_variant_id', $variantIds)
-            ->select(
-                DB::raw('YEARWEEK(valid_from, 1) as week_key'),
-                DB::raw("DATE_FORMAT(MIN(valid_from), '%d.%m.%Y') as week_label"),
-                DB::raw('ROUND(AVG(price), 2) as avg_price'),
-                DB::raw('ROUND(MIN(price), 2) as min_price'),
-            )
+            ->selectRaw('
+                YEARWEEK(valid_from, 1) as week_key,
+                DATE_FORMAT(MIN(valid_from), "%d.%m.%Y") as week_label,
+                ROUND(AVG(price), 2) as avg_price,
+                ROUND(MIN(price), 2) as min_price
+            ')
             ->groupBy('week_key')
             ->orderBy('week_key')
             ->get();
 
-        return view('products.product', compact('globalProduct', 'groupedAttributes', 'priceHistory', 'bundles'));
+        return view('products.product', compact('globalProduct', 'groupedAttributes', 'priceHistory', 'bundles', 'lowestPrice', 'lowestPricePerTenant'));
     }
 
     public function search(Request $request): View
