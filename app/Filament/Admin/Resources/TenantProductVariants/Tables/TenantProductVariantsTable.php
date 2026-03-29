@@ -37,6 +37,7 @@ class TenantProductVariantsTable
 
                 TextColumn::make('name')
                     ->label('Nazov')
+                    ->tooltip(fn (TenantProductVariant $record): ?string => $record->name)
                     ->searchable()
                     ->limit(15)
                     ->sortable()

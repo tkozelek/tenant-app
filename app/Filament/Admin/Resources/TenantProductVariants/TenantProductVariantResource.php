@@ -12,6 +12,7 @@ use BackedEnum;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
+use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use UnitEnum;
@@ -37,7 +38,17 @@ class TenantProductVariantResource extends Resource
     {
         $table = TenantProductVariantsTable::configure($table, true);
 
-        return $table->modifyQueryUsing(fn (Builder $query) => $query->with('product.tenant'));
+        $table->modifyQueryUsing(fn (Builder $query) => $query->with('product.tenant'));
+
+        $table->filters([
+            SelectFilter::make('tenant')
+            ->multiple()
+            ->relationship('product.tenant', 'name')
+            ->searchable()
+            ->preload(),
+        ]);
+
+        return $table;
     }
 
     public static function getRelations(): array

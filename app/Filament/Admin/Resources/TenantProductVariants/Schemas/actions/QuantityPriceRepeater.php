@@ -6,14 +6,16 @@ use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Utilities\Get;
 
-// 1. FIXED: Correct namespace for Get
-
 class QuantityPriceRepeater
 {
     public static function make(): Repeater
     {
         return Repeater::make('quantityPrices')
             ->relationship()
+            ->mutateRelationshipDataBeforeSaveUsing(function (array $data): array {
+                $data['valid_from'] = now();
+                return $data;
+            })
             ->label('Množstevné ceny (Prepisujú základnú cenu)')
             ->addActionLabel('Pridať množstevnú cenu')
             ->collapsible()
@@ -119,7 +121,7 @@ class QuantityPriceRepeater
                     ->rules([
                         fn (Get $get): \Closure => function (string $attribute, $value, \Closure $fail) use ($get) {
                             $min = $get('min_quantity');
-                            if ($value !== null && $value !== '' && $min !== null && (int) $value <= (int) $min) {
+                            if ($value !== null && $value !== '' && $min !== null && (int) $value < (int) $min) {
                                 $fail('Maximálny počet musí byť väčší ako minimálny počet.');
                             }
                         },
