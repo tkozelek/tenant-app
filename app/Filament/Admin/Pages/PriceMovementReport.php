@@ -2,7 +2,6 @@
 
 namespace App\Filament\Admin\Pages;
 
-use App\Models\PriceHistory;
 use App\Models\TenantProductVariant;
 use App\Models\User;
 use BackedEnum;
@@ -14,7 +13,6 @@ use Filament\Tables\Concerns\InteractsWithTable;
 use Filament\Tables\Contracts\HasTable;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
-use Illuminate\Support\Facades\DB;
 
 class PriceMovementReport extends Page implements HasTable
 {
@@ -38,22 +36,22 @@ class PriceMovementReport extends Page implements HasTable
             ->query($this->getTableQuery())
             ->columns(components: [
                 TextColumn::make('name')
+                    ->tooltip(fn ($record) => $record->name.' '.$record->product->name)
                     ->limit(15)
                     ->label('Variant')
                     ->searchable()
                     ->weight('bold'),
-
-                TextColumn::make('product.name')
-                    ->label('Produkt')
-                    ->searchable()
-                    ->badge()
-                    ->color('info'),
 
                 TextColumn::make('product.tenant.name')
                     ->label('Tenant')
                     ->searchable()
                     ->badge()
                     ->color('gray'),
+
+                TextColumn::make('current_price')
+                    ->label('Cena')
+                    ->money('EUR')
+                    ->sortable(),
 
                 TextColumn::make('change_count')
                     ->label('Zmeny')
@@ -62,13 +60,13 @@ class PriceMovementReport extends Page implements HasTable
                     ->sortable(),
 
                 TextColumn::make('min_price')
-                    ->label('Min cena')
+                    ->label('Min')
                     ->money('EUR')
                     ->sortable()
                     ->color('success'),
 
                 TextColumn::make('max_price')
-                    ->label('Max cena')
+                    ->label('Max')
                     ->money('EUR')
                     ->sortable()
                     ->color('danger'),
@@ -80,11 +78,12 @@ class PriceMovementReport extends Page implements HasTable
                     ->color(fn ($record): string => (float) $record->price_range > 20 ? 'danger' : 'warning'),
 
                 TextColumn::make('trend')
+                    ->headerTooltip('Prva cena - posledna')
                     ->label('Trend')
                     ->state(fn ($record): string => match (true) {
                         $record->first_price === null || $record->last_price === null => '-',
-                        (float) $record->last_price > (float) $record->first_price => '+'.number_format((float) $record->last_price - (float) $record->first_price, 2, ',', ' ').' €',
-                        (float) $record->last_price < (float) $record->first_price => '-'.number_format((float) $record->first_price - (float) $record->last_price, 2, ',', ' ').' €',
+                        (float) $record->last_price > (float) $record->first_price => '+ '.number_format((float) $record->last_price - (float) $record->first_price, 2, ',', ' ').' €',
+                        (float) $record->last_price < (float) $record->first_price => '- '.number_format((float) $record->first_price - (float) $record->last_price, 2, ',', ' ').' €',
                         default => 'bez zmeny',
                     })
                     ->badge()
@@ -109,33 +108,31 @@ class PriceMovementReport extends Page implements HasTable
                         '30' => 'Poslednych 30 dni',
                         '90' => 'Poslednych 90 dni',
                     ])
-                    ->query(fn ($query) => $query),
+                    ->query(function ($query, array $data): void {
+                        if (! empty($data['value'])) {
+                            $query->where('ph.created_at', '>=', now()->subDays((int) $data['value']));
+                        }
+                    }),
             ])
             ->defaultSort('change_count', 'desc');
     }
 
     protected function getTableQuery(): \Illuminate\Database\Eloquent\Builder
     {
-        $days = $this->tableFilters['activity']['value'] ?? null;
-
-        $priceStats = DB::table('price_history as ph')
-            ->selectRaw('
-                ph.tenant_product_variant_id,
-                COUNT(ph.id) as change_count,
+        return TenantProductVariant::query()
+            ->select('tenant_product_variants.*')
+            ->selectRaw(
+                'COUNT(ph.id) as change_count,
                 MIN(ph.price) as min_price,
                 MAX(ph.price) as max_price,
                 MAX(ph.price) - MIN(ph.price) as price_range,
                 MAX(ph.created_at) as last_changed_at,
-                (SELECT ph2.price FROM price_history ph2 WHERE ph2.tenant_product_variant_id = ph.tenant_product_variant_id ORDER BY ph2.created_at ASC LIMIT 1) as first_price,
-                (SELECT ph3.price FROM price_history ph3 WHERE ph3.tenant_product_variant_id = ph.tenant_product_variant_id ORDER BY ph3.created_at DESC LIMIT 1) as last_price
-            ')
-            ->when($days, fn ($q) => $q->where('ph.created_at', '>=', now()->subDays((int) $days)))
-            ->groupBy('ph.tenant_product_variant_id')
-
-        return TenantProductVariant::query()
-            ->select('tenant_product_variants.*')
-            ->selectRaw('ps.change_count, ps.min_price, ps.max_price, ps.price_range, ps.last_changed_at, ps.first_price, ps.last_price')
-            ->joinSub($priceStats, 'ps', 'tenant_product_variants.id', '=', 'ps.tenant_product_variant_id')
+                (SELECT ph2.price FROM price_history ph2 WHERE ph2.tenant_product_variant_id = tenant_product_variants.id ORDER BY ph2.created_at ASC LIMIT 1) as first_price,
+                (SELECT ph3.price FROM price_history ph3 WHERE ph3.tenant_product_variant_id = tenant_product_variants.id ORDER BY ph3.created_at DESC LIMIT 1) as last_price'
+            )
+            ->join('price_history as ph', 'tenant_product_variants.id', '=', 'ph.tenant_product_variant_id')
+            ->groupBy('tenant_product_variants.id')
+            ->havingRaw('COUNT(ph.id) >= 2')
             ->with(['product.tenant']);
     }
 
