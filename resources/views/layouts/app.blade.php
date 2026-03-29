@@ -22,7 +22,7 @@
 
     @isset($header)
         <header class="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md sticky top-0 z-30 border-b border-neutral-200 dark:border-neutral-800">
-            <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+            <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8">
                 <h1 class="text-xl font-semibold text-neutral-900 dark:text-white leading-tight">
                     {{ $header }}
                 </h1>

@@ -30,7 +30,7 @@ class TenantForm
                         ->label('Slug')
                         ->required()
                         ->unique(ignoreRecord: true)
-                        ->prefix(config('app.url')),
+                        ->prefix(config('app.url').'obchod/'),
 
                     TextInput::make('short_description')
                         ->label('Tagline (meta)')

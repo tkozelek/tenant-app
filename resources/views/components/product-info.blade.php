@@ -5,22 +5,19 @@
         ? $product->tenantProducts
             ->flatMap->variants
             ->map(fn ($v) => $v->current_price)
-            ->filter()
             ->min()
         : null;
 @endphp
 
 <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
     <div>
-        <div class="aspect-auto bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden">
-            @if($product->getFirstMediaUrl('global_products'))
-                <img lazy src="{{ $product->getFirstMediaUrl('global_products') }}" alt="{{ $product->name }}" class="w-full h-full object-contain">
-            @else
-                <div class="w-full h-full flex items-center justify-center">
-                    <i class="fa-solid fa-box text-6xl text-neutral-700"></i>
-                </div>
-            @endif
-        </div>
+        <x-media-thumbnail
+            :url="$product->getFirstMediaUrl('global_products')"
+            :alt="$product->name"
+            icon="fa-box"
+            :cover="false"
+            class="aspect-auto bg-neutral-900 border border-neutral-800 rounded-xl"
+        />
     </div>
 
     <div>

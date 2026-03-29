@@ -32,7 +32,7 @@
                 <x-input-label for="slug" value="URL adresa (slug)" />
                 <div class="mt-1 flex rounded-md shadow-sm">
                     <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-300 text-sm">
-                        {{ config('app.url') }}/
+                        {{ config('app.url') }}obchod/
                     </span>
                     <x-text-input id="slug" name="slug" type="text" class="rounded-l-none" :value="old('slug', $tenant->slug ?? '')" required placeholder="moj-obchod" />
                 </div>

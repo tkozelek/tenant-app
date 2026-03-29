@@ -15,6 +15,6 @@ class BundleItem extends Model
 
     public function variant(): BelongsTo
     {
-        return $this->belongsTo(TenantProductVariant::class, 'variant_id');
+        return $this->belongsTo(TenantProductVariant::class, 'tenant_product_variant_id');
     }
 }

@@ -13,7 +13,7 @@
         {{-- https://www.penguinui.com/components/tabs --}}
         <div
             x-data="{
-                tab: '{{ $globalProduct->tenantProducts->count() > 0 ? 'tenants' : ($priceHistory->isNotEmpty() ? 'price' : 'parameters') }}',
+                tab: '{{ $globalProduct->tenantProducts->count() > 0 ? 'tenants' : ($bundles->isNotEmpty() ? 'bundles' : ($priceHistory->isNotEmpty() ? 'price' : 'parameters')) }}',
                 highlightedTenant: null,
                 init() {
                     // fragment: #tenant-{tenant_id}
@@ -41,6 +41,13 @@
                         </x-tab>
                     @endif
 
+                    @if($bundles->isNotEmpty())
+                        <x-tab name="'bundles'">
+                            <x-slot name="additional">{{ $bundles->count() }}</x-slot>
+                            Balíčky
+                        </x-tab>
+                    @endif
+
                     @if($groupedAttributes?->isNotEmpty())
                         <x-tab name="'parameters'">
                             Parametre
@@ -62,6 +69,14 @@
                     <div class="bg-neutral-900 rounded-xl p-4 sm:p-6 h-96">
                         <canvas id="priceChart" height="300"></canvas>
                     </div>
+                </div>
+            @endif
+
+            @if($bundles->isNotEmpty())
+                <div x-show="tab === 'bundles'" x-transition class="mt-6 space-y-4">
+                    @foreach($bundles as $bundle)
+                        <x-bundle-accordion :bundle="$bundle" />
+                    @endforeach
                 </div>
             @endif
 

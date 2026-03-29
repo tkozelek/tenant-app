@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bundle;
 use App\Models\Category;
 use App\Models\GlobalProduct;
 use App\Models\PriceHistory;
@@ -41,11 +42,23 @@ class ProductController extends Controller
             'globalProductAttributes.attributeValue',
             'tenantProducts.tenant.media',
             'tenantProducts.variants.activePriceHistory',
-            'tenantProducts.variants.variantAttributes',
+            'tenantProducts.variants.media',
+            'variants.activePriceHistory',
+            'variants.variantAttributes',
+            'variants.bundles.tenant',
+            'variants.bundles.media',
+            'variants.bundles.items.variant.activePriceHistory',
+            'variants.bundles.items.variant.media',
         ]);
 
         $groupedAttributes = $globalProduct->globalProductAttributes
             ->groupBy(fn ($row) => $row->attribute?->name);
+
+        $bundles = $globalProduct->variants
+            ->flatMap(fn ($v) => $v->bundles)
+            ->where('is_active', true)
+            ->unique('id')
+            ->values();
 
         $variantIds = $globalProduct->variants()->pluck('tenant_product_variants.id');
 
@@ -61,7 +74,7 @@ class ProductController extends Controller
             ->orderBy('week_key')
             ->get();
 
-        return view('products.product', compact('globalProduct', 'groupedAttributes', 'priceHistory'));
+        return view('products.product', compact('globalProduct', 'groupedAttributes', 'priceHistory', 'bundles'));
     }
 
     public function search(Request $request): View

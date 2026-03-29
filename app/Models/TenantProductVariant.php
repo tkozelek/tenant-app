@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Spatie\Activitylog\LogOptions;
@@ -130,6 +131,21 @@ class TenantProductVariant extends Model implements HasMedia
             get: fn (): string => $this->currentOriginalPrice !== null
                 ? number_format($this->currentOriginalPrice, 2, ',', ' ').' €'
                 : '-'
+        );
+    }
+
+    public function bundleItems(): HasMany
+    {
+        return $this->hasMany(BundleItem::class, 'tenant_product_variant_id');
+    }
+
+    public function bundles(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            Bundle::class,
+            'bundle_items',
+            'tenant_product_variant_id',
+            'bundle_id'
         );
     }
 
