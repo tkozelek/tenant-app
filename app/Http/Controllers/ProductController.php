@@ -6,7 +6,6 @@ use App\Models\Category;
 use App\Models\GlobalProduct;
 use App\Models\PriceHistory;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 class ProductController extends Controller
@@ -43,6 +42,8 @@ class ProductController extends Controller
             'tenantProducts.tenant.media',
             'tenantProducts.variants.activePriceHistory',
             'tenantProducts.variants.activeQuantityPrices',
+            'tenantProducts.variants.activeCoupons',
+            'category.coupons',
             'variants.media',
             'variants.variantAttributes',
             'variants.bundles.tenant',
@@ -79,6 +80,8 @@ class ProductController extends Controller
 
         $lowestPrice = $lowestPricePerTenant->filter()->min();
 
+        $categoryCoupons = $globalProduct->category?->coupons->filter(fn ($c) => $c->isValid()) ?? collect();
+
         $variantIds = $globalProduct->variants()->pluck('tenant_product_variants.id');
 
         $priceHistory = PriceHistory::query()
@@ -93,7 +96,7 @@ class ProductController extends Controller
             ->orderBy('week_key')
             ->get();
 
-        return view('products.product', compact('globalProduct', 'groupedAttributes', 'priceHistory', 'bundles', 'lowestPrice', 'lowestPricePerTenant'));
+        return view('products.product', compact('globalProduct', 'groupedAttributes', 'priceHistory', 'bundles', 'lowestPrice', 'lowestPricePerTenant', 'categoryCoupons'));
     }
 
     public function search(Request $request): View

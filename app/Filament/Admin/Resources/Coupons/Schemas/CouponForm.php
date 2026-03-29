@@ -13,6 +13,7 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Components\Utilities\Get;
+use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 
 class CouponForm
@@ -30,7 +31,9 @@ class CouponForm
                                     ->relationship('tenant', 'name')
                                     ->required()
                                     ->searchable()
-                                    ->preload(),
+                                    ->preload()
+                                    ->live()
+                                    ->afterStateUpdated(fn (Set $set) => $set('tenantProductVariants', [])),
 
                                 TextInput::make('code')
                                     ->label('Kod')
@@ -96,9 +99,15 @@ class CouponForm
                                     ->searchable(),
                                 Select::make('tenantProductVariants')
                                     ->label('Varianty produktov')
-                                    ->relationship('productVariants', 'name')
+                                    ->relationship(
+                                        'productVariants',
+                                        'name',
+                                        fn ($query, Get $get) => $query->whereHas(
+                                            'product',
+                                            fn ($q) => $q->where('tenant_id', $get('tenant_id'))
+                                        )
+                                    )
                                     ->multiple()
-                                    ->preload()
                                     ->searchable(),
                             ])->columns(),
                     ]),

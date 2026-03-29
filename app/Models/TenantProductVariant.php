@@ -73,6 +73,15 @@ class TenantProductVariant extends Model implements HasMedia
         return $this->belongsToMany(Coupon::class, 'coupon_product_variant');
     }
 
+    public function activeCoupons(): BelongsToMany
+    {
+        return $this->belongsToMany(Coupon::class, 'coupon_product_variant')
+            ->where('is_active', true)
+            ->where('starts_at', '<=', now())
+            ->where('expires_at', '>=', now())
+            ->where(fn ($q) => $q->whereNull('usage_limit')->orWhereColumn('used_count', '<', 'usage_limit'));
+    }
+
     public function variantAttributes(): HasMany
     {
         return $this->hasMany(VariantAttribute::class, 'tenant_product_variant_id')

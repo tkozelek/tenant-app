@@ -51,7 +51,7 @@ class Category extends Model
         $descendants = new Collection;
         $parentIds = [$this->id];
 
-        while (!empty($parentIds)) {
+        while (! empty($parentIds)) {
             $children = Category::query()->whereIn('parent_id', $parentIds)->get();
 
             if ($children->isEmpty()) {

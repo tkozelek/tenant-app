@@ -1,4 +1,4 @@
-@props(['tenantProduct', 'lowestPrice' => null])
+@props(['tenantProduct', 'lowestPrice' => null, 'categoryCoupons' => collect()])
 
 <x-accordion
     open="highlightedTenant === 'tenant-{{ $tenantProduct->tenant_id }}'"
@@ -18,6 +18,15 @@
         <span class="text-xs bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full shrink-0">
             {{ $tenantProduct->variants->count() }} - variant
         </span>
+        @foreach($categoryCoupons as $coupon)
+            <div class="flex items-center gap-1.5 bg-yellow-900 border border-yellow-800 rounded-full px-2.5 py-0.5 shrink-0">
+                <span class="font-bold text-yellow-200 text-xs tracking-wide">{{ $coupon->code }}</span>
+                <span class="text-xs text-neutral-300">{{ $coupon->discount_type === 'percentage' ? number_format((float) $coupon->value, 0).'%' : number_format((float) $coupon->value, 2, ',', ' ').' €' }}</span>
+                @if($coupon->min_order_amount)
+                    <span class="text-xs text-neutral-300"> - min. {{ number_format((float) $coupon->min_order_amount, 2, ',', ' ') }} €</span>
+                @endif
+            </div>
+        @endforeach
     </x-slot>
 
     <x-slot name="aside">
@@ -32,6 +41,7 @@
                 <th class="px-5 py-2 font-medium">Variant</th>
                 <th class="px-5 py-2 font-medium">SKU</th>
                 <th class="px-5 py-2 font-medium">Sklad</th>
+                <th class="px-5 py-2 font-medium">Kupóny</th>
                 <th class="px-5 py-2 font-medium text-right">Cena</th>
             </tr>
         </thead>
@@ -55,6 +65,25 @@
                             <span class="text-green-400">{{ $variant->stock_quantity }} ks</span>
                         @else
                             <span class="text-red-400">Vypredané</span>
+                        @endif
+                    </td>
+                    <td class="px-5 py-3">
+                        @if($variant->relationLoaded('activeCoupons') && $variant->activeCoupons->isNotEmpty())
+                            <div class="flex flex-col gap-1">
+                                @foreach($variant->activeCoupons as $coupon)
+                                    <div class="flex flex-col">
+                                        <span class="font-mono text-xs font-bold text-yellow-400 tracking-wide">{{ $coupon->code }}</span>
+                                        <span class="text-xs text-neutral-300">
+                                            {{ $coupon->discount_type === 'percentage' ? number_format((float) $coupon->value, 0).'%' : number_format((float) $coupon->value, 2, ',', ' ').' €' }} zľava
+                                        </span>
+                                        @if($coupon->min_order_amount)
+                                            <span class="text-xs text-neutral-500">min. {{ number_format((float) $coupon->min_order_amount, 2, ',', ' ') }} €</span>
+                                        @endif
+                                    </div>
+                                @endforeach
+                            </div>
+                        @else
+                            <span class="text-neutral-600">-</span>
                         @endif
                     </td>
                     <td class="px-5 py-3 text-right">

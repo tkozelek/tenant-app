@@ -6,6 +6,8 @@ use App\Filament\Tenant\Resources\ActivityLogs\Pages\ListActivityLogs;
 use App\Filament\Tenant\Resources\ActivityLogs\Pages\ViewActivityLog;
 use App\Filament\Tenant\Resources\ActivityLogs\Schemas\ActivityLogInfolist;
 use App\Filament\Tenant\Resources\ActivityLogs\Tables\ActivityLogsTable;
+use App\Models\Activity;
+use App\Policies\ActivityLogPolicy;
 use BackedEnum;
 use Filament\Facades\Filament;
 use Filament\Resources\Resource;
@@ -13,8 +15,6 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use App\Models\Activity;
-use App\Policies\ActivityLogPolicy;
 
 class ActivityLogResource extends Resource
 {
@@ -27,7 +27,6 @@ class ActivityLogResource extends Resource
     protected static ?int $navigationSort = 99;
 
     protected static bool $isScopedToTenant = false;
-
 
     public static function getEloquentQuery(): Builder
     {

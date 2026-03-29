@@ -8,8 +8,8 @@ use App\Models\Category;
 use App\Models\GlobalProduct;
 use App\Models\GlobalProductAttribute;
 use App\Models\PriceHistory;
-use App\Models\TenantProductVariant;
 use App\Models\Tenant;
+use App\Models\TenantProductVariant;
 use Illuminate\Contracts\View\View;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -71,8 +71,8 @@ class ProductBrowser extends Component
         $categoryIds = $this->subCategoryIds();
 
         return Tenant::query()
-            ->whereHas('products', fn($q) => $q
-                ->whereHas('globalProduct', fn($gp) => $gp
+            ->whereHas('products', fn ($q) => $q
+                ->whereHas('globalProduct', fn ($gp) => $gp
                     ->whereIn('category_id', $categoryIds)
                     ->where('is_active', true)
                 )
@@ -159,7 +159,7 @@ class ProductBrowser extends Component
                 ->whereHas('product', fn ($q) => $q
                     ->whereColumn('global_product_id', 'global_products.id')
                 )
-                ->selectRaw('MIN((' . $perVariantPrice->toSql() . '))', $perVariantPrice->getBindings());
+                ->selectRaw('MIN(('.$perVariantPrice->toSql().'))', $perVariantPrice->getBindings());
 
             $query->addSelect(['min_price' => $minPriceSubquery])
                 ->orderByRaw('min_price IS NULL, min_price ASC');

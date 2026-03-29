@@ -6,7 +6,6 @@ use App\Filament\Admin\Resources\TenantProducts\RelationManagers\components\Vari
 use App\Filament\Components\MarketPriceStatsSection;
 use App\Filament\Components\PriceMakingSection;
 use App\Models\TenantProduct;
-use App\Models\TenantProductVariant;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
@@ -95,7 +94,7 @@ class TenantProductVariantForm
 
                             VariantAttributesSection::make(),
 
-                            ])->columnSpan(1),
+                        ])->columnSpan(1),
 
                         Group::make([
                             MarketPriceStatsSection::make(),

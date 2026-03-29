@@ -10,7 +10,8 @@
 
         <x-product-info :product="$globalProduct" :lowestPrice="$lowestPrice"/>
 
-        {{-- https://www.penguinui.com/components/tabs --}}
+
+{{-- https://www.penguinui.com/components/tabs --}}
         <div
             x-data="{
                 tab: '{{ $globalProduct->tenantProducts->count() > 0 ? 'tenants' : ($bundles->isNotEmpty() ? 'bundles' : ($priceHistory->isNotEmpty() ? 'price' : 'parameters')) }}',
@@ -59,7 +60,11 @@
             @if($globalProduct->tenantProducts->count() > 0)
                 <div x-show="tab === 'tenants'" x-transition class="mt-6 space-y-3">
                     @foreach($globalProduct->tenantProducts as $tenantProduct)
-                        <x-tenant-product-accordion :tenantProduct="$tenantProduct" :lowestPrice="$lowestPricePerTenant[$tenantProduct->id] ?? null"/>
+                        <x-tenant-product-accordion
+                        :tenantProduct="$tenantProduct"
+                        :lowestPrice="$lowestPricePerTenant[$tenantProduct->id] ?? null"
+                        :categoryCoupons="$categoryCoupons->where('tenant_id', $tenantProduct->tenant_id)->values()"
+                    />
                     @endforeach
                 </div>
             @endif
@@ -90,7 +95,7 @@
     </div>
     @if($priceHistory->isNotEmpty())
         @push('styles')
-            <script src="https://cdn.jsdelivr.net/npm/chart.js@4"></script>
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         @endpush
 
         <script>

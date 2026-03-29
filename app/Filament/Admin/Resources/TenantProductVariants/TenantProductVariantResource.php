@@ -42,10 +42,10 @@ class TenantProductVariantResource extends Resource
 
         $table->filters([
             SelectFilter::make('tenant')
-            ->multiple()
-            ->relationship('product.tenant', 'name')
-            ->searchable()
-            ->preload(),
+                ->multiple()
+                ->relationship('product.tenant', 'name')
+                ->searchable()
+                ->preload(),
         ]);
 
         return $table;
