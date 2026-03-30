@@ -41,6 +41,10 @@ class GlobalProductsTable
                     ->boolean()
                     ->label('Aktívny'),
 
+                IconColumn::make('is_featured')
+                    ->boolean()
+                    ->label('Odporúčaný'),
+
                 TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -55,6 +59,8 @@ class GlobalProductsTable
                     ->label('Podľa kategórie'),
                 TernaryFilter::make('is_active')
                     ->label('Je aktívny'),
+                TernaryFilter::make('is_featured')
+                    ->label('Je odporúčaný'),
             ])
             ->recordActions([
                 EditAction::make(),

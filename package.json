@@ -16,6 +16,7 @@
     },
     "dependencies": {
         "alpinejs": "^3.15.5",
+        "embla-carousel": "^8.6.0",
         "nouislider": "^15.8.1"
     }
 }

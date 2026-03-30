@@ -8,16 +8,19 @@ use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\History
 use App\Filament\Admin\Resources\TenantProductVariants\Schemas\TenantProductVariantForm;
 use App\Filament\Admin\Resources\TenantProductVariants\Tables\TenantProductVariantsTable;
 use App\Filament\Admin\Resources\TenantProductVariants\TenantProductVariantResource;
+use Filament\Actions\AssociateAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\DissociateAction;
 use Filament\Actions\DissociateBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Resources\RelationManagers\RelationManager;
 use Filament\Schemas\Schema;
 use Filament\Support\Enums\Width;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
 
 class VariantsRelationManager extends RelationManager
 {
@@ -37,6 +40,12 @@ class VariantsRelationManager extends RelationManager
                 CreateAction::make()
                     ->modalHeading('Pridať variant produktu '.$this->getOwnerRecord()?->name)
                     ->label('Pridať variant'),
+                AssociateAction::make()
+                    ->label('Attach')
+                    ->recordSelectSearchColumns(['name', 'sku'])
+                    ->recordSelectOptionsQuery(fn (Builder $query) => $query
+                        ->whereHas('product', fn (Builder $q) => $q->where('tenant_id', $this->getOwnerRecord()?->tenant_id))
+                    ),
             ])
             ->recordActions([
                 EditAction::make()
@@ -47,6 +56,7 @@ class VariantsRelationManager extends RelationManager
                     ->label('Zmazať'),
                 AdjustPriceAction::make(),
                 AdjustStockAction::make(),
+                DissociateAction::make(),
                 HistoryAction::make(),
             ])
             ->toolbarActions([

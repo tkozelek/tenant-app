@@ -1,4 +1,5 @@
 @import 'tailwindcss';
+@import 'nouislider/dist/nouislider.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
@@ -30,4 +31,31 @@ html {
 }
 .animate-float {
     animation: float 6s ease-in-out infinite;
+}
+
+.noUi-target {
+    background: var(--color-neutral-800);
+    border: none;
+    box-shadow: none;
+    height: 4px;
+}
+.noUi-connect {
+    background: var(--color-neutral-400);
+}
+.noUi-handle {
+    background: white;
+    border: none;
+    box-shadow: none;
+    width: 16px !important;
+    height: 16px !important;
+    border-radius: 9999px;
+    top: -6px !important;
+    cursor: grab;
+}
+.noUi-handle:active {
+    cursor: grabbing;
+}
+.noUi-handle::before,
+.noUi-handle::after {
+    display: none;
 }

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -19,7 +20,7 @@ class GlobalProduct extends Model implements HasMedia
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'slug', 'description', 'is_active', 'category_id'])
+            ->logOnly(['name', 'slug', 'description', 'is_active', 'is_featured', 'category_id'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->useLogName('global_product');
@@ -31,13 +32,20 @@ class GlobalProduct extends Model implements HasMedia
         'slug',
         'description',
         'is_active',
+        'is_featured',
     ];
 
     protected function casts(): array
     {
         return [
             'is_active' => 'boolean',
+            'is_featured' => 'boolean',
         ];
+    }
+
+    public function scopeFeatured(Builder $query): void
+    {
+        $query->where('is_featured', true)->where('is_active', true);
     }
 
     public function category(): BelongsTo

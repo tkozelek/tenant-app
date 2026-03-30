@@ -57,6 +57,11 @@ class GlobalProductForm
                                             ->default(true)
                                             ->inline(false),
 
+                                        Toggle::make('is_featured')
+                                            ->label('Odporúčaný')
+                                            ->default(false)
+                                            ->inline(false),
+
                                         RichEditor::make('description')
                                             ->columnSpanFull()
                                             ->hintAction(
