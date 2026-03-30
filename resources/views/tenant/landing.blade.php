@@ -4,10 +4,10 @@
     @section('og.description', $tenant->short_description ?? null)
     @section('og.url', request()->url() ?? null)
 
-    <div class="container mx-auto min-h-screen bg-neutral-950">
+    <div class="min-h-screen bg-neutral-950">
         <x-tenant.hero :tenant="$tenant" />
 
-        <div class="px-4 sm:px-6 lg:px-8 py-10 flex flex-col gap-10">
+        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col gap-10">
             @if(!empty($tenant->description))
                 <x-tenant.about :tenant="$tenant" />
             @endif
