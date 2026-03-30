@@ -15,14 +15,22 @@
 
     <div class="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent"></div>
 
-    <div class="absolute top-4 left-4 z-20">
+    <div class="absolute top-4 left-4 right-4 z-20 flex justify-between items-start">
         <a href="{{ url()->previous() }}"
-           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full text-white text-sm hover:bg-white/20 transition-colors">
-            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 12H5m0 0l7 7m-7-7l7-7"/>
-            </svg>
+           class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm hover:bg-neutral-800 transition-colors">
+            <i class="fa-solid fa-arrow-left text-xs"></i>
             Späť
         </a>
+
+        @auth
+            @can('view', $tenant)
+                <a href="{{ route('filament.tenant.pages.dashboard', $tenant) }}"
+                   class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-neutral-900 border border-neutral-700 rounded-lg text-white text-sm hover:bg-neutral-800 transition-colors">
+                    <i class="fa-solid fa-gear"></i>
+                    Panel
+                </a>
+            @endcan
+        @endauth
     </div>
 
     <div class="absolute bottom-0 left-0 right-0 px-6 pb-5 flex items-end gap-4">

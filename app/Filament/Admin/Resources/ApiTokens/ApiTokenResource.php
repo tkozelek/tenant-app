@@ -8,7 +8,6 @@ use App\Filament\Admin\Resources\ApiTokens\Schemas\ApiTokenForm;
 use App\Filament\Admin\Resources\ApiTokens\Tables\ApiTokensTable;
 use App\Models\ApiToken;
 use BackedEnum;
-use Filament\Facades\Filament;
 use Filament\Resources\Resource;
 use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;

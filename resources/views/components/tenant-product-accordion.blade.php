@@ -14,7 +14,7 @@
             class="w-10 h-10 rounded-lg"
         />
         <div>
-            <span class="font-semibold text-white block leading-tight">{{ $tenantProduct->tenant->name }}</span>
+            <a href="{{ route('tenant.show', $tenantProduct->tenant) }}" class="font-semibold text-white hover:text-neutral-300 block leading-tight" target="_blank">{{ $tenantProduct->tenant->name }}</a>
         </div>
         <span class="text-xs bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full shrink-0">
             {{ $tenantProduct->variants->count() }} - variant

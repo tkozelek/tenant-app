@@ -7,6 +7,7 @@ use App\Filament\Tenant\Widgets\TenantStockOverviewChart;
 use App\Http\Middleware\SetPermissionsTeamId;
 use App\Models\Tenant;
 use Filament\Actions\Action;
+use Filament\Facades\Filament;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -59,6 +60,11 @@ class TenantPanelProvider extends PanelProvider
                     ->label('Späť na aplikáciu')
                     ->icon('heroicon-o-arrow-left-circle')
                     ->url(fn (): string => route('dashboard.index')),
+                Action::make('tenantLandingPage')
+                    ->label('Verejná stránka')
+                    ->icon('heroicon-o-globe-alt')
+                    ->url(fn (): string => route('tenant.show', Filament::getTenant()))
+                    ->openUrlInNewTab(),
             ])
             ->tenantMiddleware([
                 SetPermissionsTeamId::class,
