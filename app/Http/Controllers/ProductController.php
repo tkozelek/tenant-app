@@ -63,17 +63,23 @@ class ProductController extends Controller
 
         $lowestPricePerTenant = $globalProduct->tenantProducts
             ->mapWithKeys(function ($tenantProduct) {
-                $lowest = $tenantProduct->variants
-                    ->map(function ($v) {
-                        $prices = collect([$v->current_price]);
-                        if ($v->relationLoaded('activeQuantityPrices')) {
-                            $prices = $prices->merge($v->activeQuantityPrices->pluck('price'));
-                        }
+                $variantPrices = $tenantProduct->variants->map(function ($v) {
+                    $prices = collect([$v->current_price]);
+                    if ($v->relationLoaded('activeQuantityPrices')) {
+                        $prices = $prices->merge($v->activeQuantityPrices->pluck('price'));
+                    }
 
-                        return $prices->filter()->min();
-                    })
-                    ->filter()
-                    ->min();
+                    return $prices->filter()->min();
+                });
+
+                $lowest = $variantPrices->filter()->min();
+
+                $tenantProduct->variants->each(function ($v, $key) use ($variantPrices, $lowest) {
+                    $v->is_cheapest = $lowest !== null
+                        && isset($variantPrices[$key])
+                        && $variantPrices[$key] !== null
+                        && bccomp((string) $variantPrices[$key], (string) $lowest, 2) === 0;
+                });
 
                 return [$tenantProduct->id => $lowest];
             });

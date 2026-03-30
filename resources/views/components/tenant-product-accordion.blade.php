@@ -1,9 +1,10 @@
-@props(['tenantProduct', 'lowestPrice' => null, 'categoryCoupons' => collect()])
+@props(['tenantProduct', 'lowestPrice' => null, 'isCheapest' => false, 'categoryCoupons' => collect()])
 
 <x-accordion
     open="highlightedTenant === 'tenant-{{ $tenantProduct->tenant_id }}'"
     :id="'tenant-'.$tenantProduct->tenant_id"
     x-bind:class="highlightedTenant === 'tenant-{{ $tenantProduct->tenant_id }}' && 'ring-1 ring-white/20'"
+    @class(['ring-1 ring-emerald-500/50' => $isCheapest])
 >
     <x-slot name="header">
         <x-media-thumbnail
@@ -47,7 +48,7 @@
         </thead>
         <tbody class="divide-y divide-neutral-800">
             @foreach($tenantProduct->variants as $variant)
-                <tr class="hover:bg-neutral-800/30 transition-colors">
+                <tr @class(['hover:bg-neutral-800/30 transition-colors', 'bg-amber-950 ring-1 ring-inset ring-amber-700' => $variant->is_cheapest])>
                     <td class="px-5 py-3">
                         <div class="flex items-center gap-3">
                             <x-media-thumbnail
