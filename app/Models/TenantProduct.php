@@ -97,6 +97,14 @@ class TenantProduct extends Model implements HasMedia
             ->min();
     }
 
+    public function cheapestActiveVariant(): ?TenantProductVariant
+    {
+        return $this->variants
+            ->filter(fn (TenantProductVariant $v) => $v->stock_quantity > 0 && $v->activePriceHistory)
+            ->sortBy(fn (TenantProductVariant $v) => $v->activePriceHistory->price)
+            ->first();
+    }
+
     public function getCheapestVariant(): ?TenantProductVariant
     {
         $activePriceSubquery = PriceHistory::query()

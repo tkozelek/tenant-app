@@ -19,14 +19,34 @@ class TenantController extends Controller
 
         $products = $tenant->products()
             ->where('is_active', true)
-            ->with(['globalProduct.media', 'globalProduct.category', 'variants.activePriceHistory'])
+            ->with(['globalProduct', 'globalProduct.media', 'globalProduct.category', 'variants.activePriceHistory', 'variants.activeQuantityPrices'])
             ->latest()
-            ->take(6)
+            ->take(12)
+            ->get();
+
+        $lowestPrices = $products->mapWithKeys(function ($product) {
+            $price = $product->variants->map(function ($variant) {
+                $prices = collect([$variant->current_price]);
+                if ($variant->relationLoaded('activeQuantityPrices')) {
+                    $prices = $prices->merge($variant->activeQuantityPrices->pluck('price'));
+                }
+                return $prices->filter()->min();
+            });
+
+            return [$product->id => $price->filter()->min()];
+        });
+
+        $bundles = $tenant->bundles()
+            ->where('is_active', true)
+            ->with('media')
+            ->latest()
             ->get();
 
         return view('tenant.landing', [
             'tenant' => $tenant,
             'products' => $products,
+            'bundles' => $bundles,
+            'lowestPrices' => $lowestPrices,
         ]);
     }
 

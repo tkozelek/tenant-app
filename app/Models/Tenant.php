@@ -81,6 +81,11 @@ class Tenant extends Model implements HasMedia, HasName
         return $this->hasMany(TenantProduct::class);
     }
 
+    public function bundles(): HasMany
+    {
+        return $this->hasMany(Bundle::class);
+    }
+
     public function globalProductRequests(): HasMany
     {
         return $this->hasMany(GlobalProductRequest::class);
