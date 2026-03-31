@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\AdminController;
+use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
@@ -11,9 +12,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index']);
 
-Route::get('/produkty', [ProductController::class, 'index'])->name('products.index');
-Route::get('/produkty/{category:slug}', [ProductController::class, 'show'])->name('products.show');
-Route::get('/produkt/{globalProduct:slug}', [ProductController::class, 'product'])->name('products.product');
+Route::get('/produkty', [CategoryController::class, 'index'])->name('products.index');
+Route::get('/produkty/{category:slug}', [CategoryController::class, 'show'])->name('products.show');
+Route::get('/produkt/{globalProduct:slug}', [ProductController::class, 'show'])->name('products.product');
 Route::get('/hladat', [ProductController::class, 'search'])->name('products.search');
 
 Route::middleware(['auth'])->group(function () {
