@@ -12,15 +12,16 @@
 @if(!empty($priceRange) && $priceRange['min'] < $priceRange['max'])
     @php $priceStep = ($priceRange['max'] - $priceRange['min']) > 10 ? 1 : 0.1; @endphp
     <div class="border-b border-neutral-800 pb-5">
-        <h4 class="text-sm font-semibold text-white mb-3">Cena</h4>
+        <h4 class="text-sm font-semibold text-white mb-3">Cena €</h4>
         <div
             x-data="rangeSlider({
-                min: {{ $priceRange['min'] }},
-                max: {{ $priceRange['max'] }},
+                boundMin: {{ $priceRange['min'] }},
+                boundMax: {{ $priceRange['max'] }},
+                startMin: {{ $priceFilter['min'] ?? $priceRange['min'] }},
+                startMax: {{ $priceFilter['max'] ?? $priceRange['max'] }},
                 step: {{ $priceStep }},
                 onChange: (min, max) => $wire.updatePrice(min, max)
             })"
-            x-init="init()"
             wire:ignore
         >
             <div class="flex items-center gap-2 mb-4">
@@ -61,9 +62,13 @@
                                    @checked(in_array($value->id, $selectedValues))
                                    class="w-4 h-4 rounded border-neutral-600 bg-neutral-800 text-white focus:ring-neutral-500 focus:ring-offset-0 cursor-pointer">
 
-                            <span class="text-sm text-neutral-400 group-hover:text-white transition-colors">
+                            <span class="text-sm text-neutral-400 group-hover:text-white transition-colors flex-1">
                                 {{ $value->value }}
                             </span>
+
+                            @if(isset($this->attributeValueCounts[$value->id]))
+                                <span class="text-xs text-neutral-600">{{ $this->attributeValueCounts[$value->id] }}</span>
+                            @endif
                         </label>
                     @endforeach
                 </div>
@@ -71,16 +76,18 @@
             @elseif($attribute->type === 'number')
                 @php
                     $bounds = $attributeRanges[$attribute->id] ?? ['min' => 0, 'max' => 100];
+                    $currentRange = $rangeFilters[$attribute->id] ?? $bounds;
                     $step = ($bounds['max'] - $bounds['min']) > 10 ? 1 : 0.1;
                 @endphp
                 <div
                     x-data="rangeSlider({
-                        min: {{ $bounds['min'] }},
-                        max: {{ $bounds['max'] }},
+                        boundMin: {{ $bounds['min'] }},
+                        boundMax: {{ $bounds['max'] }},
+                        startMin: {{ $currentRange['min'] }},
+                        startMax: {{ $currentRange['max'] }},
                         step: {{ $step }},
                         onChange: (min, max) => $wire.updateRange({{ $attribute->id }}, min, max)
                     })"
-                    x-init="init()"
                     wire:ignore
                 >
                     <div class="flex items-center gap-2 mb-4">
@@ -105,9 +112,13 @@
                            @checked(!empty($boolFilters[$attribute->id]))
                            class="w-4 h-4 rounded border-neutral-600 bg-neutral-800 text-white focus:ring-neutral-500 focus:ring-offset-0 cursor-pointer">
 
-                    <span class="text-sm text-neutral-400 group-hover/check:text-white transition-colors">
+                    <span class="text-sm text-neutral-400 group-hover/check:text-white transition-colors flex-1">
                         Ano
                     </span>
+
+                    @if(isset($this->attributeBoolCounts[$attribute->id]))
+                        <span class="text-xs text-neutral-600">{{ $this->attributeBoolCounts[$attribute->id] }}</span>
+                    @endif
                 </label>
             @endif
         </div>
@@ -116,9 +127,9 @@
 
 <script>
     document.addEventListener('alpine:init', () => {
-        Alpine.data('rangeSlider', ({ min, max, step, onChange }) => ({
-            min,
-            max,
+        Alpine.data('rangeSlider', ({ boundMin, boundMax, startMin, startMax, step, onChange }) => ({
+            min: startMin,
+            max: startMax,
             step,
             dragging: false,
             slider: null,
@@ -128,25 +139,23 @@
                     start: [this.min, this.max],
                     connect: true,
                     step: this.step,
-                    range: { min: this.min, max: this.max }
+                    range: { min: boundMin, max: boundMax }
                 });
 
                 this.slider.on('start', () => this.dragging = true);
 
-                // values[0] min, values[1] max
                 this.slider.on('end', (values) => {
                     this.dragging = false;
                     onChange(parseFloat(values[0]), parseFloat(values[1]));
-                    // this.$wire.updateRange(
-                    //     attributeId,
-                    //     parseFloat(values[0]),
-                    //     parseFloat(values[1])
-                    // );
                 });
 
                 this.slider.on('update', (values) => {
                     this.min = parseFloat(values[0]);
                     this.max = parseFloat(values[1]);
+                });
+
+                window.addEventListener('filters-cleared', () => {
+                    this.slider.set([boundMin, boundMax]);
                 });
             }
         }));

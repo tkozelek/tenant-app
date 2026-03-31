@@ -71,9 +71,15 @@
             @endif
 
             @if($priceHistory->isNotEmpty())
-                <div x-show="tab === 'price'" x-transition class="mt-6">
+                <div x-show="tab === 'price'" x-transition class="mt-6"
+                     x-init="$watch('tab', value => { if (value === 'price') $dispatch('init-price-chart') })">
                     <div class="bg-neutral-900 rounded-xl p-4 sm:p-6 h-96">
-                        <canvas id="priceChart" height="300"></canvas>
+                        <canvas id="priceChart"
+                                x-on:init-price-chart.window="$nextTick(() => initPriceChart())"
+                                data-labels="{{ json_encode($priceHistory->pluck('week_label')) }}"
+                                data-avg="{{ json_encode($priceHistory->pluck('avg_price')) }}"
+                                data-min="{{ json_encode($priceHistory->pluck('min_price')) }}"
+                                height="300"></canvas>
                     </div>
                 </div>
             @endif
@@ -94,86 +100,4 @@
 
         </div>
     </div>
-    @if($priceHistory->isNotEmpty())
-        @push('styles')
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        @endpush
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                const ctx = document.getElementById('priceChart');
-                if (!ctx) return;
-
-                ctx.height = 300;
-
-                const labels = @json($priceHistory->pluck('week_label'));
-                const avgPrices = @json($priceHistory->pluck('avg_price'));
-                const minPrices = @json($priceHistory->pluck('min_price'));
-
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: labels,
-                        datasets: [
-                            {
-                                label: 'Priemerná cena',
-                                data: avgPrices,
-                                borderColor: '#a78bfa',
-                                backgroundColor: 'rgba(167, 139, 250, 0.1)',
-                                fill: true,
-                                tension: 0.3,
-                                pointRadius: 3,
-                            },
-                            {
-                                label: 'Najnižšia cena',
-                                data: minPrices,
-                                borderColor: '#34d399',
-                                backgroundColor: 'rgba(52, 211, 153, 0.1)',
-                                fill: true,
-                                tension: 0.3,
-                                pointRadius: 3,
-                            },
-                        ],
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: {
-                            intersect: false,
-                            mode: 'index',
-                        },
-                        plugins: {
-                            tooltip: {
-                                callbacks: {
-                                    label: function (context) {
-                                        return context.dataset.label + ': ' + parseFloat(context.raw).toFixed(2) + ' €';
-                                    },
-                                },
-                            },
-                            legend: {
-                                labels: {
-                                    color: '#d4d4d4',
-                                },
-                            },
-                        },
-                        scales: {
-                            x: {
-                                ticks: {color: '#a3a3a3'},
-                                grid: {color: 'rgba(115, 115, 115, 0.2)'},
-                            },
-                            y: {
-                                ticks: {
-                                    color: '#a3a3a3',
-                                    callback: function (value) {
-                                        return value.toFixed(2) + ' €';
-                                    },
-                                },
-                                grid: {color: 'rgba(115, 115, 115, 0.2)'},
-                            },
-                        },
-                    },
-                });
-            });
-        </script>
-    @endif
 </x-app-layout>

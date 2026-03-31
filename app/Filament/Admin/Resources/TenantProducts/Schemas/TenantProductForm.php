@@ -18,6 +18,7 @@ use Filament\Schemas\Components\Utilities\Set;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
+use Illuminate\Validation\Rules\Unique;
 
 class TenantProductForm
 {
@@ -37,7 +38,7 @@ class TenantProductForm
                             ->required()
                             ->maxLength(255)
                             ->rules([
-                                fn (Get $get, ?TenantProduct $record): \Illuminate\Validation\Rules\Unique => Rule::unique('tenant_products', 'slug')
+                                fn (Get $get, ?TenantProduct $record): Unique => Rule::unique('tenant_products', 'slug')
                                     ->where('tenant_id', $get('tenant_id'))
                                     ->ignore($record?->id),
                             ]),

@@ -3,8 +3,8 @@
 <x-accordion
     open="highlightedTenant === 'tenant-{{ $tenantProduct->tenant_id }}'"
     :id="'tenant-'.$tenantProduct->tenant_id"
-    x-bind:class="highlightedTenant === 'tenant-{{ $tenantProduct->tenant_id }}' && 'ring-1 ring-white/20'"
-    @class(['ring-1 ring-emerald-500/50' => $isCheapest])
+    x-bind:class="highlightedTenant === 'tenant-{{ $tenantProduct->tenant_id }}' && 'ring-1 ring-gray-700'"
+    @class(['ring-1 ring-emerald-500' => $isCheapest])
 >
     <x-slot name="header">
         <x-media-thumbnail
@@ -14,7 +14,7 @@
             class="w-10 h-10 rounded-lg"
         />
         <div>
-            <a href="{{ route('tenant.show', $tenantProduct->tenant) }}" class="font-semibold text-white hover:text-neutral-300 block leading-tight" target="_blank">{{ $tenantProduct->tenant->name }}</a>
+            <a href="{{ route('tenant.show', $tenantProduct->tenant) }}" class="font-semibold text-white hover:text-neutral-300 block leading-tight">{{ $tenantProduct->tenant->name }}</a>
         </div>
         <span class="text-xs bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full shrink-0">
             {{ $tenantProduct->variants->count() }} - variant
@@ -48,7 +48,7 @@
         </thead>
         <tbody class="divide-y divide-neutral-800">
             @foreach($tenantProduct->variants as $variant)
-                <tr @class(['hover:bg-neutral-800/30 transition-colors', 'bg-amber-950 ring-1 ring-inset ring-amber-700' => $variant->is_cheapest])>
+                <tr @class(['hover:bg-neutral-800 transition-colors', 'bg-amber-950 ring-1 ring-inset ring-amber-700 hover:!bg-amber-900' => $variant->is_cheapest])>
                     <td class="px-5 py-3">
                         <div class="flex items-center gap-3">
                             <x-media-thumbnail

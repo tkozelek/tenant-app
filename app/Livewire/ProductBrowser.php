@@ -11,10 +11,12 @@ use App\Models\PriceHistory;
 use App\Models\Tenant;
 use App\Models\TenantProductVariant;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Locked;
+use Livewire\Attributes\Url;
 use Livewire\Component;
 use Livewire\WithPagination;
 
@@ -25,20 +27,26 @@ class ProductBrowser extends Component
     #[Locked]
     public int $categoryId;
 
+    #[Url(except: [])]
     public array $selectedTenants = [];
 
+    #[Url(except: [])]
     public array $selectedValues = [];
 
+    #[Url(except: [])]
     public array $boolFilters = [];
 
+    #[Url(except: [])]
     public array $rangeFilters = [];
 
     public array $attributeRanges = [];
 
     public array $priceRange = [];
 
+    #[Url(except: [])]
     public array $priceFilter = [];
 
+    #[Url(except: 'date')]
     public string $sort = 'date';
 
     public function updatedSort(): void
@@ -54,7 +62,7 @@ class ProductBrowser extends Component
     }
 
     #[Computed]
-    public function category(): Category
+    public function category(): Collection|\Illuminate\Database\Eloquent\Model
     {
         return Category::findOrFail($this->categoryId);
     }
@@ -94,57 +102,43 @@ class ProductBrowser extends Component
     }
 
     #[Computed]
+    public function attributeValueCounts(): array
+    {
+        $filteredProductsQuery = GlobalProduct::query()->select('global_products.id');
+        $this->applyFilters(
+            query: $filteredProductsQuery
+        );
+
+        return GlobalProductAttribute::query()
+            ->whereIn('global_product_id', $filteredProductsQuery)
+            ->whereNotNull('attribute_value_id')
+            ->selectRaw('attribute_value_id, COUNT(DISTINCT global_product_id) as products_count')
+            ->groupBy('attribute_value_id')
+            ->pluck('products_count', 'attribute_value_id')
+            ->toArray();
+    }
+
+    #[Computed]
+    public function attributeBoolCounts(): array
+    {
+        $filteredProductsQuery = GlobalProduct::query()->select('global_products.id');
+        $this->applyFilters(
+            query: $filteredProductsQuery
+        );
+
+        return GlobalProductAttribute::query()
+            ->whereIn('global_product_id', $filteredProductsQuery)
+            ->selectRaw('attribute_id, COUNT(DISTINCT global_product_id) as products_count')
+            ->groupBy('attribute_id')
+            ->pluck('products_count', 'attribute_id')
+            ->toArray();
+    }
+
+    #[Computed]
     public function products(): LengthAwarePaginator
     {
-        $categoryIds = $this->subCategoryIds();
-
-        $query = GlobalProduct::query()
-            ->whereIn('category_id', $categoryIds)
-            ->where('is_active', true);
-
-        if (! empty($this->selectedTenants)) {
-            $query->whereHas('tenantProducts', fn ($q) => $q
-                ->whereIn('tenant_id', $this->selectedTenants)
-            );
-        }
-
-        if (! empty($this->selectedValues)) {
-            $grouped = AttributeValue::whereIn('id', $this->selectedValues)
-                ->get()
-                ->groupBy('attribute_id');
-
-            foreach ($grouped as $attributeId => $values) {
-                $query->whereHas('globalProductAttributes', fn ($q) => $q
-                    ->where('attribute_id', $attributeId)
-                    ->whereIn('attribute_value_id', $values->pluck('id'))
-                );
-            }
-        }
-
-        foreach ($this->boolFilters as $attributeId => $checked) {
-            if ($checked) {
-                $query->whereHas('globalProductAttributes', fn ($q) => $q
-                    ->where('attribute_id', $attributeId)
-                );
-            }
-        }
-
-        foreach ($this->rangeFilters as $attributeId => $range) {
-            if ($this->isRangeFiltered($attributeId)) {
-                $query->whereHas('globalProductAttributes', fn ($q) => $q
-                    ->where('attribute_id', $attributeId)
-                    ->whereRaw('CAST(custom_value AS DECIMAL(10,2)) BETWEEN ? AND ?', [$range['min'], $range['max']])
-                );
-            }
-        }
-
-        if ($this->isPriceFiltered()) {
-            $query->whereHas('variants', fn ($q) => $q
-                ->whereHas('activePriceHistory', fn ($ph) => $ph
-                    ->whereBetween('price', [$this->priceFilter['min'], $this->priceFilter['max']])
-                )
-            );
-        }
+        $query = GlobalProduct::query();
+        $this->applyFilters($query);
 
         if ($this->sort === 'price') {
             $perVariantPrice = PriceHistory::query()
@@ -154,6 +148,8 @@ class ProductBrowser extends Component
                 ->orderByDesc('valid_from')
                 ->orderByDesc('created_at')
                 ->limit(1);
+
+            //"select `price` from `price_history` where `valid_from` <= ? and (`valid_to` is null or `valid_to` >= ?) and `tenant_product_variant_id` = `tenant_product_variants`.`id` order by `valid_from` desc, `created_at` desc limit 1 ◀" // app\Livewire\ProductBrowser.php:152
 
             $minPriceSubquery = TenantProductVariant::query()
                 ->whereHas('product', fn ($q) => $q
@@ -173,6 +169,69 @@ class ProductBrowser extends Component
             ->paginate(12);
     }
 
+    private function applyFilters(
+        Builder $query
+    ): Builder {
+        $categoryIds = $this->subCategoryIds();
+
+        $query->whereIn('category_id', $categoryIds)->where('is_active', true);
+
+        if (! empty($this->selectedTenants)) {
+            $query->whereHas('tenantProducts', fn ($q) => $q
+                ->whereIn('tenant_id', $this->selectedTenants)
+            );
+        }
+
+        if (! empty($this->selectedValues)) {
+            // vyberieme napr. 128gb 256gb (10,12) group by velkost pamate id napr. 2
+            $grouped = AttributeValue::whereIn('id', $this->selectedValues)
+                ->get()
+                ->groupBy('attribute_id');
+
+            // 2 => [10,12]
+            // 3 => 14,15
+
+            foreach ($grouped as $attributeId => $values) {
+                $query->whereHas('globalProductAttributes', fn ($q) => $q
+                    ->where('attribute_id', $attributeId) // 2, 3
+                    ->whereIn('attribute_value_id', $values->pluck('id')) // 10,12  ,  14,15 etc..
+                );
+            }
+        }
+
+
+        foreach ($this->boolFilters as $attributeId => $checked) {
+            if ($checked) {
+                $query->whereHas('globalProductAttributes', fn ($q) => $q
+                    ->where('attribute_id', $attributeId)
+                );
+            }
+        }
+
+
+        foreach ($this->rangeFilters as $attributeId => $range) {
+            if ($this->isRangeFiltered($attributeId)) {
+                $query->whereHas('globalProductAttributes', fn ($q) => $q
+                    ->where('attribute_id', $attributeId)
+                    ->whereRaw('custom_value BETWEEN ? AND ?', [$range['min'], $range['max']])
+                );
+            }
+        }
+
+        if ($this->isPriceFiltered()) {
+            $query->whereHas('variants', fn ($q) => $q
+                ->whereHas('activePriceHistory', fn ($ph) => $ph
+                    ->whereBetween('price', [$this->priceFilter['min'], $this->priceFilter['max']])
+                )
+                ->orWhereHas('activeQuantityPrices', fn ($qp) => $qp
+                    ->whereBetween('price', [$this->priceFilter['min'], $this->priceFilter['max']])
+                )
+            );
+        }
+
+        return $query;
+    }
+
     private function initializePriceFilter(): void
     {
         $categoryIds = $this->subCategoryIds();
@@ -190,7 +249,10 @@ class ProductBrowser extends Component
         $max = (float) ($result->max_price ?? 1000);
 
         $this->priceRange = ['min' => $min, 'max' => $max];
-        $this->priceFilter = ['min' => $min, 'max' => $max];
+
+        if (empty($this->priceFilter)) {
+            $this->priceFilter = ['min' => $min, 'max' => $max];
+        }
     }
 
     private function initializeRangeFilters(): void
@@ -216,7 +278,10 @@ class ProductBrowser extends Component
 
         foreach ($range as $item) {
             $this->attributeRanges[$item->attribute_id] = ['min' => (float) $item->min_val, 'max' => (float) $item->max_val];
-            $this->rangeFilters[$item->attribute_id] = ['min' => (float) $item->min_val, 'max' => (float) $item->max_val];
+
+            if (! isset($this->rangeFilters[$item->attribute_id])) {
+                $this->rangeFilters[$item->attribute_id] = ['min' => (float) $item->min_val, 'max' => (float) $item->max_val];
+            }
         }
     }
 
@@ -279,9 +344,15 @@ class ProductBrowser extends Component
         $this->selectedValues = [];
         $this->boolFilters = [];
         $this->selectedTenants = [];
+
+        $this->rangeFilters = [];
+        $this->priceFilter = [];
+
         $this->initializeRangeFilters();
         $this->initializePriceFilter();
         $this->resetPage();
+
+        $this->dispatch('filters-cleared');
     }
 
     public function render(): View

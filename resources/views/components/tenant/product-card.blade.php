@@ -3,6 +3,8 @@
 @php
     $globalProduct = $product->globalProduct;
     $cheapestVariant = $product->cheapestActiveVariant();
+
+    $img = $globalProduct?->getFirstMediaUrl('global_products') ?? $product->getFirstMediaUrl('tenant_products');
 @endphp
 
 <div class="group relative block bg-neutral-900 border border-neutral-800 rounded-xl overflow-hidden hover:border-neutral-700 transition-all duration-300">
@@ -14,9 +16,9 @@
     @endif
 
     <div class="relative aspect-4/3 overflow-hidden bg-neutral-800">
-        @if($globalProduct?->getFirstMediaUrl('global_products'))
-            <img src="{{ $globalProduct->getFirstMediaUrl('global_products') }}"
-                 alt="{{ $globalProduct->name }}"
+        @if($img)
+            <img src="{{ $img }}"
+                 alt="{{ $globalProduct->name ?? $product->name }}"
                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700">
         @else
             <div class="w-full h-full flex items-center justify-center">
