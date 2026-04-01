@@ -33,6 +33,7 @@ class TenantRoleSeeder extends Seeder
             'tenant.reports.price_movement',
             'tenant.reports.stock_health',
             'tenant.reports.coupon_performance',
+            'tenant.reports.stale_products',
         ];
 
         $tenantProductPermissions = [
