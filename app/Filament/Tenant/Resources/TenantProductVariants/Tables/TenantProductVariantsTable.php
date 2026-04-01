@@ -3,6 +3,7 @@
 namespace App\Filament\Tenant\Resources\TenantProductVariants\Tables;
 
 use App\Filament\Admin\Resources\TenantProductVariants\Tables\TenantProductVariantsTable as AdminTenantProductVariantsTable;
+use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\BulkAdjustPriceAction;
 use App\Filament\Exports\TenantProductVariantExporter;
 use App\Filament\Imports\TenantProductVariantImporter;
 use Filament\Actions\BulkActionGroup;
@@ -31,6 +32,7 @@ class TenantProductVariantsTable
                 ->importer(TenantProductVariantImporter::class)
                 ->options(fn () => ['tenant_id' => Filament::getTenant()?->id]),
             BulkActionGroup::make([
+                BulkAdjustPriceAction::make(),
                 DeleteBulkAction::make(),
             ]),
         ]);
