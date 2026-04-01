@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Pages;
 
+use App\Filament\Admin\Resources\TenantProductVariants\TenantProductVariantResource;
 use App\Models\TenantProductVariant;
 use App\Models\User;
 use BackedEnum;
@@ -42,8 +43,11 @@ class StaleProductsReport extends Page implements HasTable
             ->columns([
                 TextColumn::make('name')
                     ->label('Variant')
+                    ->limit(15)
+                    ->tooltip(fn ($record) => $record->name.' '.$record->product->name)
                     ->searchable()
-                    ->weight('bold'),
+                    ->weight('bold')
+                    ->url(fn ($record) => TenantProductVariantResource::getUrl('edit', ['record' => $record->id])),
 
                 TextColumn::make('product.tenant.name')
                     ->label('Tenant')

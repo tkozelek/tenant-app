@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Pages;
 
+use App\Filament\Admin\Resources\GlobalProducts\GlobalProductResource;
 use App\Models\GlobalProduct;
 use BackedEnum;
 use Filament\Pages\Page;
@@ -35,7 +36,8 @@ class PriceCompetitivenessReport extends Page implements HasTable
                     ->label('Produkt')
                     ->searchable()
                     ->sortable()
-                    ->weight('bold'),
+                    ->weight('bold')
+                    ->url(fn ($record) => GlobalProductResource::getUrl('edit', ['record' => $record->id])),
 
                 TextColumn::make('category.name')
                     ->label('Kategoria')

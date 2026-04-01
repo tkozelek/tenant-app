@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Pages;
 
+use App\Filament\Admin\Resources\TenantProductVariants\TenantProductVariantResource;
 use App\Models\PriceHistory;
 use App\Models\User;
 use BackedEnum;
@@ -59,7 +60,8 @@ class ExpiringPricesReport extends Page implements HasTable
                     ->label('Variant')
                     ->searchable()
                     ->badge()
-                    ->color('gray'),
+                    ->color('gray')
+                    ->url(fn ($record) => TenantProductVariantResource::getUrl('edit', ['record' => $record->tenant_product_variant_id])),
 
                 TextColumn::make('variant.sku')
                     ->label('SKU')

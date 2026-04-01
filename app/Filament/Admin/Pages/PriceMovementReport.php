@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Pages;
 
+use App\Filament\Admin\Resources\TenantProductVariants\TenantProductVariantResource;
 use App\Models\TenantProductVariant;
 use App\Models\User;
 use BackedEnum;
@@ -40,7 +41,8 @@ class PriceMovementReport extends Page implements HasTable
                     ->limit(15)
                     ->label('Variant')
                     ->searchable()
-                    ->weight('bold'),
+                    ->weight('bold')
+                    ->url(fn ($record) => TenantProductVariantResource::getUrl('edit', ['record' => $record->id])),
 
                 TextColumn::make('product.tenant.name')
                     ->label('Tenant')

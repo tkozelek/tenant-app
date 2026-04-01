@@ -2,6 +2,7 @@
 
 namespace App\Filament\Tenant\Pages;
 
+use App\Filament\Tenant\Resources\TenantProductVariants\TenantProductVariantResource;
 use App\Models\TenantProductVariant;
 use App\Models\User;
 use BackedEnum;
@@ -51,7 +52,8 @@ class StockHealthReport extends Page implements HasTable
                 TextColumn::make('name')
                     ->label('Variant')
                     ->searchable()
-                    ->weight('bold'),
+                    ->weight('bold')
+                    ->url(fn ($record) => TenantProductVariantResource::getUrl('edit', ['record' => $record->id])),
 
                 TextColumn::make('product.name')
                     ->label('Produkt')
