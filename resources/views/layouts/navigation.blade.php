@@ -12,6 +12,9 @@
                     <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
                         Produkty
                     </x-nav-link>
+                    <x-nav-link :href="route('price.compare')" :active="request()->routeIs('price.compare')">
+                        Porovnanie
+                    </x-nav-link>
                     @auth()
                         @include('layouts.partials.navlinks')
                     @endauth
@@ -58,6 +61,9 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
                 Produkty
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('price.compare')" :active="request()->routeIs('price.compare')">
+                Porovnanie
             </x-responsive-nav-link>
             @auth()
                 @include('layouts.partials.phone.phone')

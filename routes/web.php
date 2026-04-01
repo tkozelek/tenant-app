@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\CompareController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ProductController;
@@ -16,6 +17,8 @@ Route::get('/produkty', [CategoryController::class, 'index'])->name('products.in
 Route::get('/produkty/{category:slug}', [CategoryController::class, 'show'])->name('products.show');
 Route::get('/produkt/{globalProduct:slug}', [ProductController::class, 'show'])->name('products.product');
 Route::get('/hladat', [ProductController::class, 'search'])->name('products.search');
+Route::get('/porovnat', [CompareController::class, 'show'])->name('price.compare');
+Route::get('/porovnat/search', [CompareController::class, 'search'])->name('price.compare.search');
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard.index');
