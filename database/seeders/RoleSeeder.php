@@ -97,6 +97,7 @@ class RoleSeeder extends Seeder
         $reportPermissions = [
             'reports.expiring_prices',
             'reports.price_movement',
+            'reports.coupon_performance',
         ];
 
         $apiTokenPermissions = [

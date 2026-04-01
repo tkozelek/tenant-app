@@ -21,6 +21,10 @@ class ExpiringPricesReport extends Page implements HasTable
 
     protected string $view = 'filament.admin.pages.expiring-prices-report';
 
+    protected static ?string $title = 'Expirujuce ceny';
+
+    protected static ?string $navigationLabel = 'Expirujuce ceny';
+
     protected static string|\UnitEnum|null $navigationGroup = 'Reporty';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClock;
