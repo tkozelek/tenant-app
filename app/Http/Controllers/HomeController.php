@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bundle;
 use App\Models\GlobalProduct;
 use Illuminate\View\View;
 
@@ -37,6 +38,13 @@ class HomeController extends Controller
             return [$product->id => $lowest];
         });
 
-        return view('welcome', compact('featuredProducts', 'featuredPrices'));
+        $featuredBundles = Bundle::query()
+            ->where('is_active', true)
+            ->with(['tenant', 'items.variant.activePriceHistory'])
+            ->latest()
+            ->limit(8)
+            ->get();
+
+        return view('welcome', compact('featuredProducts', 'featuredPrices', 'featuredBundles'));
     }
 }

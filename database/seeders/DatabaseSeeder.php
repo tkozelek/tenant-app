@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             TenantProductSeeder::class,
             TenantProductVariantSeeder::class,
 
+            BundleSeeder::class,
             CouponSeeder::class,
         ]);
     }

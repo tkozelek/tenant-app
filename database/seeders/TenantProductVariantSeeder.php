@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Attribute;
+use App\Models\PriceHistory;
 use App\Models\TenantProduct;
 use App\Models\TenantProductVariant;
 use Carbon\Carbon;
@@ -61,6 +62,10 @@ class TenantProductVariantSeeder extends Seeder
 
                         $this->generatePriceHistory($variant, $basePrice);
                         $this->generateStockHistory($variant);
+
+                        if (fake()->boolean(50)) {
+                            $this->generateQuantityPrices($variant, $basePrice);
+                        }
                     });
                 }
             } else {
@@ -82,6 +87,10 @@ class TenantProductVariantSeeder extends Seeder
 
                     $this->generatePriceHistory($variant, $basePrice);
                     $this->generateStockHistory($variant);
+
+                    if (fake()->boolean(50)) {
+                        $this->generateQuantityPrices($variant, $basePrice);
+                    }
                 });
             }
         }
@@ -92,6 +101,7 @@ class TenantProductVariantSeeder extends Seeder
         $price = $initialPrice;
         $date = Carbon::now()->subMonths(6);
         $now = Carbon::now();
+        $entries = [];
 
         while (true) {
             $daysToAdd = rand(5, 15);
@@ -115,12 +125,44 @@ class TenantProductVariantSeeder extends Seeder
                 $finalPrice = round($price * (rand(70, 90) / 100), 2);
             }
 
-            $variant->priceHistories()->create([
+            $entries[] = [
                 'price' => $finalPrice,
                 'original_price' => $finalOriginalPrice,
-                'valid_from' => $date,
-                'created_at' => $date,
-                'updated_at' => $date,
+                'valid_from' => $date->copy(),
+            ];
+        }
+
+        PriceHistory::withoutEvents(function () use ($variant, $entries): void {
+            foreach ($entries as $i => $entry) {
+                $validTo = isset($entries[$i + 1]) ? $entries[$i + 1]['valid_from'] : null;
+
+                $variant->priceHistories()->create([
+                    'price' => $entry['price'],
+                    'original_price' => $entry['original_price'],
+                    'valid_from' => $entry['valid_from'],
+                    'valid_to' => $validTo,
+                    'created_at' => $entry['valid_from'],
+                    'updated_at' => $entry['valid_from'],
+                ]);
+            }
+        });
+    }
+
+    private function generateQuantityPrices(TenantProductVariant $variant, float $basePrice): void
+    {
+        $tiers = [
+            ['min' => 2, 'max' => 4,    'discount' => 0.95],
+            ['min' => 5, 'max' => 9,    'discount' => 0.90],
+            ['min' => 10, 'max' => null, 'discount' => 0.82],
+        ];
+
+        foreach ($tiers as $tier) {
+            $variant->quantityPrices()->create([
+                'min_quantity' => $tier['min'],
+                'max_quantity' => $tier['max'],
+                'price' => round($basePrice * $tier['discount'], 2),
+                'valid_from' => Carbon::now()->subMonths(6),
+                'valid_to' => null,
             ]);
         }
     }

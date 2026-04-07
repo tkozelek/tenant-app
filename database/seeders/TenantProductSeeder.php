@@ -17,7 +17,7 @@ class TenantProductSeeder extends Seeder
         $tenantIds = Tenant::pluck('id');
 
         foreach ($tenantIds as $tenantId) {
-            $numberOfProducts = rand(2, 4);
+            $numberOfProducts = rand(5, 8);
 
             for ($i = 0; $i < $numberOfProducts; $i++) {
                 $globalProduct = fake()->boolean(90)
@@ -39,7 +39,7 @@ class TenantProductSeeder extends Seeder
                         'global_product_request_id' => null,
                         'name' => $name,
                         'description' => $productDesc,
-                        'is_active' => fake()->boolean(80),
+                        'is_active' => true,
                     ]
                 );
 

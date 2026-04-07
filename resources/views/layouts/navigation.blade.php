@@ -12,6 +12,9 @@
                     <x-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
                         Produkty
                     </x-nav-link>
+                    <x-nav-link :href="route('bundles.index')" :active="request()->routeIs('bundles.*')">
+                        Balíky
+                    </x-nav-link>
                     <x-nav-link :href="route('price.compare')" :active="request()->routeIs('price.compare')">
                         Porovnanie
                     </x-nav-link>
