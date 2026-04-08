@@ -93,8 +93,8 @@ class CompareController extends Controller
         $byProduct = $rows->groupBy('global_product_id');
         $datasets = [];
 
-//        dump($byProduct);
-//        dump($allWeeks);
+        //        dump($byProduct);
+        //        dump($allWeeks);
 
         foreach ($products as $product) {
             $color = $product['color'];

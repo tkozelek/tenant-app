@@ -30,6 +30,7 @@ class TenantController extends Controller
                 if ($variant->relationLoaded('activeQuantityPrices')) {
                     $prices = $prices->merge($variant->activeQuantityPrices->pluck('price'));
                 }
+
                 return $prices->filter()->min();
             });
 

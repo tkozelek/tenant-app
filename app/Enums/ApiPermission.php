@@ -14,6 +14,7 @@ enum ApiPermission: string
     case CouponsWrite = 'api.coupons.write';
     case ReportsRead = 'api.reports.read';
     case BundlesRead = 'api.bundles.read';
+    case CategoriesRead = 'api.categories.read';
 
     public function label(): string
     {
@@ -28,6 +29,7 @@ enum ApiPermission: string
             self::CouponsWrite => 'Kupony - Zapis',
             self::ReportsRead => 'Reporty - Citanie',
             self::BundlesRead => 'Bundles - Citanie',
+            self::CategoriesRead => 'Kategorie - Citanie',
         };
     }
 

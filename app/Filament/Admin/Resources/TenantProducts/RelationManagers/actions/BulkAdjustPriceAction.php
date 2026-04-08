@@ -65,7 +65,7 @@ class BulkAdjustPriceAction extends BulkAction
                     });
 
                     Notification::make()
-                        ->title('Cena zmenena pre ' . $records->count() . ' variant(ov).')
+                        ->title('Cena zmenena pre '.$records->count().' variant(ov).')
                         ->success()
                         ->send();
                 } catch (\Exception $e) {

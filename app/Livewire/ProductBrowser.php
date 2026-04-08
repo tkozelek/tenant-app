@@ -199,7 +199,6 @@ class ProductBrowser extends Component
             }
         }
 
-
         foreach ($this->boolFilters as $attributeId => $checked) {
             if ($checked) {
                 $query->whereHas('globalProductAttributes', fn ($q) => $q
@@ -207,7 +206,6 @@ class ProductBrowser extends Component
                 );
             }
         }
-
 
         foreach ($this->rangeFilters as $attributeId => $range) {
             if ($this->isRangeFiltered($attributeId)) {
