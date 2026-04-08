@@ -20,6 +20,8 @@ class GlobalProductRequestResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedInboxArrowDown;
 
+    protected static string|null|\UnitEnum $navigationGroup = 'Produkty';
+
     public static function getNavigationBadge(): ?string
     {
         return (string) GlobalProductRequest::where('status', 'pending')

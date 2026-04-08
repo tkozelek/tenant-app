@@ -15,6 +15,7 @@ use Filament\Schemas\Schema;
 use Filament\Support\Icons\Heroicon;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use UnitEnum;
 
 class TenantProductVariantResource extends Resource
 {
@@ -23,6 +24,8 @@ class TenantProductVariantResource extends Resource
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'name';
+
+    protected static string | UnitEnum | null $navigationGroup = 'Produkty';
 
     protected static ?int $navigationSort = 50;
 

@@ -20,7 +20,11 @@ class BundleResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArchiveBox;
 
+    protected static ?int $navigationSort = 60;
+
     protected static ?string $recordTitleAttribute = 'name';
+
+    protected static string|null|\UnitEnum $navigationGroup = 'Produkty';
 
     public static function form(Schema $schema): Schema
     {

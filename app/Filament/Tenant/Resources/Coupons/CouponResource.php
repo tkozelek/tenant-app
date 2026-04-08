@@ -20,6 +20,10 @@ class CouponResource extends Resource
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTicket;
 
+    protected static ?int $navigationSort = 70;
+
+    protected static string|null|\UnitEnum $navigationGroup = 'Produkty';
+
     protected static ?string $recordTitleAttribute = 'code';
 
     public static function form(Schema $schema): Schema
