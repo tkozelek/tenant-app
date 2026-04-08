@@ -91,6 +91,11 @@ class Tenant extends Model implements HasMedia, HasName
         return $this->hasMany(GlobalProductRequest::class);
     }
 
+    public function xmlFeeds(): HasMany
+    {
+        return $this->hasMany(XmlFeed::class);
+    }
+
     public function getImageUrl(): ?string
     {
         return $this->getFirstMediaUrl('images');

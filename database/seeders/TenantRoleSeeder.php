@@ -76,6 +76,13 @@ class TenantRoleSeeder extends Seeder
             'tenant.api_tokens.manage',
         ];
 
+        $tenantXmlFeedPermissions = [
+            'tenant.xml_feeds.view_any',
+            'tenant.xml_feeds.create',
+            'tenant.xml_feeds.update',
+            'tenant.xml_feeds.delete',
+        ];
+
         $allTenantPermissions = array_merge(
             $tenantGeneralPermissions,
             $tenantReportPermissions,
@@ -85,6 +92,7 @@ class TenantRoleSeeder extends Seeder
             $tenantCouponPermissions,
             $tenantBundlePermissions,
             $tenantApiTokenPermissions,
+            $tenantXmlFeedPermissions,
         );
 
         foreach ($allTenantPermissions as $permission) {
@@ -119,6 +127,7 @@ class TenantRoleSeeder extends Seeder
             $tenantRequestPermissions,
             $tenantCouponPermissions,
             $tenantBundlePermissions,
+            $tenantXmlFeedPermissions,
         ));
 
         $productManager = Role::firstOrCreate(
@@ -137,6 +146,7 @@ class TenantRoleSeeder extends Seeder
             $tenantVariantPermissions,
             $tenantRequestPermissions,
             $tenantBundlePermissions,
+            ['tenant.xml_feeds.view_any'],
         ));
 
         $variantManager = Role::firstOrCreate(
