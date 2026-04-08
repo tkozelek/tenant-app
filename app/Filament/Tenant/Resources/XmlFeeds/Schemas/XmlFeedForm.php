@@ -3,7 +3,6 @@
 namespace App\Filament\Tenant\Resources\XmlFeeds\Schemas;
 
 use App\Enums\XmlFeedPortal;
-use App\Models\TenantProductVariant;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;

@@ -3,13 +3,11 @@
 namespace App\Filament\Admin\Resources\XmlFeeds\Schemas;
 
 use App\Enums\XmlFeedPortal;
-use App\Models\TenantProductVariant;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
-use Filament\Schemas\Components\Utilities\Get;
 use Filament\Schemas\Schema;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;

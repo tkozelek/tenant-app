@@ -25,7 +25,7 @@ class TenantProductVariantResource extends Resource
 
     protected static ?string $recordTitleAttribute = 'name';
 
-    protected static string | UnitEnum | null $navigationGroup = 'Produkty';
+    protected static string|UnitEnum|null $navigationGroup = 'Produkty';
 
     protected static ?int $navigationSort = 50;
 

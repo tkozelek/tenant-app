@@ -149,7 +149,7 @@ class ProductBrowser extends Component
                 ->orderByDesc('created_at')
                 ->limit(1);
 
-            //"select `price` from `price_history` where `valid_from` <= ? and (`valid_to` is null or `valid_to` >= ?) and `tenant_product_variant_id` = `tenant_product_variants`.`id` order by `valid_from` desc, `created_at` desc limit 1 ◀" // app\Livewire\ProductBrowser.php:152
+            //"select `price` from `price_history` where `valid_from` <= ? and (`valid_to` is null or `valid_to` >= ?) and `tenant_product_variant_id` = `tenant_product_variants`.`id` order by `valid_from` desc, `created_at` desc limit 1
 
             $minPriceSubquery = TenantProductVariant::query()
                 ->whereHas('product', fn ($q) => $q
