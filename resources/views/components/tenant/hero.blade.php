@@ -48,6 +48,13 @@
             @if(!empty($tenant->short_description))
                 <p class="text-sm text-white/60 mt-0.5">{{ $tenant->short_description }}</p>
             @endif
+            @if(!empty($tenant->website_url))
+                <a href="{{ $tenant->website_url }}" target="_blank" rel="noopener noreferrer"
+                   class="inline-flex items-center gap-1 text-xs text-white/50 hover:text-white/80 transition-colors mt-1">
+                    <i class="fa-solid fa-globe text-xs"></i>
+                    {{ parse_url($tenant->website_url, PHP_URL_HOST) }}
+                </a>
+            @endif
         </div>
     </div>
 </div>
