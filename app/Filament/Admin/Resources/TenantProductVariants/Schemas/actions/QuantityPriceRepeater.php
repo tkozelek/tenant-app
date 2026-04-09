@@ -23,7 +23,7 @@ class QuantityPriceRepeater
             ->defaultItems(0)
             ->reorderable(false)
             ->itemLabel(function (array $state): ?string {
-                $minQuantity = $state['min_quantity'] ?? 0;
+                $minQuantity = $state['min_quantity'] ?? 1;
                 $maxQuantity = $state['max_quantity'] ?? '';
 
                 return sprintf('%s ks - %s => %s €', $minQuantity, $maxQuantity, $state['price']);

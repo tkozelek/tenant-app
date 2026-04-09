@@ -151,7 +151,7 @@ class TenantProductVariantSeeder extends Seeder
     private function generateQuantityPrices(TenantProductVariant $variant, float $basePrice): void
     {
         $tiers = [
-            ['min' => 2, 'max' => 4,    'discount' => 0.95],
+            ['min' => 1, 'max' => 4,    'discount' => 0.95],
             ['min' => 5, 'max' => 9,    'discount' => 0.90],
             ['min' => 10, 'max' => null, 'discount' => 0.82],
         ];
