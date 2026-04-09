@@ -14,7 +14,6 @@ class MarketPriceStatsSection
     {
         return Section::make('Cenovy prehlad trhu')
             ->description('Aktualne aktivne ceny toho isteho produktu napriec predajcami')
-            ->visibleOn('create')
             ->hidden(fn (Get $get): bool => blank($get('tenant_product_id')))
             ->schema([
                 TextEntry::make('market_avg')
