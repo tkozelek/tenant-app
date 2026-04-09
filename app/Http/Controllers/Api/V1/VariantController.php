@@ -92,12 +92,15 @@ class VariantController extends Controller
         $variant->load(['activePriceHistory', 'activeQuantityPrices']);
 
         $unitPrice = $variant->current_price;
+        $quantityTier = null;
 
-        $quantityTier = $variant->activeQuantityPrices
-            ->first(fn ($qp) => $quantity >= $qp->min_quantity && ($qp->max_quantity === null || $quantity <= $qp->max_quantity));
+        if (! $variant->activePriceHistory?->is_flash_sale) {
+            $quantityTier = $variant->activeQuantityPrices
+                ->first(fn ($qp) => $quantity >= $qp->min_quantity && ($qp->max_quantity === null || $quantity <= $qp->max_quantity));
 
-        if ($quantityTier !== null) {
-            $unitPrice = (float) $quantityTier->price;
+            if ($quantityTier !== null) {
+                $unitPrice = (float) $quantityTier->price;
+            }
         }
 
         $totalPrice = $unitPrice !== null ? round($unitPrice * $quantity, 2) : null;

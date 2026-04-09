@@ -21,6 +21,8 @@ class PriceHistory extends Model
         'user_id',
         'valid_from',
         'valid_to',
+        'is_flash_sale',
+        'flash_sale_label',
     ];
 
     protected $casts = [
@@ -28,6 +30,7 @@ class PriceHistory extends Model
         'original_price' => 'decimal:2',
         'valid_from' => 'datetime',
         'valid_to' => 'datetime',
+        'is_flash_sale' => 'boolean',
     ];
 
     public function variant(): BelongsTo

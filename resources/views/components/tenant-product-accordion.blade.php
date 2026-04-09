@@ -69,53 +69,17 @@
                             <span class="text-red-400">Vypredané</span>
                         @endif
                     </td>
-                    <td class="px-5 py-3">
-                        @if($variant->relationLoaded('activeCoupons') && $variant->activeCoupons->isNotEmpty())
-                            <div class="flex flex-col gap-1">
-                                @foreach($variant->activeCoupons as $coupon)
-                                    <div class="flex flex-col">
-                                        <span class="font-mono text-xs font-bold text-yellow-400 tracking-wide">{{ $coupon->code }}</span>
-                                        <span class="text-xs text-neutral-300">
-                                            {{ $coupon->discount_type === 'percentage' ? number_format((float) $coupon->value, 0).'%' : number_format((float) $coupon->value, 2, ',', ' ').' €' }} zľava
-                                        </span>
-                                        @if($coupon->min_order_amount)
-                                            <span class="text-xs text-neutral-500">min. {{ number_format((float) $coupon->min_order_amount, 2, ',', ' ') }} €</span>
-                                        @endif
-                                    </div>
-                                @endforeach
-                            </div>
-                        @else
-                            <span class="text-neutral-600">-</span>
-                        @endif
+                    <td class="px-4 py-3">
+                        <x-variant-coupons :variant="$variant" />
                     </td>
-                    <td class="px-5 py-3 text-right">
-                        @if($variant->relationLoaded('activeQuantityPrices') && $variant->activeQuantityPrices->isNotEmpty())
-                            <div class="flex flex-col items-end gap-0.5">
-                                @foreach($variant->activeQuantityPrices as $tier)
-                                    <span class="text-xs text-neutral-400">
-                                        {{ $tier->min_quantity }}{{ $tier->max_quantity ? '–'.$tier->max_quantity : '+' }} ks:
-                                        <span class="text-white font-semibold">{{ number_format((float) $tier->price, 2, ',', ' ') }} €</span>
-                                    </span>
-                                @endforeach
-                                @if($variant->current_price)
-                                    <span class="text-xs text-neutral-500 mt-0.5">bežná: {{ $variant->current_price_formatted }}</span>
-                                @endif
-                            </div>
-                        @elseif($variant->currentOriginalPrice && $variant->currentOriginalPrice > $variant->currentPrice)
-                            <span class="text-xs text-neutral-500 line-through mr-1">{{ $variant->current_original_price_formatted }}</span>
-                            <span class="font-semibold text-red-400">{{ $variant->current_price_formatted }}</span>
-                        @else
-                            <span class="font-semibold text-white">{{ $variant->current_price_formatted }}</span>
-                        @endif
+                    <td class="px-4 py-3 text-right">
+                        <x-variant-price :variant="$variant" />
                     </td>
                     <td class="px-5 py-3 text-right">
                         @if($variant->url)
-                            <a href="{{ $variant->url }}"
-                               target="_blank"
-                               rel="noopener noreferrer"
-                               class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors whitespace-nowrap">
+                            <a href="{{ $variant->url }}" class="font-semibold tracking-wider text-xs text-neutral-800 hover:text-black transition-colors py-3 px-1.5 bg-yellow-400 hover:bg-yellow-600 rounded-lg ">
                                 Kúpiť
-                                <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
                             </a>
                         @endif
                     </td>
@@ -124,3 +88,28 @@
         </tbody>
     </table>
 </x-accordion>
+
+<script>
+function flashSaleCountdown(ends) {
+    return {
+        ends,
+        remaining: '',
+        init() {
+            this.tick();
+            setInterval(() => this.tick(), 1000);
+        },
+        tick() {
+            const diff = this.ends - Date.now();
+            if (diff <= 0) {
+                this.remaining = 'koniec';
+                return;
+            }
+
+            const h = Math.floor(diff / (60 * 60 * 1000));
+            const m = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
+            const s = Math.floor((diff % (60 * 1000)) / 1000);
+            this.remaining = (h ? h + 'h ' : '') + m + 'm ' + s + 's';
+        },
+    };
+}
+</script>

@@ -4,6 +4,7 @@ namespace App\Filament\Tenant\Resources\TenantProducts\RelationManagers;
 
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustPriceAction;
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustStockAction;
+use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\FlashSaleAction;
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\HistoryAction;
 use App\Filament\Admin\Resources\TenantProductVariants\Schemas\TenantProductVariantForm;
 use App\Filament\Admin\Resources\TenantProductVariants\Tables\TenantProductVariantsTable;
@@ -51,6 +52,7 @@ class VariantsRelationManager extends RelationManager
                 EditAction::make(),
                 HistoryAction::make(),
                 AdjustPriceAction::make(),
+                FlashSaleAction::make(),
                 AdjustStockAction::make()
                     ->after(fn (RelationManager $livewire) => $livewire->dispatch('refresh')),
                 DissociateAction::make(),

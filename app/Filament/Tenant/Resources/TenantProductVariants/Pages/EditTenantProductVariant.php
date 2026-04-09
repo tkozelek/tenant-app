@@ -4,6 +4,7 @@ namespace App\Filament\Tenant\Resources\TenantProductVariants\Pages;
 
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustPriceAction;
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustStockAction;
+use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\FlashSaleAction;
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\HistoryAction;
 use App\Filament\Tenant\Resources\TenantProducts\TenantProductResource;
 use App\Filament\Tenant\Resources\TenantProductVariants\TenantProductVariantResource;
@@ -27,6 +28,7 @@ class EditTenantProductVariant extends EditRecord
                 ->url(fn (): string => TenantProductResource::getUrl('edit', ['record' => $this->record->tenant_product_id])),
             HistoryAction::make(),
             AdjustPriceAction::make(),
+            FlashSaleAction::make(),
             AdjustStockAction::make()
                 ->after(fn () => $this->refreshFormData(['stock_quantity'])),
         ];
