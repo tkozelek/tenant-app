@@ -44,6 +44,7 @@
                 <th class="px-5 py-2 font-medium">Sklad</th>
                 <th class="px-5 py-2 font-medium">Kupóny</th>
                 <th class="px-5 py-2 font-medium text-right">Cena</th>
+                <th class="px-5 py-2 font-medium"></th>
             </tr>
         </thead>
         <tbody class="divide-y divide-neutral-800">
@@ -105,6 +106,17 @@
                             <span class="font-semibold text-red-400">{{ $variant->current_price_formatted }}</span>
                         @else
                             <span class="font-semibold text-white">{{ $variant->current_price_formatted }}</span>
+                        @endif
+                    </td>
+                    <td class="px-5 py-3 text-right">
+                        @if($variant->url)
+                            <a href="{{ $variant->url }}"
+                               target="_blank"
+                               rel="noopener noreferrer"
+                               class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white transition-colors whitespace-nowrap">
+                                Kúpiť
+                                <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
+                            </a>
                         @endif
                     </td>
                 </tr>

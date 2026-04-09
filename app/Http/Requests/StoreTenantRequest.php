@@ -24,6 +24,7 @@ class StoreTenantRequest extends FormRequest
         return [
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255|unique:tenants,slug',
+            'website_url' => 'nullable|url|max:2048',
             'description' => 'nullable|string',
             'short_description' => 'nullable|string|max:255',
             'is_public' => 'sometimes|boolean',

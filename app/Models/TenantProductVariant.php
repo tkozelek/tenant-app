@@ -27,7 +27,7 @@ class TenantProductVariant extends Model implements HasMedia
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'sku', 'ean', 'stock_quantity'])
+            ->logOnly(['name', 'sku', 'ean', 'stock_quantity', 'url'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->useLogName('variant');
@@ -43,6 +43,7 @@ class TenantProductVariant extends Model implements HasMedia
         'tenant_product_id',
         'sku',
         'ean',
+        'url',
         'stock_quantity',
     ];
 

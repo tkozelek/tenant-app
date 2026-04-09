@@ -86,6 +86,14 @@ class TenantProductVariantForm
                                         ->unique(ignoreRecord: true)
                                         ->columnSpan(1),
 
+                                    TextInput::make('url')
+                                        ->label('URL produktu v obchode')
+                                        ->url()
+                                        ->maxLength(2048)
+                                        ->placeholder('https://...')
+                                        ->helperText('Odkaz na produkt vo e-shope tenanta.')
+                                        ->columnSpan(2),
+
                                     TextInput::make('stock_quantity')
                                         ->label('Skladová zásoba')
                                         ->required()

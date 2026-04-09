@@ -23,7 +23,7 @@ class Tenant extends Model implements HasMedia, HasName
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'slug', 'description', 'short_description', 'is_public', 'owner_id'])
+            ->logOnly(['name', 'slug', 'website_url', 'description', 'short_description', 'is_public', 'owner_id'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->useLogName('tenant');
@@ -33,6 +33,7 @@ class Tenant extends Model implements HasMedia, HasName
         'owner_id',
         'name',
         'slug',
+        'website_url',
         'description',
         'short_description',
         'is_public',

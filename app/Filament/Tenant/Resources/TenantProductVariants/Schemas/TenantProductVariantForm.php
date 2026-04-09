@@ -67,6 +67,15 @@ class TenantProductVariantForm
                                         ->unique(ignoreRecord: true)
                                         ->columnSpan(1),
 
+                                    TextInput::make('url')
+                                        ->label('URL produktu v obchode')
+                                        ->url()
+                                        ->maxLength(2048)
+                                        ->placeholder(fn () => Filament::getTenant()?->website_url ?? 'https://...')
+                                        ->default(fn () => Filament::getTenant()?->website_url)
+                                        ->helperText('Odkaz na produkt vo vašom e-shope. Zákazníci budú presmerovaní na túto adresu.')
+                                        ->columnSpan(2),
+
                                     TextInput::make('stock_quantity')
                                         ->label('Sklad')
                                         ->required()

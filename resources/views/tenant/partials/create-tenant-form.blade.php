@@ -40,6 +40,14 @@
             </div>
         </div>
 
+        <!-- Website URL -->
+        <div>
+            <x-input-label for="website_url" value="URL vášho e-shopu" />
+            <x-text-input id="website_url" name="website_url" type="url" class="mt-1 block w-full" :value="old('website_url', $tenant->website_url ?? '')" placeholder="https://dr-max.com/" />
+            <p class="mt-1 text-xs text-neutral-500 dark:text-neutral-400">Základná adresa vášho e-shopu. Bude sa predvypĺňať pri odkazoch na produkty.</p>
+            <x-input-error class="mt-2" :messages="$errors->get('website_url')" />
+        </div>
+
         <!-- Short description -->
         <div>
             <x-input-label for="short_description" value="Krátky popis (SEO)" />

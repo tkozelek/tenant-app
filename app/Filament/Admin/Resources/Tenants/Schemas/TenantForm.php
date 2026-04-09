@@ -32,6 +32,13 @@ class TenantForm
                         ->unique(ignoreRecord: true)
                         ->prefix(config('app.url').'obchod/'),
 
+                    TextInput::make('website_url')
+                        ->label('URL e-shopu')
+                        ->url()
+                        ->maxLength(2048)
+                        ->placeholder('https://dr-max.com/')
+                        ->helperText('Základná URL adresa e-shopu tenantu. Bude sa predvypĺňať pri produktových odkazoch.'),
+
                     TextInput::make('short_description')
                         ->label('Tagline (meta)')
                         ->placeholder('A short version of description'),
