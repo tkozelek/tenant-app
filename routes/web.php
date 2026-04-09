@@ -10,6 +10,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\TenantController;
 use App\Http\Controllers\TenantUserController;
+use App\Http\Controllers\XmlFeedController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', [HomeController::class, 'index']);
@@ -52,6 +53,8 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::get('/obchod/{tenant:slug}', [TenantController::class, 'show'])->name('tenant.show');
+
+Route::get('/feed/{tenant:slug}/{token}.xml', [XmlFeedController::class, 'show'])->name('xml-feed.show');
 
 // Route::can('platform.access')->prefix('/admin')->name('admin.')->group(function () {
 //    Route::get('/', [AdminController::class, 'index'])->name('index');
