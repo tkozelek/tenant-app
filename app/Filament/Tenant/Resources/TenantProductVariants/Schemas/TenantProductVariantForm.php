@@ -73,6 +73,11 @@ class TenantProductVariantForm
                                         ->maxLength(2048)
                                         ->placeholder(fn () => Filament::getTenant()?->website_url ?? 'https://...')
                                         ->default(fn () => Filament::getTenant()?->website_url)
+                                        ->afterStateHydrated(function ($component, $state) {
+                                            if (blank($state)) {
+                                                $component->state(Filament::getTenant()?->website_url);
+                                            }
+                                        })
                                         ->helperText('Odkaz na produkt vo vašom e-shope. Zákazníci budú presmerovaní na túto adresu.')
                                         ->columnSpan(2),
 
