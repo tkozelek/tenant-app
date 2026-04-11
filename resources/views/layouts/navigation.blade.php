@@ -15,6 +15,9 @@
                     <x-nav-link :href="route('bundles.index')" :active="request()->routeIs('bundles.*')">
                         Balíky
                     </x-nav-link>
+                    <x-nav-link :href="route('coupons.index')" :active="request()->routeIs('coupons.*')">
+                        Kupony
+                    </x-nav-link>
                     <x-nav-link :href="route('price.compare')" :active="request()->routeIs('price.compare')">
                         Porovnanie
                     </x-nav-link>
@@ -64,6 +67,9 @@
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link :href="route('products.index')" :active="request()->routeIs('products.*')">
                 Produkty
+            </x-responsive-nav-link>
+            <x-responsive-nav-link :href="route('coupons.index')" :active="request()->routeIs('coupons.*')">
+                Kupony
             </x-responsive-nav-link>
             <x-responsive-nav-link :href="route('price.compare')" :active="request()->routeIs('price.compare')">
                 Porovnanie

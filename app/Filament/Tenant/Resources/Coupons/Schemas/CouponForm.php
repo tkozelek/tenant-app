@@ -96,13 +96,14 @@ class CouponForm
 
                                 Select::make('productVariants')
                                     ->label('Varianty produktov')
+                                    ->relationship('productVariants', 'name')
                                     ->multiple()
                                     ->searchable()
                                     ->options(
-                                        fn () => TenantProductVariant::whereHas(
-                                            'product',
-                                            fn ($q) => $q->where('tenant_id', Filament::getTenant()?->id)
-                                        )->pluck('name', 'id')
+                                        TenantProductVariant::query()
+                                            ->whereHas('product', function ($query) {
+                                                $query->where('tenant_id', Filament::getTenant()?->id);
+                                            })->get()->pluck('name', 'id')
                                     ),
                             ])->columns(),
                     ]),
