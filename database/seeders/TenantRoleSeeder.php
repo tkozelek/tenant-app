@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\PermissionScope;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
@@ -96,7 +97,7 @@ class TenantRoleSeeder extends Seeder
         );
 
         foreach ($allTenantPermissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
+            Permission::firstOrCreate(['name' => $permission], ['scope' => PermissionScope::Tenant]);
         }
 
         $tenantOwner = Role::firstOrCreate(
@@ -106,6 +107,7 @@ class TenantRoleSeeder extends Seeder
             ],
             [
                 'description' => 'Ma plny pristup ku vsetkemu v prevadzke, spravuje nastavenia, userov aj produkty.',
+                'scope' => PermissionScope::Tenant,
             ]
         );
         $tenantOwner->syncPermissions($allTenantPermissions);
@@ -117,6 +119,7 @@ class TenantRoleSeeder extends Seeder
             ],
             [
                 'description' => 'Riadi prevadzku, spravuje produkty a pozera statistiky, ale nerobi userov ani settings.',
+                'scope' => PermissionScope::Tenant,
             ]
         );
         $shopManager->syncPermissions(array_merge(
@@ -137,6 +140,7 @@ class TenantRoleSeeder extends Seeder
             ],
             [
                 'description' => 'Stara sa o produkty, pridava a upravuje ich a ich info.',
+                'scope' => PermissionScope::Tenant,
             ]
         );
         $productManager->syncPermissions(array_merge(
@@ -156,6 +160,7 @@ class TenantRoleSeeder extends Seeder
             ],
             [
                 'description' => 'Spravuje varianty produktov, ceny a sklad, ale nemeni produkty.',
+                'scope' => PermissionScope::Tenant,
             ]
         );
         $variantManager->syncPermissions(array_merge(
@@ -170,6 +175,7 @@ class TenantRoleSeeder extends Seeder
             ],
             [
                 'description' => 'Kontroluje sklad a aktualizuje mnozstva produktov.',
+                'scope' => PermissionScope::Tenant,
             ]
         );
         $warehouseStaff->syncPermissions([
@@ -186,6 +192,7 @@ class TenantRoleSeeder extends Seeder
             ],
             [
                 'description' => 'Spravuje kupony v prevadzke.',
+                'scope' => PermissionScope::Tenant,
             ]
         );
         $tenantCouponManager->syncPermissions(array_merge(
@@ -200,6 +207,7 @@ class TenantRoleSeeder extends Seeder
             ],
             [
                 'description' => 'Spravuje API kluce a pristupy pre externy system.',
+                'scope' => PermissionScope::Tenant,
             ]
         );
         $apiTokenManager->syncPermissions([
@@ -215,6 +223,7 @@ class TenantRoleSeeder extends Seeder
             ],
             [
                 'description' => 'Pozera iba reporty a statistiky, nic neupravuje.',
+                'scope' => PermissionScope::Tenant,
             ]
         );
         $tenantAnalyst->syncPermissions(array_merge(
@@ -229,6 +238,7 @@ class TenantRoleSeeder extends Seeder
             ],
             [
                 'description' => 'Spravuje poziadavky na nove produkty.',
+                'scope' => PermissionScope::Tenant,
             ]
         );
         $requestManager->syncPermissions(array_merge(

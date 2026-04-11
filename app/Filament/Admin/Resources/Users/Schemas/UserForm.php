@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Users\Schemas;
 
+use App\Enums\PermissionScope;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Schema;
@@ -38,9 +39,7 @@ class UserForm
                     ->relationship(
                         name: 'roles',
                         titleAttribute: 'name',
-                        modifyQueryUsing: fn ($query) => $query
-                            ->whereNull('roles.tenant_id')
-                            ->whereHas('permissions', fn ($q) => $q->where('name', 'platform.access'))
+                        modifyQueryUsing: fn ($query) => $query->where('scope', PermissionScope::App)
                     )
                     ->placeholder('No role selected')
                     ->preload()

@@ -20,6 +20,7 @@ class ProductService
             'tenantProducts.variants.activePriceHistory',
             'tenantProducts.variants.activeQuantityPrices',
             'tenantProducts.variants.activeCoupons',
+            'tenantProducts.variants.media',
             'category.activeCoupons',
             'variants.media',
             'variants.variantAttributes',

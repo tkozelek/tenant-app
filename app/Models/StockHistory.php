@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\StockHistoryType;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -16,6 +17,13 @@ class StockHistory extends Model
         'quantity',
         'note',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'type' => StockHistoryType::class,
+        ];
+    }
 
     public function variant(): BelongsTo
     {

@@ -8,7 +8,7 @@ class GenericFeedBuilder implements Builder
 {
     public function build(XmlFeed $feed, iterable $variants): string
     {
-        $xml = new \XMLWriter();
+        $xml = new \XMLWriter;
         $xml->openMemory();
         $xml->startDocument('1.0', 'UTF-8');
         $xml->setIndent(true);

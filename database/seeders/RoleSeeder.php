@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Enums\PermissionScope;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
@@ -124,64 +125,9 @@ class RoleSeeder extends Seeder
             'tenant.view_api_docs',
         ];
 
-        $tenantReportPermissions = [
-            'tenant.reports.expiring_prices',
-            'tenant.reports.price_movement',
-            'tenant.reports.stock_health',
-            'tenant.reports.coupon_performance',
-            'tenant.reports.stale_products',
-        ];
-
-        $tenantProductPermissions = [
-            'tenant.products.view_any',
-            'tenant.products.create',
-            'tenant.products.update',
-            'tenant.products.delete',
-        ];
-
-        $tenantVariantPermissions = [
-            'tenant.variants.view_any',
-            'tenant.variants.create',
-            'tenant.variants.update',
-            'tenant.variants.delete',
-        ];
-
-        $tenantRequestPermissions = [
-            'tenant.requests.view_any',
-            'tenant.requests.create',
-            'tenant.requests.update',
-            'tenant.requests.delete',
-        ];
-
-        $tenantCouponPermissions = [
-            'tenant.coupons.view_any',
-            'tenant.coupons.create',
-            'tenant.coupons.update',
-            'tenant.coupons.delete',
-            'tenant.coupons.export',
-        ];
-
-        $tenantXmlFeedPermissions = [
-            'tenant.xml_feeds.view_any',
-            'tenant.xml_feeds.create',
-            'tenant.xml_feeds.update',
-            'tenant.xml_feeds.delete',
-        ];
-
-        $tenantPermissions = array_merge(
-            $tenantGeneralPermissions,
-            $tenantReportPermissions,
-            $tenantProductPermissions,
-            $tenantVariantPermissions,
-            $tenantRequestPermissions,
-            $tenantCouponPermissions,
-            $tenantXmlFeedPermissions,
-        );
-
-        $allPermissions = array_merge(
+        $appPermissions = array_merge(
             $platformPermissions,
             $tenantsPermissions,
-            $tenantPermissions,
             $rolePermissions,
             $userPermissions,
             $couponsPermissions,
@@ -194,8 +140,12 @@ class RoleSeeder extends Seeder
             $xmlFeedPermissions,
         );
 
-        foreach ($allPermissions as $permission) {
-            Permission::firstOrCreate(['name' => $permission]);
+        foreach ($appPermissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission], ['scope' => PermissionScope::App]);
+        }
+
+        foreach ($tenantGeneralPermissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission], ['scope' => PermissionScope::Tenant]);
         }
 
         $superAdmin = Role::firstOrCreate(
@@ -205,6 +155,7 @@ class RoleSeeder extends Seeder
             ],
             [
                 'description' => 'Má absolútny prístup ku všetkým funkciám a nastaveniam celého systému.',
+                'scope' => PermissionScope::App,
             ]
         );
         $superAdmin->syncPermissions(Permission::all());
@@ -216,12 +167,12 @@ class RoleSeeder extends Seeder
             ],
             [
                 'description' => 'Spravuje celú platformu, prevádzky a globálny katalóg. Nemá právo vytvárať ani mazať používateľov.',
+                'scope' => PermissionScope::App,
             ]
         );
         $platformAdmin->syncPermissions(array_merge(
             $platformPermissions,
             $tenantsPermissions,
-            $tenantPermissions,
             $couponsPermissions,
             $reportPermissions,
             $apiTokenPermissions,
@@ -241,12 +192,12 @@ class RoleSeeder extends Seeder
             ],
             [
                 'description' => 'Spravuje prevádzky a ich prevádzkové dáta. Nemá prístup ku globálnemu katalógu ani správe používateľov.',
+                'scope' => PermissionScope::App,
             ]
         );
         $tenantManager->syncPermissions(array_merge(
             ['platform.access'],
             $tenantsPermissions,
-            $tenantPermissions,
             ['users.view_any'],
             $reportPermissions,
             $xmlFeedPermissions,
@@ -259,6 +210,7 @@ class RoleSeeder extends Seeder
             ],
             [
                 'description' => 'Spravuje globálny katalóg produktov, kategórie, atribúty a požiadavky na nové produkty.',
+                'scope' => PermissionScope::App,
             ]
         );
         $catalogManager->syncPermissions(array_merge(
@@ -276,6 +228,7 @@ class RoleSeeder extends Seeder
             ],
             [
                 'description' => 'Spravuje používateľské účty a ich roly v systéme. Nemá prístup k prevádzkovým ani katalógovým dátam.',
+                'scope' => PermissionScope::App,
             ]
         );
         $userManager->syncPermissions(array_merge(
@@ -291,6 +244,7 @@ class RoleSeeder extends Seeder
             ],
             [
                 'description' => 'Spravuje zľavové kupóny naprieč celou platformou.',
+                'scope' => PermissionScope::App,
             ]
         );
         $couponManager->syncPermissions(array_merge(
@@ -305,6 +259,7 @@ class RoleSeeder extends Seeder
             ],
             [
                 'description' => 'Má prístup iba k reportom a štatistikám platformy. Nemôže upravovať žiadne dáta.',
+                'scope' => PermissionScope::App,
             ]
         );
         $reportAnalyst->syncPermissions(array_merge(

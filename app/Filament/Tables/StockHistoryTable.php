@@ -2,6 +2,7 @@
 
 namespace App\Filament\Tables;
 
+use App\Enums\StockHistoryType;
 use App\Models\TenantProductVariant;
 use Filament\Actions\Concerns\InteractsWithActions;
 use Filament\Actions\Contracts\HasActions;
@@ -34,21 +35,8 @@ class StockHistoryTable extends Component implements HasActions, HasForms, HasTa
                 TextColumn::make('type')
                     ->label('Typ')
                     ->badge()
-                    ->formatStateUsing(fn (string $state): string => match ($state) {
-                        'purchase' => 'Nakup',
-                        'sale' => 'Predaj',
-                        'adjustment' => 'Oprava',
-                        'return' => 'Vratenie',
-                        'transfer' => 'Prevod',
-                        default => $state,
-                    })
-                    ->color(fn (string $state): string => match ($state) {
-                        'purchase' => 'success',
-                        'sale' => 'danger',
-                        'adjustment' => 'warning',
-                        'return' => 'info',
-                        default => 'gray',
-                    }),
+                    ->formatStateUsing(fn (StockHistoryType $state): string => $state->label())
+                    ->color(fn (StockHistoryType $state): string => $state->color()),
 
                 TextColumn::make('quantity')
                     ->label('Množstvo')

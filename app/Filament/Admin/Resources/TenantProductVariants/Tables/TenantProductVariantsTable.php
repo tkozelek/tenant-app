@@ -4,8 +4,8 @@ namespace App\Filament\Admin\Resources\TenantProductVariants\Tables;
 
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustPriceAction;
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\AdjustStockAction;
-use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\FlashSaleAction;
 use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\BulkAdjustPriceAction;
+use App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions\FlashSaleAction;
 use App\Filament\Exports\TenantProductVariantExporter;
 use App\Models\TenantProductVariant;
 use Filament\Actions\BulkActionGroup;

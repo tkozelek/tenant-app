@@ -2,6 +2,7 @@
 
 namespace App\Filament\Tenant\Resources\Users\Schemas;
 
+use App\Enums\PermissionScope;
 use App\Models\Role;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\Select;
@@ -42,11 +43,10 @@ class UserForm
                         Select::make('role_id')
                             ->label('Rola')
                             ->options(fn (): array => Role::query()
-                                ->where(function ($query) {
-                                    $query->where(function ($q) {
-                                        $q->whereNull('tenant_id')
-                                            ->whereDoesntHave('permissions', fn ($q) => $q->where('name', 'platform.access'));
-                                    })->orWhere('tenant_id', Filament::getTenant()?->id)->orderBy('id');
+                                ->where('scope', PermissionScope::Tenant)
+                                ->where(function ($query): void {
+                                    $query->whereNull('tenant_id')
+                                        ->orWhere('tenant_id', Filament::getTenant()?->id);
                                 })
                                 ->pluck('name', 'id')
                                 ->toArray()

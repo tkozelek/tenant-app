@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\TenantProducts\RelationManagers\actions;
 
+use App\Enums\StockHistoryType;
 use Filament\Actions\Action;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
@@ -26,13 +27,7 @@ class AdjustStockAction extends Action
             ->schema([
                 Select::make('type')
                     ->label('Zmenit typ')
-                    ->options([
-                        'purchase' => 'Nákup',
-                        'sale' => 'Predaj',
-                        'adjustment' => 'Oprava',
-                        'return' => 'Vrátenie',
-                        'transfer' => 'Prevod',
-                    ])
+                    ->options(StockHistoryType::options())
                     ->required(),
                 TextInput::make('quantity')
                     ->label('Zmena skladu')

@@ -28,7 +28,7 @@ class ProductVariantResource extends JsonResource
                 'ends_at' => $isFlashSale ? $activePriceHistory->valid_to : null,
             ]),
 
-            'quantity_prices' => $this->whenLoaded('activeQuantityPrices', function () use ($isFlashSale) {
+            'quantity_prices' => $this->whenLoaded('activeQuantityPrices', function () {
                 return $this->activeQuantityPrices->map(fn ($qp) => [
                     'min_quantity' => $qp->min_quantity,
                     'max_quantity' => $qp->max_quantity,

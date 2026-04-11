@@ -2,12 +2,13 @@
 
 namespace App\Filament\Tenant\Resources\Roles\Schemas;
 
+use App\Enums\PermissionScope;
+use App\Models\Permission;
 use Filament\Forms\Components\CheckboxList;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
-use Spatie\Permission\Models\Permission;
 
 class RoleForm
 {
@@ -36,7 +37,7 @@ class RoleForm
                             ->relationship(name: 'permissions', titleAttribute: 'name')
                             ->options(
                                 Permission::query()
-                                    ->where('name', 'like', 'tenant.%')
+                                    ->where('scope', PermissionScope::Tenant)
                                     ->pluck('name', 'id')
                             )
                             ->searchable()

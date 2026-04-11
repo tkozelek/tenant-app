@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Users\RelationManagers\actions;
 
+use App\Enums\PermissionScope;
 use App\Models\Role;
 use Filament\Actions\EditAction;
 use Filament\Forms\Components\Select;
@@ -17,8 +18,7 @@ class EditTenantRoleAction
                 Select::make('role_id')
                     ->label('Rola')
                     ->options(
-                        Role::whereDoesntHave('permissions', fn ($q) => $q->where('name', 'platform.access'))
-                            ->pluck('name', 'id')
+                        Role::where('scope', PermissionScope::Tenant)->pluck('name', 'id')
                     )
                     ->required()
                     ->default(fn (Model $record) => $record->pivot?->role_id),

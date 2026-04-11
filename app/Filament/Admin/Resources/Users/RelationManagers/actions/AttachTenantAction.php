@@ -2,6 +2,7 @@
 
 namespace App\Filament\Admin\Resources\Users\RelationManagers\actions;
 
+use App\Enums\PermissionScope;
 use App\Models\Role;
 use App\Models\User;
 use Filament\Actions\AttachAction;
@@ -19,8 +20,7 @@ class AttachTenantAction
                 Select::make('role_id')
                     ->label('Rola')
                     ->options(
-                        Role::whereDoesntHave('permissions', fn ($q) => $q->where('name', 'platform.access'))
-                            ->pluck('name', 'id')
+                        Role::where('scope', PermissionScope::Tenant)->pluck('name', 'id')
                     )
                     ->required(),
             ])

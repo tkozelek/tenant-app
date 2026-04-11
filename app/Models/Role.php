@@ -2,10 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Database\Query\Expression;
-use Illuminate\Database\Eloquent\Builder;
+use App\Enums\PermissionScope;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Query\Builder as QueryBuilder;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 use Spatie\Permission\Models\Role as SpatieRole;
@@ -14,9 +12,11 @@ class Role extends SpatieRole
 {
     use LogsActivity;
 
-    public function orderBy(Builder|\Closure|string|QueryBuilder|Expression $column, string $direction = 'asc'): void
+    protected function casts(): array
     {
-        parent::orderBy('id', 'asc');
+        return [
+            'scope' => PermissionScope::class,
+        ];
     }
 
     public function tenant(): BelongsTo

@@ -7,17 +7,14 @@ use App\Builders\HeurekaFeedBuilder;
 use App\Enums\XmlFeedPortal;
 use App\Models\TenantProductVariant;
 use App\Models\XmlFeed;
-use Illuminate\Support\Collection;
 use Illuminate\Support\LazyCollection;
 
 readonly class XmlFeedService
 {
-
     public function __construct(
         private HeurekaFeedBuilder $heurekaFeedBuilder,
         private GenericFeedBuilder $genericFeedBuilder,
-    )
-    {}
+    ) {}
 
     public function generate(XmlFeed $feed): string
     {

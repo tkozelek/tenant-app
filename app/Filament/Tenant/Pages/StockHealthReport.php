@@ -2,6 +2,7 @@
 
 namespace App\Filament\Tenant\Pages;
 
+use App\Enums\StockHistoryType;
 use App\Filament\Tenant\Resources\TenantProductVariants\TenantProductVariantResource;
 use App\Models\TenantProductVariant;
 use App\Models\User;
@@ -43,8 +44,8 @@ class StockHealthReport extends Page implements HasTable
                 TenantProductVariant::query()
                     ->whereHas('product', fn ($q) => $q->where('tenant_id', Filament::getTenant()?->id))
                     ->with('product')
-                    ->withSum(['stockHistories as stock_in' => fn ($q) => $q->where('type', 'purchase')], 'quantity')
-                    ->withSum(['stockHistories as stock_out' => fn ($q) => $q->where('type', 'sale')], 'quantity')
+                    ->withSum(['stockHistories as stock_in' => fn ($q) => $q->where('type', StockHistoryType::Purchase)], 'quantity')
+                    ->withSum(['stockHistories as stock_out' => fn ($q) => $q->where('type', StockHistoryType::Sale)], 'quantity')
                     ->withCount('stockHistories as movement_count')
                     ->orderBy('stock_quantity')
             )

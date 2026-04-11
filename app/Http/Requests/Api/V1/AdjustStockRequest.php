@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Api\V1;
 
+use App\Enums\StockHistoryType;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
@@ -15,7 +16,7 @@ class AdjustStockRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'type' => ['required', 'string', Rule::in(['purchase', 'sale', 'adjustment', 'return', 'transfer'])],
+            'type' => ['required', Rule::enum(StockHistoryType::class)],
             'quantity' => ['required', 'integer', 'not_in:0'],
             'note' => ['nullable', 'string', 'max:1000'],
         ];

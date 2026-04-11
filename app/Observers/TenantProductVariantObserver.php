@@ -2,6 +2,7 @@
 
 namespace App\Observers;
 
+use App\Enums\StockHistoryType;
 use App\Models\TenantProductVariant;
 
 class TenantProductVariantObserver
@@ -10,7 +11,7 @@ class TenantProductVariantObserver
     {
         if ($productVariant->stock_quantity > 0) {
             $productVariant->stockHistories()->create([
-                'type' => 'adjustment',
+                'type' => StockHistoryType::Adjustment,
                 'quantity' => $productVariant->stock_quantity,
                 'note' => 'initial stock',
                 'user_id' => auth()->user()->id ?? null,
