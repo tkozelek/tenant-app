@@ -6,12 +6,15 @@ use App\Observers\PriceHistoryObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 #[ObservedBy([PriceHistoryObserver::class])]
 class PriceHistory extends Model
 {
+    use HasFactory;
+
     protected $table = 'price_history';
 
     protected $fillable = [

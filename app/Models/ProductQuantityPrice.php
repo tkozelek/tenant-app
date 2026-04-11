@@ -4,13 +4,14 @@ namespace App\Models;
 
 use App\Observers\ProductQuantityPriceObserver;
 use Illuminate\Database\Eloquent\Attributes\ObservedBy;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 #[ObservedBy([ProductQuantityPriceObserver::class])]
 class ProductQuantityPrice extends Model
 {
-    use SoftDeletes;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = ['tenant_product_variant_id', 'min_quantity', 'max_quantity', 'price', 'valid_from', 'valid_to'];
 
