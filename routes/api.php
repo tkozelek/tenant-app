@@ -13,7 +13,7 @@ use App\Http\Controllers\Api\V1\VariantController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1/{tenant:slug}')
-    ->middleware('api.auth')
+    ->middleware(['api.auth', 'throttle:api'])
     ->name('api.v1.')
     ->group(function () {
         Route::get('/', [TenantProfileController::class, 'show']);
@@ -25,11 +25,11 @@ Route::prefix('v1/{tenant:slug}')
         Route::get('variants/{variant}/quantity-prices', [VariantController::class, 'quantityPrices']);
         Route::get('variants/{variant}/calculate-price', [VariantController::class, 'calculatePrice']);
         Route::get('variants/{variant}/stock-history', [VariantController::class, 'stockHistory']);
-        Route::post('variants/{variant}/stock', [StockController::class, 'store']);
+        Route::post('variants/{variant}/stock', [StockController::class, 'store'])->middleware('throttle:api-sensitive');
 
         Route::apiResource('coupons', CouponController::class)->only(['index', 'show']);
-        Route::post('coupons/check', [CouponController::class, 'check']);
-        Route::post('coupons/use', [CouponController::class, 'use']);
+        Route::post('coupons/check', [CouponController::class, 'check'])->middleware('throttle:api-sensitive');
+        Route::post('coupons/use', [CouponController::class, 'use'])->middleware('throttle:api-sensitive');
 
         Route::apiResource('bundles', BundleController::class)->only(['index', 'show']);
         Route::get('bundles/{bundle}/price-history', [PriceHistoryController::class, 'bundle']);
@@ -39,7 +39,7 @@ Route::prefix('v1/{tenant:slug}')
 
         Route::get('search', [SearchController::class, 'index']);
 
-        Route::prefix('reports')->group(function () {
+        Route::prefix('reports')->middleware('throttle:api-sensitive')->group(function () {
             Route::get('stock-health', [ReportController::class, 'stockHealth']);
             Route::get('expiring-prices', [ReportController::class, 'expiringPrices']);
             Route::get('price-history', [ReportController::class, 'priceHistory']);
