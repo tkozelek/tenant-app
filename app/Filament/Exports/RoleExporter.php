@@ -21,6 +21,9 @@ class RoleExporter extends Exporter
             ExportColumn::make('name'),
             ExportColumn::make('description'),
             ExportColumn::make('guard_name'),
+            ExportColumn::make('permissions')
+                ->label('Permissions')
+                ->formatStateUsing(fn (mixed $state, Role $record): string => $record->permissions->pluck('name')->implode('|')),
             ExportColumn::make('created_at'),
             ExportColumn::make('updated_at'),
         ];

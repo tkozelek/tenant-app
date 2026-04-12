@@ -3,8 +3,12 @@
 namespace App\Filament\Admin\Resources\Roles\Tables;
 
 use App\Filament\Exports\RoleExporter;
+use App\Filament\Imports\RoleImporter;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ExportBulkAction;
+use Filament\Actions\ImportAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
 use Filament\Tables\Table;
@@ -46,10 +50,18 @@ class RolesTable
             ->recordActions([
                 EditAction::make(),
             ])
+            ->headerActions([
+                ImportAction::make()
+                    ->importer(RoleImporter::class)
+                    ->authorize('importAny'),
+            ])
             ->toolbarActions([
-                ExportBulkAction::make()
-                    ->exporter(RoleExporter::class)
-                    ->authorize('exportAny'),
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ExportBulkAction::make()
+                        ->exporter(RoleExporter::class)
+                        ->authorize('exportAny'),
+                ]),
             ]);
     }
 }
