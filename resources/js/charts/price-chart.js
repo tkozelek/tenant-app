@@ -30,6 +30,44 @@ const chartDefaults = {
     },
 };
 
+export function initVariantPriceChart(canvas) {
+    if (!canvas || canvas.chart) return;
+
+    const labels = JSON.parse(canvas.dataset.labels);
+    const prices = JSON.parse(canvas.dataset.prices);
+    const original = JSON.parse(canvas.dataset.original);
+
+    const datasets = [
+        {
+            label: 'Cena',
+            data: prices,
+            borderColor: '#34d399',
+            backgroundColor: 'rgba(52, 211, 153, 0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 3,
+        },
+    ];
+
+    if (original.some(v => v !== null)) {
+        datasets.push({
+            label: 'Pôvodná cena',
+            data: original,
+            borderColor: '#a78bfa',
+            backgroundColor: 'rgba(167, 139, 250, 0.1)',
+            fill: true,
+            tension: 0.3,
+            pointRadius: 3,
+        });
+    }
+
+    canvas.chart = new Chart(canvas, {
+        type: 'line',
+        data: { labels, datasets },
+        options: chartDefaults,
+    });
+}
+
 export function initPriceChart() {
     const canvas = document.getElementById('priceChart');
     if (!canvas || canvas.chart) return;

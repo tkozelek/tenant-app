@@ -11,5 +11,5 @@
         @endforeach
     </div>
 @else
-    <span class="text-neutral-700">—</span>
+    <span class="text-neutral-700">-</span>
 @endif

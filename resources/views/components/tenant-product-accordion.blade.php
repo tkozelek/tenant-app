@@ -49,7 +49,9 @@
         </thead>
         <tbody class="divide-y divide-neutral-800">
             @foreach($tenantProduct->variants as $variant)
-                <tr @class(['hover:bg-neutral-800 transition-colors', 'bg-amber-950 ring-1 ring-inset ring-amber-700 hover:!bg-amber-900' => $variant->is_cheapest])>
+                <tr @click="Livewire.dispatch('select-variant-history', { variantId: {{ $variant->id }} })"
+                    class="cursor-pointer transition-colors"
+                    @class(['hover:bg-neutral-800', 'bg-amber-950 ring-1 ring-inset ring-amber-700 hover:!bg-amber-900' => $variant->is_cheapest])>
                     <td class="px-5 py-3">
                         <div class="flex items-center gap-3">
                             <x-media-thumbnail
@@ -77,7 +79,7 @@
                     </td>
                     <td class="px-5 py-3 text-right">
                         @if($variant->url)
-                            <a href="{{ $variant->url }}" class="font-semibold tracking-wider text-xs text-neutral-800 hover:text-black transition-colors py-3 px-1.5 bg-yellow-400 hover:bg-yellow-600 rounded-lg ">
+                            <a href="{{ $variant->url }}" @click.stop class="font-semibold tracking-wider text-xs text-neutral-800 hover:text-black transition-colors py-3 px-1.5 bg-yellow-400 hover:bg-yellow-600 rounded-lg">
                                 Kúpiť
                                 <i class="fa-solid fa-arrow-up-right-from-square"></i>
                             </a>

@@ -10,6 +10,8 @@
 
         <x-product-info :product="$globalProduct" :lowestPrice="$lowestPrice"/>
 
+        <livewire:variant-price-history />
+
 
 {{-- https://www.penguinui.com/components/tabs --}}
         <div
