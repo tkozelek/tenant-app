@@ -27,6 +27,16 @@
         </div>
     </div>
 
+    @if($bundle->url)
+        <div class="px-5 py-3 border-b border-neutral-800">
+            <a href="{{ $bundle->url }}"
+               class="font-semibold tracking-wider text-xs text-neutral-800 hover:text-black transition-colors py-3 px-1.5 bg-yellow-400 hover:bg-yellow-600 rounded-lg">
+                Kúpiť
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+        </div>
+    @endif
+
     <div class="divide-y divide-neutral-800/70 flex-1">
         @foreach($bundle->items as $item)
             <div class="flex items-center justify-between gap-3 px-5 py-2.5">

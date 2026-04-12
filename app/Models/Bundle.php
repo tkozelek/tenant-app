@@ -21,7 +21,7 @@ class Bundle extends Model implements HasMedia
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->logOnly(['name', 'slug', 'description', 'price', 'original_price', 'is_active'])
+            ->logOnly(['name', 'slug', 'description', 'price', 'original_price', 'is_active', 'url'])
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs()
             ->useLogName('bundle');
@@ -40,6 +40,7 @@ class Bundle extends Model implements HasMedia
         'price',
         'original_price',
         'is_active',
+        'url',
     ];
 
     protected $casts = [

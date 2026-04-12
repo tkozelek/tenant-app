@@ -26,6 +26,14 @@
         @else
             <span class="text-sm font-semibold text-white">{{ number_format($bundle->price, 2, ',', ' ') }} €</span>
         @endif
+
+        @if($bundle->url)
+            <a href="{{ $bundle->url }}"
+               class="font-semibold tracking-wider text-xs text-neutral-800 hover:text-black transition-colors py-3 px-1.5 bg-yellow-400 hover:bg-yellow-600 rounded-lg">
+                Kúpiť
+                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+            </a>
+        @endif
     </x-slot>
 
     <table class="w-full text-sm">

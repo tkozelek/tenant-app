@@ -69,6 +69,14 @@ class BundleForm
                                 Toggle::make('is_active')
                                     ->default(true)
                                     ->required(),
+
+                                TextInput::make('url')
+                                    ->label('URL')
+                                    ->url()
+                                    ->nullable()
+                                    ->columnSpanFull()
+                                    ->placeholder('https://...')
+                                    ->helperText('Ak je vyplnené, zobrazí sa tlačidlo Kúpiť na frontende.'),
                             ])->columns(),
                         Section::make('Media')
                             ->schema([
