@@ -18,6 +18,12 @@ class Bundle extends Model implements HasMedia
 {
     use InteractsWithMedia, LogsActivity;
 
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('bundles')
+            ->useDisk('public');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

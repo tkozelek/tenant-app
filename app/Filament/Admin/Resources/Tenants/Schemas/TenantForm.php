@@ -77,6 +77,7 @@ class TenantForm
                         ->collection('titles')
                         ->image()
                         ->imageEditor()
+                        ->visibility('public')
                         ->columnSpanFull()
                         ->helperText('Banner over the apge'),
 
@@ -85,6 +86,7 @@ class TenantForm
                         ->collection('images')
                         ->image()
                         ->alignCenter()
+                        ->visibility('public')
                         ->helperText('Upload a square profile image'),
                 ]),
 

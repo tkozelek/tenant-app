@@ -59,6 +59,7 @@ class TenantProductForm
                             ->multiple()
                             ->reorderable()
                             ->panelLayout('grid')
+                            ->visibility('public')
                             ->label('Obrázky produktu')
                             ->columnSpanFull(),
                     ]),

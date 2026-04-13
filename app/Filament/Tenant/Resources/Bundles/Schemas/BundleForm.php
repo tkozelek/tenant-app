@@ -85,6 +85,7 @@ class BundleForm
                                     ->multiple()
                                     ->reorderable()
                                     ->panelLayout('compact')
+                                    ->visibility('public')
                                     ->columnSpanFull(),
                             ]),
                     ]),

@@ -18,6 +18,12 @@ class GlobalProduct extends Model implements HasMedia
 {
     use HasFactory, InteractsWithMedia, LogsActivity;
 
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('global_products')
+            ->useDisk('public');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

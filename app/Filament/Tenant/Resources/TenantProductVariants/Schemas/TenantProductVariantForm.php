@@ -102,6 +102,7 @@ class TenantProductVariantForm
                                         ->multiple()
                                         ->reorderable()
                                         ->panelLayout('grid')
+                                        ->visibility('public')
                                         ->label('Obrázky')
                                         ->columnSpanFull(),
                                 ]),

@@ -70,6 +70,14 @@ class BundleSeeder extends Seeder
                         'quantity' => rand(1, 2),
                     ]);
                 }
+
+                try {
+                    $placeholderText = urlencode($bundle->name);
+                    $bundle->addMediaFromUrl("https://placehold.co/600x400.jpeg?text={$placeholderText}")
+                        ->toMediaCollection('bundles');
+                } catch (\Exception $e) {
+                    $this->command->warn("Failed to download image for bundle: {$bundle->name}");
+                }
             }
         }
     }

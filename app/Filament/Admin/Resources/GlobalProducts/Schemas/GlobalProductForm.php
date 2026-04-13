@@ -77,6 +77,7 @@ class GlobalProductForm
                                                     ->multiple()
                                                     ->reorderable()
                                                     ->panelLayout('compact')
+                                                    ->visibility('public')
                                                     ->columnSpanFull(),
                                             ]),
                                     ]),

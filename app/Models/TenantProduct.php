@@ -19,6 +19,12 @@ class TenantProduct extends Model implements HasMedia
     /** @use HasFactory<\Database\Factories\TenantProductFactory> */
     use HasFactory, InteractsWithMedia, LogsActivity;
 
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('tenant_products')
+            ->useDisk('public');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

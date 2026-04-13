@@ -47,7 +47,7 @@ class TenantProductSeeder extends Seeder
                     try {
                         $placeholderText = urlencode($name);
                         $tenantProduct->addMediaFromUrl("https://placehold.co/600x400.jpeg?text={$placeholderText}")
-                            ->toMediaCollection('tenant_product');
+                            ->toMediaCollection('tenant_products');
                     } catch (\Exception $e) {
                         $this->command->warn("Failed to download img for: {$name}");
                     }

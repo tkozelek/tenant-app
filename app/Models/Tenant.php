@@ -20,6 +20,17 @@ class Tenant extends Model implements HasMedia, HasName
 {
     use HasApiTokens, HasBrandName, HasFactory, InteractsWithMedia, LogsActivity;
 
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('images')
+            ->useDisk('public')
+            ->singleFile();
+
+        $this->addMediaCollection('titles')
+            ->useDisk('public')
+            ->singleFile();
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

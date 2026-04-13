@@ -24,6 +24,12 @@ class TenantProductVariant extends Model implements HasMedia
     /** @use HasFactory<\Database\Factories\TenantProductVariantFactory> */
     use HasFactory, InteractsWithMedia, LogsActivity;
 
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('tenant_product_variants')
+            ->useDisk('public');
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
