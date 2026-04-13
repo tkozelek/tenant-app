@@ -2,6 +2,7 @@
 
 namespace App\Livewire\Tenant;
 
+use App\Models\Bundle;
 use App\Models\Category;
 use App\Models\GlobalProduct;
 use App\Models\Tenant;
@@ -26,6 +27,7 @@ class SearchInput extends Component
             ...$this->searchGlobalProducts(),
             ...$this->searchTenants(),
             ...$this->searchTenantProducts(),
+            ...$this->searchBundles(),
         ]);
     }
 
@@ -97,6 +99,24 @@ class SearchInput extends Component
             'sub' => $product->tenant?->name,
             'url' => route('tenant.show', $product->tenant),
         ], $products->all());
+    }
+
+    private function searchBundles(): array
+    {
+        $bundles = Bundle::query()
+            ->where('is_active', true)
+            ->where('name', 'like', "%{$this->search}%")
+            ->with('tenant')
+            ->limit(3)
+            ->get();
+
+        return array_map(fn (Bundle $bundle) => [
+            'type' => 'bundle',
+            'label' => 'Balík',
+            'name' => $bundle->name,
+            'sub' => $bundle->tenant?->name,
+            'url' => route('bundles.index'),
+        ], $bundles->all());
     }
 
     public function render(): \Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\View\View

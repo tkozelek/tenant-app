@@ -45,8 +45,9 @@
                         >
 
                         <span class="shrink-0 text-[10px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded
-                            @if($result['type'] === 'tenant') bg-indigo-500/20
-                            @elseif($result['type'] === 'category')
+                            @if($result['type'] === 'tenant') bg-indigo-500/20 text-indigo-300
+                            @elseif($result['type'] === 'category') bg-emerald-500/20 text-emerald-300
+                            @elseif($result['type'] === 'bundle') bg-amber-500/20 text-amber-300
                             @else text-neutral-400
                             @endif">
                             {{ $result['label'] }}
