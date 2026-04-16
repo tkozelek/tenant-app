@@ -20,7 +20,8 @@ class BundlesTable
             ->columns([
                 TextColumn::make('name')
                     ->searchable(),
-                TextColumn::make('price')
+                TextColumn::make('activePriceHistory.price')
+                    ->label('Cena')
                     ->money()
                     ->sortable(),
                 TextColumn::make('items_count')

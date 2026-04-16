@@ -18,13 +18,13 @@
     </x-slot>
 
     <x-slot name="aside">
-        @if($bundle->original_price && $bundle->original_price > $bundle->price)
+        @if($bundle->currentOriginalPrice && $bundle->currentOriginalPrice > $bundle->currentPrice)
             <div class="text-right">
-                <span class="text-xs text-neutral-500 line-through block">{{ number_format($bundle->original_price, 2, ',', ' ') }} €</span>
-                <span class="text-sm font-semibold text-red-400">{{ number_format($bundle->price, 2, ',', ' ') }} €</span>
+                <span class="text-xs text-neutral-500 line-through block">{{ $bundle->current_original_price_formatted }}</span>
+                <span class="text-sm font-semibold text-red-400">{{ $bundle->current_price_formatted }}</span>
             </div>
         @else
-            <span class="text-sm font-semibold text-white">{{ number_format($bundle->price, 2, ',', ' ') }} €</span>
+            <span class="text-sm font-semibold text-white">{{ $bundle->current_price_formatted }}</span>
         @endif
 
         @if($bundle->url)

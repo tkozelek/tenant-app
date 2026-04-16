@@ -22,7 +22,7 @@ class BundlesTable
                     ->sortable()
                     ->weight('bold'),
 
-                TextColumn::make('price')
+                TextColumn::make('activePriceHistory.price')
                     ->label('Cena')
                     ->money('EUR')
                     ->sortable(),

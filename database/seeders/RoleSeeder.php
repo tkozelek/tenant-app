@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Enums\PermissionScope;
 use App\Models\User;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Hash;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -272,7 +273,7 @@ class RoleSeeder extends Seeder
             [
                 'first_name' => 'Tomáš',
                 'last_name' => 'Kozelek',
-                'password' => '$2y$12$Nk/uzpXJlK/lj35hIAhmTOHpuIv/A/.YvrElf4i0E0rYibpBkV2NC',
+                'password' => Hash::make('password'),
             ]
         );
 

@@ -44,21 +44,17 @@ class BundleSeeder extends Seeder
                 $bundlePrice = round($totalPrice * 0.82, 2);
                 $name = "Bundle {$tenant->name} #".($i + 1);
 
-                $bundle = Bundle::withoutEvents(function () use ($tenant, $name, $bundlePrice, $totalPrice): Bundle {
-                    return Bundle::create([
-                        'tenant_id' => $tenant->id,
-                        'name' => $name,
-                        'slug' => Str::slug($name).'-'.Str::lower(Str::random(4)),
-                        'description' => 'Výhodný balík produktov so zľavou 18 %.',
-                        'price' => $bundlePrice,
-                        'original_price' => round($totalPrice, 2),
-                        'is_active' => true,
-                    ]);
-                });
+                $bundle = Bundle::create([
+                    'tenant_id' => $tenant->id,
+                    'name' => $name,
+                    'slug' => Str::slug($name).'-'.Str::lower(Str::random(4)),
+                    'description' => 'Výhodný balík produktov so zľavou 18 %.',
+                    'is_active' => true,
+                ]);
 
                 $bundle->priceHistories()->create([
-                    'price' => $bundle->price,
-                    'original_price' => $bundle->original_price,
+                    'price' => $bundlePrice,
+                    'original_price' => round($totalPrice, 2),
                     'user_id' => $tenant->owner_id,
                     'valid_from' => Carbon::now(),
                     'valid_to' => null,

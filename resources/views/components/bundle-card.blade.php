@@ -9,19 +9,19 @@
         </div>
 
         <div class="text-right shrink-0">
-            @if($bundle->original_price && $bundle->original_price > $bundle->price)
+            @if($bundle->currentOriginalPrice && $bundle->currentOriginalPrice > $bundle->currentPrice)
                 <span class="text-xs text-neutral-500 line-through block">
-                    {{ number_format($bundle->original_price, 2, ',', ' ') }} €
+                    {{ $bundle->current_original_price_formatted }}
                 </span>
                 <span class="text-base font-bold text-red-400">
-                    {{ number_format($bundle->price, 2, ',', ' ') }} €
+                    {{ $bundle->current_price_formatted }}
                 </span>
                 <span class="text-xs text-emerald-500 font-medium block mt-0.5">
-                    ušetríte {{ number_format($bundle->original_price - $bundle->price, 2, ',', ' ') }} €
+                    ušetríte {{ number_format($bundle->currentOriginalPrice - $bundle->currentPrice, 2, ',', ' ') }} €
                 </span>
             @else
                 <span class="text-base font-bold text-white">
-                    {{ number_format($bundle->price, 2, ',', ' ') }} €
+                    {{ $bundle->current_price_formatted }}
                 </span>
             @endif
         </div>

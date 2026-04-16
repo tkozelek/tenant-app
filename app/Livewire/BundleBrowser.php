@@ -42,7 +42,7 @@ class BundleBrowser extends Component
     public function bundles(): LengthAwarePaginator
     {
         return Bundle::query()
-            ->with(['tenant', 'items.variant.activePriceHistory'])
+            ->with(['tenant', 'activePriceHistory', 'items.variant.activePriceHistory'])
             ->where('is_active', true)
             ->when($this->selectedTenant, fn ($q) => $q->where('tenant_id', $this->selectedTenant))
             ->when($this->search, fn ($q) => $q->where('name', 'like', "%{$this->search}%"))

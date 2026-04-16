@@ -104,12 +104,12 @@
                                         <div class="p-4">
                                             <h3 class="font-semibold text-white mb-3 line-clamp-1">{{ $bundle->name }}</h3>
 
-                                            @if($bundle->price)
+                                            @if($bundle->currentPrice)
                                                 <div class="flex items-baseline gap-2">
-                                                    @if($bundle->original_price && $bundle->original_price > $bundle->price)
-                                                        <span class="text-xs text-neutral-600 line-through">{{ number_format($bundle->original_price, 2, ',', ' ') }} €</span>
+                                                    @if($bundle->currentOriginalPrice && $bundle->currentOriginalPrice > $bundle->currentPrice)
+                                                        <span class="text-xs text-neutral-600 line-through">{{ $bundle->current_original_price_formatted }}</span>
                                                     @endif
-                                                    <span class="text-base font-bold text-white">{{ number_format($bundle->price, 2, ',', ' ') }} €</span>
+                                                    <span class="text-base font-bold text-white">{{ $bundle->current_price_formatted }}</span>
                                                 </div>
                                             @endif
                                         </div>

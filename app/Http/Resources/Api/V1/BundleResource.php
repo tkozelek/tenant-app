@@ -14,8 +14,8 @@ class BundleResource extends JsonResource
             'name' => $this->name,
             'slug' => $this->slug,
             'description' => $this->description,
-            'price' => (float) $this->price,
-            'original_price' => $this->original_price !== null ? (float) $this->original_price : null,
+            'price' => $this->current_price,
+            'original_price' => $this->current_original_price,
             'is_active' => $this->is_active,
             'items' => $this->whenLoaded('items', fn () => $this->items->map(fn ($item) => [
                 'variant_id' => $item->variant_id,

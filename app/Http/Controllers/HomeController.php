@@ -40,7 +40,7 @@ class HomeController extends Controller
 
         $featuredBundles = Bundle::query()
             ->where('is_active', true)
-            ->with(['tenant', 'items.variant.activePriceHistory'])
+            ->with(['tenant', 'activePriceHistory', 'items.variant.activePriceHistory'])
             ->latest()
             ->limit(8)
             ->get();

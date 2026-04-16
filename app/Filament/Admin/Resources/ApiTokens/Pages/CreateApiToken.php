@@ -25,7 +25,7 @@ class CreateApiToken extends CreateRecord
         $newToken = $tenant->createToken($data['name'], $abilities, $expiresAt);
 
         $newToken->accessToken->forceFill([
-            'created_by_user_id' => auth()->id(),
+            'user_id' => auth()->id(),
         ])->save();
 
         $this->plainTextToken = $newToken->plainTextToken;
@@ -37,7 +37,7 @@ class CreateApiToken extends CreateRecord
     {
         Notification::make()
             ->title('Token bol vytvorený')
-            ->body('Skopírujte si token teraz — nebude znovu zobrazený: '.$this->plainTextToken)
+            ->body('Skopírujte si token teraz - nebude znovu zobrazený: '.$this->plainTextToken)
             ->success()
             ->persistent()
             ->send();

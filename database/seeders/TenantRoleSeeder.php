@@ -139,7 +139,7 @@ class TenantRoleSeeder extends Seeder
                 config('permission.column_names.team_foreign_key') => null,
             ],
             [
-                'description' => 'Stara sa o produkty, pridava a upravuje ich a ich info.',
+                'description' => 'Stara sa o produkty, varianty, kupony a balicky prevadzky.',
                 'scope' => PermissionScope::Tenant,
             ]
         );
@@ -149,23 +149,9 @@ class TenantRoleSeeder extends Seeder
             $tenantProductPermissions,
             $tenantVariantPermissions,
             $tenantRequestPermissions,
+            $tenantCouponPermissions,
             $tenantBundlePermissions,
             ['tenant.xml_feeds.view_any'],
-        ));
-
-        $variantManager = Role::firstOrCreate(
-            [
-                'name' => 'Správca variantov',
-                config('permission.column_names.team_foreign_key') => null,
-            ],
-            [
-                'description' => 'Spravuje varianty produktov, ceny a sklad, ale nemeni produkty.',
-                'scope' => PermissionScope::Tenant,
-            ]
-        );
-        $variantManager->syncPermissions(array_merge(
-            ['tenant.access', 'tenant.products.view_any', 'tenant.bundles.view_any'],
-            $tenantVariantPermissions,
         ));
 
         $warehouseStaff = Role::firstOrCreate(
@@ -185,36 +171,24 @@ class TenantRoleSeeder extends Seeder
             'tenant.variants.update',
         ]);
 
-        $tenantCouponManager = Role::firstOrCreate(
-            [
-                'name' => 'Správca kupónov prevádzky',
-                config('permission.column_names.team_foreign_key') => null,
-            ],
-            [
-                'description' => 'Spravuje kupony v prevadzke.',
-                'scope' => PermissionScope::Tenant,
-            ]
-        );
-        $tenantCouponManager->syncPermissions(array_merge(
-            ['tenant.access', 'tenant.bundles.view_any'],
-            $tenantCouponPermissions,
-        ));
-
         $apiTokenManager = Role::firstOrCreate(
             [
-                'name' => 'Správca API prístupu',
+                'name' => 'Správca integrácií',
                 config('permission.column_names.team_foreign_key') => null,
             ],
             [
-                'description' => 'Spravuje API kluce a pristupy pre externy system.',
+                'description' => 'Spravuje API tokeny a XML feedy prevadzky pre externu integraci.',
                 'scope' => PermissionScope::Tenant,
             ]
         );
-        $apiTokenManager->syncPermissions([
-            'tenant.access',
-            'tenant.api_tokens.manage',
-            'tenant.view_api_docs',
-        ]);
+        $apiTokenManager->syncPermissions(array_merge(
+            [
+                'tenant.access',
+                'tenant.api_tokens.manage',
+                'tenant.view_api_docs',
+            ],
+            $tenantXmlFeedPermissions,
+        ));
 
         $tenantAnalyst = Role::firstOrCreate(
             [
@@ -227,23 +201,9 @@ class TenantRoleSeeder extends Seeder
             ]
         );
         $tenantAnalyst->syncPermissions(array_merge(
-            ['tenant.access', 'tenant.products.view_any', 'tenant.variants.view_any', 'tenant.bundles.view_any'],
+            ['tenant.access', 'tenant.products.view_any', 'tenant.variants.view_any', 'tenant.bundles.view_any', 'tenant.coupons.view_any'],
             $tenantReportPermissions,
         ));
 
-        $requestManager = Role::firstOrCreate(
-            [
-                'name' => 'Správca požiadaviek',
-                config('permission.column_names.team_foreign_key') => null,
-            ],
-            [
-                'description' => 'Spravuje poziadavky na nove produkty.',
-                'scope' => PermissionScope::Tenant,
-            ]
-        );
-        $requestManager->syncPermissions(array_merge(
-            ['tenant.access', 'tenant.products.view_any'],
-            $tenantRequestPermissions,
-        ));
     }
 }

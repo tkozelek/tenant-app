@@ -11,7 +11,7 @@ class CreateGlobalProductRequest extends CreateRecord
 
     protected function mutateFormDataBeforeCreate(array $data): array
     {
-        $data['requested_by_user_id'] = auth()->id();
+        $data['user_id'] = auth()->id();
         $data['status'] = 'pending';
 
         return $data;

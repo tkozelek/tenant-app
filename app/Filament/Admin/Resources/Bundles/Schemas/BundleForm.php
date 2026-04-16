@@ -4,6 +4,7 @@ namespace App\Filament\Admin\Resources\Bundles\Schemas;
 
 use App\Filament\Actions\GenerateDescipritonAction;
 use App\Models\TenantProductVariant;
+use Filament\Forms\Components\DateTimePicker;
 use Filament\Forms\Components\Repeater;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -79,12 +80,12 @@ class BundleForm
                                                     }
                                                 }
 
-                                                $origPrice = $get('original_price');
+                                                $origPrice = $get('initial_original_price');
                                                 if ($origPrice) {
                                                     $parts[] = "Originálna cena: {$origPrice}€.";
                                                 }
 
-                                                $price = $get('price');
+                                                $price = $get('initial_price');
                                                 if ($price) {
                                                     $parts[] = "Cena po zľave: {$price}€.";
                                                 }
@@ -121,19 +122,27 @@ class BundleForm
                     ->schema([
                         Section::make('Cenotvorba')
                             ->schema([
-                                TextInput::make('price')
+                                TextInput::make('initial_price')
                                     ->label('Aktuálna cena')
-                                    ->required()
                                     ->numeric()
                                     ->prefix('€')
                                     ->step('0.01'),
 
-                                TextInput::make('original_price')
+                                TextInput::make('initial_original_price')
                                     ->label('Pôvodná cena (pred zľavou)')
                                     ->numeric()
                                     ->prefix('€')
                                     ->step('0.01')
                                     ->helperText('Vyplňte, ak je produkt v zľave.'),
+
+                                DateTimePicker::make('initial_valid_from')
+                                    ->label('Platné od')
+                                    ->default(now()),
+
+                                DateTimePicker::make('initial_valid_to')
+                                    ->label('Platné do')
+                                    ->after('initial_valid_from')
+                                    ->helperText('Nepovinné. Ak je vyplnené, cena sa automaticky deaktivuje po tomto dátume.'),
 
                                 TextEntry::make('total_price')
                                     ->label('Hodnota poloziek v baliku')

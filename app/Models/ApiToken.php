@@ -18,8 +18,7 @@ class ApiToken extends PersonalAccessToken
         'token',
         'abilities',
         'expires_at',
-        'created_by_user_id',
-        'updated_by_user_id',
+        'user_id',
     ];
 
     public function getActivitylogOptions(): LogOptions
@@ -33,11 +32,6 @@ class ApiToken extends PersonalAccessToken
 
     public function createdBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'created_by_user_id');
-    }
-
-    public function updatedBy(): BelongsTo
-    {
-        return $this->belongsTo(User::class, 'updated_by_user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }

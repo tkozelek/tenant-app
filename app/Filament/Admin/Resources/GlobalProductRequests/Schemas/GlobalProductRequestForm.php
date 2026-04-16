@@ -22,7 +22,7 @@ class GlobalProductRequestForm
                         Select::make('tenant_id')
                             ->relationship('tenant', 'name'),
 
-                        Select::make('requested_by_user_id')
+                        Select::make('user_id')
                             ->relationship('requestedBy', 'email')
                             ->label('Vytvoril'),
 

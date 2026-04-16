@@ -32,7 +32,7 @@ class GlobalProductRequest extends Model implements HasMedia
 
     protected $fillable = [
         'tenant_id',
-        'requested_by_user_id',
+        'user_id',
         'status',
         'suggested_name',
         'suggested_description',
@@ -48,7 +48,7 @@ class GlobalProductRequest extends Model implements HasMedia
 
     public function requestedBy(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'requested_by_user_id');
+        return $this->belongsTo(User::class, 'user_id');
     }
 
     public function suggestedCategory(): BelongsTo

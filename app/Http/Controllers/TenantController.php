@@ -39,7 +39,7 @@ class TenantController extends Controller
 
         $bundles = $tenant->bundles()
             ->where('is_active', true)
-            ->with('media')
+            ->with(['media', 'activePriceHistory'])
             ->latest()
             ->get();
 

@@ -42,7 +42,7 @@ class GlobalProductRequestSeeder extends Seeder
         foreach ($requests as $request) {
             GlobalProductRequest::create([
                 'tenant_id' => $tenant->id,
-                'requested_by_user_id' => $user->id,
+                'user_id' => $user->id,
                 'suggested_category_id' => $category->id,
                 'suggested_name' => $request['suggested_name'],
                 'suggested_description' => $request['suggested_description'] ?? null,

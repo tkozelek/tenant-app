@@ -22,7 +22,7 @@ class BundleController extends Controller
 
         $bundles = Bundle::where('tenant_id', $tenant->id)
             ->where('is_active', true)
-            ->with('items.variant')
+            ->with(['activePriceHistory', 'items.variant'])
             ->paginate(25);
 
         return BundleResource::collection($bundles);
@@ -38,7 +38,7 @@ class BundleController extends Controller
 
         abort_unless($bundle->tenant_id === $tenant->id, 404);
 
-        $bundle->load('items.variant');
+        $bundle->load(['activePriceHistory', 'items.variant']);
 
         return new BundleResource($bundle);
     }

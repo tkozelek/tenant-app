@@ -27,26 +27,26 @@ class ProductBrowser extends Component
     #[Locked]
     public int $categoryId;
 
-    #[Url(except: [])]
+    #[Url(as: 'obchody', except: [])]
     public array $selectedTenants = [];
 
-    #[Url(except: [])]
+    #[Url(as: 'hodnoty', except: [])]
     public array $selectedValues = [];
 
-    #[Url(except: [])]
+    #[Url(as: 'boolean', except: [])]
     public array $boolFilters = [];
 
-    #[Url(except: [])]
+    #[Url(as: 'rozsah', except: [])]
     public array $rangeFilters = [];
 
     public array $attributeRanges = [];
 
     public array $priceRange = [];
 
-    #[Url(except: [])]
+    #[Url(as: 'cena', except: [])]
     public array $priceFilter = [];
 
-    #[Url(except: 'date')]
+    #[Url(as: 'zoradit', except: 'date')]
     public string $sort = 'date';
 
     public function updatedSort(): void
