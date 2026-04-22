@@ -3,9 +3,11 @@
 namespace App\Providers;
 
 use App\Models\ApiToken;
+use App\Models\User;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\OpenApi;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
+use Illuminate\Auth\Access\Gate;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\RateLimiter;
@@ -19,6 +21,12 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Sanctum::usePersonalAccessTokenModel(ApiToken::class);
+
+        Gate::define('viewPulse', function (User $user) {
+            return in_array($user->email, config('app.pulse_emails', [
+                "tommyside@centrum.sk",
+            ]));
+        });
 
         Scramble::configure()
             ->withDocumentTransformers(function (OpenApi $openApi): void {
