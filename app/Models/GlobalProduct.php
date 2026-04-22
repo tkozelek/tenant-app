@@ -1,0 +1,97 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Spatie\Activitylog\LogOptions;
+use Spatie\Activitylog\Traits\LogsActivity;
+use Spatie\MediaLibrary\HasMedia;
+use Spatie\MediaLibrary\InteractsWithMedia;
+
+class GlobalProduct extends Model implements HasMedia
+{
+    use HasFactory, InteractsWithMedia, LogsActivity;
+
+    public function registerMediaCollections(): void
+    {
+        $this->addMediaCollection('global_products')
+            ->useDisk('public');
+    }
+
+    public function getActivitylogOptions(): LogOptions
+    {
+        return LogOptions::defaults()
+            ->logOnly(['name', 'slug', 'description', 'is_active', 'is_featured', 'category_id'])
+            ->logOnlyDirty()
+            ->dontSubmitEmptyLogs()
+            ->useLogName('global_product');
+    }
+
+    protected $fillable = [
+        'category_id',
+        'name',
+        'slug',
+        'description',
+        'is_active',
+        'is_featured',
+    ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'is_featured' => 'boolean',
+        ];
+    }
+
+    public function scopeFeatured(Builder $query): void
+    {
+        $query->where('is_featured', true)->where('is_active', true);
+    }
+
+    public function category(): BelongsTo
+    {
+        return $this->belongsTo(Category::class);
+    }
+
+    public function globalProductAttributes(): HasMany
+    {
+        return $this->hasMany(GlobalProductAttribute::class)
+            ->with(['attribute', 'attributeValue']);
+    }
+
+    public function tenantProducts(): HasMany
+    {
+        return $this->hasMany(TenantProduct::class);
+    }
+
+    public function variants(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            TenantProductVariant::class,
+            TenantProduct::class,
+            'global_product_id',
+            'tenant_product_id',
+            'id',
+            'id'
+        );
+    }
+
+    protected function minPrice(): Attribute
+    {
+        return Attribute::make(
+            get: function (): ?float {
+                return $this->variants
+                    ->pluck('activePriceHistory')
+                    ->filter()
+                    ->min('price');
+            }
+        );
+    }
+}

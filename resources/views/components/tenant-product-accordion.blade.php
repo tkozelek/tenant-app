@@ -1,0 +1,117 @@
+@props(['tenantProduct', 'lowestPrice' => null, 'isCheapest' => false, 'categoryCoupons' => collect()])
+
+<x-accordion
+    open="highlightedTenant === 'tenant-{{ $tenantProduct->tenant_id }}'"
+    :id="'tenant-'.$tenantProduct->tenant_id"
+    x-bind:class="highlightedTenant === 'tenant-{{ $tenantProduct->tenant_id }}' && 'ring-1 ring-gray-700'"
+    @class(['ring-1 ring-emerald-500' => $isCheapest])
+>
+    <x-slot name="header">
+        <x-media-thumbnail
+            :url="$tenantProduct->tenant->getImageUrl()"
+            :alt="$tenantProduct->tenant->name"
+            icon="fa-store"
+            class="w-10 h-10 rounded-lg"
+        />
+        <div>
+            <a href="{{ route('tenant.show', $tenantProduct->tenant) }}" class="font-semibold text-white hover:text-neutral-300 block leading-tight">{{ $tenantProduct->tenant->name }}</a>
+        </div>
+        <span class="text-xs bg-neutral-800 text-neutral-400 px-2 py-0.5 rounded-full shrink-0">
+            {{ $tenantProduct->variants->count() }} - variant
+        </span>
+        @foreach($categoryCoupons as $coupon)
+            <div class="flex items-center gap-1.5 bg-yellow-900 border border-yellow-800 rounded-full px-2.5 py-0.5 shrink-0">
+                <span class="font-bold text-yellow-200 text-xs tracking-wide">{{ $coupon->code }}</span>
+                <span class="text-xs text-neutral-300">{{ $coupon->discount_type === 'percentage' ? number_format((float) $coupon->value, 0).'%' : number_format((float) $coupon->value, 2, ',', ' ').' €' }}</span>
+                @if($coupon->min_order_amount)
+                    <span class="text-xs text-neutral-300"> - min. {{ number_format((float) $coupon->min_order_amount, 2, ',', ' ') }} €</span>
+                @endif
+            </div>
+        @endforeach
+    </x-slot>
+
+    <x-slot name="aside">
+        @if($lowestPrice)
+            <span class="text-sm font-semibold text-white">od {{ number_format($lowestPrice, 2, ',', ' ') }} €</span>
+        @endif
+    </x-slot>
+
+    <table class="w-full text-sm">
+        <thead>
+            <tr class="text-left text-xs text-neutral-500 border-b border-neutral-800">
+                <th class="px-5 py-2 font-medium">Variant</th>
+                <th class="px-5 py-2 font-medium">SKU</th>
+                <th class="px-5 py-2 font-medium">Sklad</th>
+                <th class="px-5 py-2 font-medium">Kupóny</th>
+                <th class="px-5 py-2 font-medium text-right">Cena</th>
+                <th class="px-5 py-2 font-medium"></th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-neutral-800">
+            @foreach($tenantProduct->variants as $variant)
+                <tr @click="Livewire.dispatch('select-variant-history', { variantId: {{ $variant->id }} })"
+                    class="cursor-pointer transition-colors"
+                    @class(['hover:bg-neutral-800', 'bg-amber-950 ring-1 ring-inset ring-amber-700 hover:!bg-amber-900' => $variant->is_cheapest])>
+                    <td class="px-5 py-3">
+                        <div class="flex items-center gap-3">
+                            <x-media-thumbnail
+                                :url="$variant->getFirstMediaUrl('tenant_product_variants')"
+                                :alt="$variant->name"
+                                icon="fa-cube"
+                                class="w-8 h-8 rounded"
+                            />
+                            <span class="text-white">{{ $variant->name }}</span>
+                        </div>
+                    </td>
+                    <td class="px-5 py-3 text-neutral-400 font-mono text-xs">{{ $variant->sku ?? '-' }}</td>
+                    <td class="px-5 py-3">
+                        @if($variant->stock_quantity > 0)
+                            <span class="text-green-400">{{ $variant->stock_quantity }} ks</span>
+                        @else
+                            <span class="text-red-400">Vypredané</span>
+                        @endif
+                    </td>
+                    <td class="px-4 py-3">
+                        <x-variant-coupons :variant="$variant" />
+                    </td>
+                    <td class="px-4 py-3 text-right">
+                        <x-variant-price :variant="$variant" />
+                    </td>
+                    <td class="px-5 py-3 text-right">
+                        @if($variant->url)
+                            <a href="{{ $variant->url }}" @click.stop class="font-semibold tracking-wider text-xs text-neutral-800 hover:text-black transition-colors py-3 px-1.5 bg-yellow-400 hover:bg-yellow-600 rounded-lg">
+                                Kúpiť
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </a>
+                        @endif
+                    </td>
+                </tr>
+            @endforeach
+        </tbody>
+    </table>
+</x-accordion>
+
+<script>
+function flashSaleCountdown(ends) {
+    return {
+        ends,
+        remaining: '',
+        init() {
+            this.tick();
+            setInterval(() => this.tick(), 1000);
+        },
+        tick() {
+            const diff = this.ends - Date.now();
+            if (diff <= 0) {
+                this.remaining = 'koniec';
+                return;
+            }
+
+            const h = Math.floor(diff / (60 * 60 * 1000));
+            const m = Math.floor((diff % (60 * 60 * 1000)) / (60 * 1000));
+            const s = Math.floor((diff % (60 * 1000)) / 1000);
+            this.remaining = (h ? h + 'h ' : '') + m + 'm ' + s + 's';
+        },
+    };
+}
+</script>

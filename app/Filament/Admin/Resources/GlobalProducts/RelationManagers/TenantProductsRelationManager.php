@@ -1,0 +1,70 @@
+<?php
+
+namespace App\Filament\Admin\Resources\GlobalProducts\RelationManagers;
+
+use App\Filament\Admin\Resources\GlobalProducts\RelationManagers\Schemas\TenantProductRelationForm;
+use App\Filament\Admin\Resources\TenantProducts\TenantProductResource;
+use Filament\Actions\AssociateAction;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
+use Filament\Actions\DeleteAction;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\DissociateAction;
+use Filament\Actions\DissociateBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Resources\RelationManagers\RelationManager;
+use Filament\Schemas\Schema;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Table;
+
+class TenantProductsRelationManager extends RelationManager
+{
+    protected static string $relationship = 'tenantProducts';
+
+    public function form(Schema $schema): Schema
+    {
+        return TenantProductRelationForm::configure($schema, $this);
+    }
+
+    public function table(Table $table): Table
+    {
+        return $table
+            ->recordTitleAttribute('name')
+            ->recordUrl(fn ($record) => TenantProductResource::getUrl('edit', ['record' => $record]))
+            ->columns([
+                TextColumn::make('tenant.name')
+                    ->label('Tenant')
+                    ->sortable()
+                    ->searchable()
+                    ->url(fn ($record) => route('tenant.show', $record->tenant)),
+
+                TextColumn::make('name')
+                    ->label('Nazvo produktu')
+                    ->searchable(),
+
+                IconColumn::make('is_active')
+                    ->boolean()
+                    ->label('Aktivny'),
+            ])
+            ->filters([
+                //
+            ])
+            ->headerActions([
+                CreateAction::make()
+                    ->label('Priradit k tenantovi'),
+                AssociateAction::make(),
+            ])
+            ->recordActions([
+                EditAction::make(),
+                DissociateAction::make(),
+                DeleteAction::make(),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DissociateBulkAction::make(),
+                    DeleteBulkAction::make(),
+                ]),
+            ]);
+    }
+}

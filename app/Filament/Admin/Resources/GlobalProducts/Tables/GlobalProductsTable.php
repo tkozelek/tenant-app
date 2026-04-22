@@ -1,0 +1,82 @@
+<?php
+
+namespace App\Filament\Admin\Resources\GlobalProducts\Tables;
+
+use App\Filament\Exports\GlobalProductExporter;
+use App\Filament\Imports\GlobalProductImporter;
+use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteBulkAction;
+use Filament\Actions\EditAction;
+use Filament\Actions\ExportBulkAction;
+use Filament\Actions\ImportAction;
+use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\SpatieMediaLibraryImageColumn;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+
+class GlobalProductsTable
+{
+    public static function configure(Table $table): Table
+    {
+        return $table
+            ->columns([
+                SpatieMediaLibraryImageColumn::make('media')
+                    ->collection('global_products')
+                    ->square()
+                    ->stacked()
+                    ->limit(3),
+
+                TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('category.name')
+                    ->label('Kategória')
+                    ->searchable()
+                    ->sortable(),
+
+                IconColumn::make('is_active')
+                    ->boolean()
+                    ->label('Aktívny'),
+
+                IconColumn::make('is_featured')
+                    ->boolean()
+                    ->label('Odporúčaný'),
+
+                TextColumn::make('created_at')
+                    ->dateTime()
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])
+            ->filters([
+                SelectFilter::make('category_id')
+                    ->relationship('category', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->multiple()
+                    ->label('Podľa kategórie'),
+                TernaryFilter::make('is_active')
+                    ->label('Je aktívny'),
+                TernaryFilter::make('is_featured')
+                    ->label('Je odporúčaný'),
+            ])
+            ->recordActions([
+                EditAction::make(),
+            ])
+            ->headerActions([
+                ImportAction::make()
+                    ->importer(GlobalProductImporter::class)
+                    ->authorize('importAny'),
+            ])
+            ->toolbarActions([
+                BulkActionGroup::make([
+                    DeleteBulkAction::make(),
+                    ExportBulkAction::make()
+                        ->exporter(GlobalProductExporter::class)
+                        ->authorize('exportAny'),
+                ]),
+            ]);
+    }
+}
