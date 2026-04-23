@@ -58,8 +58,4 @@ Route::get('/obchod/{tenant:slug}', [TenantController::class, 'show'])->name('te
 
 Route::get('/feed/{tenant:slug}/{token}.xml', [XmlFeedController::class, 'show'])->name('xml-feed.show');
 
-// Route::can('platform.access')->prefix('/admin')->name('admin.')->group(function () {
-//    Route::get('/', [AdminController::class, 'index'])->name('index');
-// });
-
 require __DIR__.'/auth.php';
