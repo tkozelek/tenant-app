@@ -26,7 +26,7 @@ class BundlesTable
                     ->sortable(),
                 TextColumn::make('items_count')
                     ->counts('items')
-                    ->label('Items Included'),
+                    ->label('Položky'),
                 IconColumn::make('is_active')
                     ->boolean(),
                 TextColumn::make('created_at')

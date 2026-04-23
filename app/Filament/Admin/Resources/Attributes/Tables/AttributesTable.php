@@ -43,9 +43,9 @@ class AttributesTable
             ->filters([
                 SelectFilter::make('type')
                     ->options([
-                        'select' => 'Select',
-                        'number' => 'Number',
-                        'bool' => 'Boolean',
+                        'select' => 'Výber',
+                        'number' => 'Číslo',
+                        'bool' => 'Áno/Nie',
                         'text' => 'Text',
                     ]),
                 TernaryFilter::make('is_filterable'),

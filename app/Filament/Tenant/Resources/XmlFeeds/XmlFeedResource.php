@@ -19,6 +19,10 @@ class XmlFeedResource extends Resource
 {
     protected static ?string $model = XmlFeed::class;
 
+    protected static ?string $modelLabel = 'XML feed';
+
+    protected static ?string $pluralModelLabel = 'XML feedy';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRss;
 
     protected static string|UnitEnum|null $navigationGroup = 'Integracie';

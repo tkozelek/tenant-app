@@ -40,7 +40,7 @@ class UsersTable
                         $tenantId = Filament::getTenant()?->id;
 
                         if ($record->id === Filament::getTenant()?->owner_id) {
-                            return 'Owner';
+                            return 'Vlastník';
                         }
 
                         return $record->roles()

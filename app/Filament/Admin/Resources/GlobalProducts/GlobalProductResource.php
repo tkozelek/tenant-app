@@ -19,6 +19,10 @@ class GlobalProductResource extends Resource
 {
     protected static ?string $model = GlobalProduct::class;
 
+    protected static ?string $modelLabel = 'Glob. produkt';
+
+    protected static ?string $pluralModelLabel = 'Glob. produkty';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedGlobeAlt;
 
     protected static ?int $navigationSort = 30;

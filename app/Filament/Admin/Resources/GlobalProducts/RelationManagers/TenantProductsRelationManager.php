@@ -53,7 +53,8 @@ class TenantProductsRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make()
                     ->label('Priradit k tenantovi'),
-                AssociateAction::make(),
+                AssociateAction::make()
+                    ->label('Pripojiť'),
             ])
             ->recordActions([
                 EditAction::make(),

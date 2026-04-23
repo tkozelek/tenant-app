@@ -27,10 +27,10 @@ class UsersTable
                 TextColumn::make('last_name')
                     ->searchable(),
                 TextColumn::make('email')
-                    ->label('Email address')
+                    ->label('E-mail')
                     ->searchable(),
                 TextColumn::make('roles.name')
-                    ->label('Role')
+                    ->label('Rola')
                     ->badge()
                     ->color('info')
                     ->getStateUsing(function (Model $record) {
@@ -52,7 +52,7 @@ class UsersTable
                     ->relationship('roles', 'name', fn (Builder $query) => $query->whereHas('permissions', fn ($q) => $q->where('name', 'platform.access')))
                     ->multiple()
                     ->preload()
-                    ->label('Filter by role'),
+                    ->label('Podľa roly'),
             ])
             ->recordActions([
                 ViewAction::make(),

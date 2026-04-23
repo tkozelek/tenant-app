@@ -44,7 +44,7 @@ class AdjustStockAction extends Action
                     ])
                     ->helperText('Pozitívne na pridanie kusov, negatívne na odobratie.'),
                 Textarea::make('note')
-                    ->label('Note')
+                    ->label('Poznámka')
                     ->columnSpanFull(),
             ])
             ->action(function (array $data, $record) {

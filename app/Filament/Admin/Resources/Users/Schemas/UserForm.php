@@ -22,7 +22,7 @@ class UserForm
                     ->required()
                     ->maxLength(255),
                 TextInput::make('email')
-                    ->label('Email address')
+                    ->label('E-mail')
                     ->email()
                     ->required()
                     ->unique(ignoreRecord: true),
@@ -34,14 +34,14 @@ class UserForm
                     ->rule(Password::default()),
 
                 Select::make('roles')
-                    ->label('Global Role')
+                    ->label('Globálna rola')
                     ->disabled(fn ($record) => $record?->is(auth()->user()))
                     ->relationship(
                         name: 'roles',
                         titleAttribute: 'name',
                         modifyQueryUsing: fn ($query) => $query->where('scope', PermissionScope::App)
                     )
-                    ->placeholder('No role selected')
+                    ->placeholder('Bez roly')
                     ->preload()
                     ->searchable()
                     ->nullable(),

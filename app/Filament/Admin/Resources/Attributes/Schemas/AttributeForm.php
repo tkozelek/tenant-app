@@ -36,9 +36,9 @@ class AttributeForm
                             // vyber aky je dany atribut
                             Select::make('type')
                                 ->options([
-                                    'select' => 'Select',
-                                    'number' => 'Number',
-                                    'bool' => 'Boolean',
+                                    'select' => 'Výber',
+                                    'number' => 'Číslo',
+                                    'bool' => 'Áno/Nie',
                                     'text' => 'Text',
                                 ])
                                 ->required()
@@ -46,7 +46,7 @@ class AttributeForm
                             // jednotky
                             TextInput::make('unit')
                                 ->maxLength(50)
-                                ->placeholder('e.g., GB, kg, cm')
+                                ->placeholder('napr. GB, kg, cm')
                                 ->helperText('Nechaj prázdne v prípad potreby'),
                             // ci sa da pomocou neho filtrovat
                             Toggle::make('is_filterable')

@@ -18,10 +18,10 @@ class TenantForm
     {
         return $schema->schema([
 
-            Section::make('Info')
+            Section::make('Informácie')
                 ->schema([
                     TextInput::make('name')
-                        ->label('Name')
+                        ->label('Názov')
                         ->required()
                         ->live(onBlur: true)
                         ->afterStateUpdated(fn (Set $set, ?string $state) => $set('slug', Str::slug($state))),
@@ -41,10 +41,10 @@ class TenantForm
 
                     TextInput::make('short_description')
                         ->label('Tagline (meta)')
-                        ->placeholder('A short version of description'),
+                        ->placeholder('Krátky popis'),
 
                     RichEditor::make('description')
-                        ->label('Description')
+                        ->label('Popis')
                         ->hintAction(
                             GenerateDescipritonAction::make()
                                 ->references('description')
@@ -70,7 +70,7 @@ class TenantForm
                 ]),
 
             Section::make('Branding')
-                ->description('Manage tenant imamges.')
+                ->description('Obrázky tenanta.')
                 ->schema([
                     SpatieMediaLibraryFileUpload::make('title_image')
                         ->label('Titulka')
@@ -79,7 +79,7 @@ class TenantForm
                         ->imageEditor()
                         ->visibility('public')
                         ->columnSpanFull()
-                        ->helperText('Banner over the apge'),
+                        ->helperText('Banner nad stránkou.'),
 
                     SpatieMediaLibraryFileUpload::make('image')
                         ->label('Tenant logo')
@@ -87,13 +87,13 @@ class TenantForm
                         ->image()
                         ->alignCenter()
                         ->visibility('public')
-                        ->helperText('Upload a square profile image'),
+                        ->helperText('Štvorcový profilový obrázok.'),
                 ]),
 
-            Section::make('Administration')
+            Section::make('Administrácia')
                 ->schema([
                     Select::make('owner_id')
-                        ->label('Owner')
+                        ->label('Vlastník')
                         ->relationship('owner', 'email')
                         ->default(auth()->user()->id)
                         ->searchable()
@@ -101,7 +101,7 @@ class TenantForm
                         ->required(),
 
                     Toggle::make('is_public')
-                        ->label('Public?')
+                        ->label('Verejný?')
                         ->inline(false)
                         ->default(true),
                 ]),

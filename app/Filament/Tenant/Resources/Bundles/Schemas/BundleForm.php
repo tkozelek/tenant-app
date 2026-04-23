@@ -79,7 +79,7 @@ class BundleForm
                                     ->placeholder('https://...')
                                     ->helperText('Ak je vyplnené, zobrazí sa tlačidlo Kúpiť na frontende.'),
                             ])->columns(),
-                        Section::make('Media')
+                        Section::make('Médiá')
                             ->schema([
                                 SpatieMediaLibraryFileUpload::make('media')
                                     ->collection('bundles')

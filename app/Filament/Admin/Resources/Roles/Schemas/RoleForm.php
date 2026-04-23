@@ -26,7 +26,7 @@ class RoleForm
                             ->required(),
                     ])->columns(1),
 
-                Section::make('Permissions')
+                Section::make('Oprávnenia')
                     ->description('Právemoci pre danú rolu')
                     ->schema([
                         CheckboxList::make('permissions')

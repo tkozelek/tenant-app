@@ -21,13 +21,17 @@ class RoleResource extends Resource
 {
     protected static ?string $model = Role::class;
 
+    protected static ?string $modelLabel = 'Rola';
+
+    protected static ?string $pluralModelLabel = 'Roly';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Key;
 
     protected static string|UnitEnum|null $navigationGroup = 'Použivatelia';
 
     protected static ?int $navigationSort = 50;
 
-    protected static ?string $navigationLabel = 'Role';
+    protected static ?string $navigationLabel = 'Roly';
 
     protected static ?string $recordTitleAttribute = 'name';
 

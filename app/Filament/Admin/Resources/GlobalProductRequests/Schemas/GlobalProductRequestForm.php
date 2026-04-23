@@ -16,7 +16,7 @@ class GlobalProductRequestForm
     {
         return $schema
             ->components([
-                Section::make('Request Information')
+                Section::make('Informácie')
                     ->disabled(fn (?GlobalProductRequest $record) => $record?->status === 'approved')
                     ->schema([
                         Select::make('tenant_id')

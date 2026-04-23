@@ -60,7 +60,7 @@ class GlobalProductRequestsTable
             ->recordActions([
                 EditAction::make()
                     ->label(function (GlobalProductRequest $record) {
-                        return $record->status === 'approved' ? 'View' : 'Edit';
+                        return $record->status === 'approved' ? 'Zobraziť' : 'Upraviť';
                     }),
                 ApproveAndCreateAction::make(),
                 RejectAction::make(),

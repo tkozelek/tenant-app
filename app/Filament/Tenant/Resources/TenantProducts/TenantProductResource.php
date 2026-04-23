@@ -19,6 +19,10 @@ class TenantProductResource extends Resource
 {
     protected static ?string $model = TenantProduct::class;
 
+    protected static ?string $modelLabel = 'Produkt';
+
+    protected static ?string $pluralModelLabel = 'Produkty';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedBuildingStorefront;
 
     protected static string|null|\UnitEnum $navigationGroup = 'Produkty';

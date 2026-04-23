@@ -42,7 +42,7 @@ class VariantsRelationManager extends RelationManager
                     ->modalHeading('Pridať variant produktu '.$this->getOwnerRecord()?->name)
                     ->label('Pridať variant'),
                 AssociateAction::make()
-                    ->label('Attach')
+                    ->label('Pripojiť')
                     ->recordSelectSearchColumns(['name', 'sku'])
                     ->recordSelectOptionsQuery(fn (Builder $query) => $query
                         ->whereHas('product', fn (Builder $q) => $q->where('tenant_id', $this->getOwnerRecord()?->tenant_id))

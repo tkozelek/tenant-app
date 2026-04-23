@@ -27,13 +27,13 @@ class ActivityLogInfolist
                             }),
 
                         TextEntry::make('log_name')
-                            ->label('Type')
+                            ->label('Typ')
                             ->badge()
                             ->color('gray')
                             ->formatStateUsing(fn (string $state): string => str_replace('_', ' ', ucfirst($state))),
 
                         TextEntry::make('created_at')
-                            ->label('When')
+                            ->label('Kedy')
                             ->dateTime(),
 
                         TextEntry::make('subject_type')
@@ -44,11 +44,11 @@ class ActivityLogInfolist
                             ->label('Model ID'),
 
                         TextEntry::make('causer.full_name')
-                            ->label('By')
-                            ->placeholder('System'),
+                            ->label('Kým')
+                            ->placeholder('Systém'),
                     ]),
 
-                Section::make('New Values')
+                Section::make('Nové hodnoty')
                     ->visible(fn (Activity $record): bool => filled($record->properties->get('attributes')))
                     ->schema([
                         KeyValueEntry::make('properties.attributes')
@@ -56,7 +56,7 @@ class ActivityLogInfolist
                             ->columnSpanFull(),
                     ]),
 
-                Section::make('Previous Values')
+                Section::make('Staré hodnoty')
                     ->visible(fn (Activity $record): bool => filled($record->properties->get('old')))
                     ->schema([
                         KeyValueEntry::make('properties.old')

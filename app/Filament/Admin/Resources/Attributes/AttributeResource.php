@@ -19,6 +19,10 @@ class AttributeResource extends Resource
 {
     protected static ?string $model = Attribute::class;
 
+    protected static ?string $modelLabel = 'Atribút';
+
+    protected static ?string $pluralModelLabel = 'Atribúty';
+
     protected static string|UnitEnum|null $navigationGroup = 'Kategorie';
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTag;

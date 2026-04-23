@@ -30,7 +30,7 @@ class ApproveAndCreateAction extends Action
             ->color('success')
             ->icon('heroicon-o-check-badge')
             ->visible(fn (GlobalProductRequest $record) => $record->status === 'pending')
-            ->modalHeading(fn (GlobalProductRequest $record) => sprintf("Schvalit a vytovrit - %s", $record->suggested_name))
+            ->modalHeading(fn (GlobalProductRequest $record) => sprintf('Schváliť a vytvoriť - %s', $record->suggested_name))
             ->schema([
                 TextInput::make('name')
                     ->default(fn (GlobalProductRequest $record) => $record->suggested_name)
@@ -95,7 +95,7 @@ class ApproveAndCreateAction extends Action
                         ->sendToDatabase($record->requestedBy);
                 }
 
-                Notification::make()->title('Globalny produkt vytvoreny, request upraveny.')->success()->send();
+                Notification::make()->title('Globálny produkt vytvorený, žiadosť aktualizovaná.')->success()->send();
             });
     }
 }

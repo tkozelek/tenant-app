@@ -42,7 +42,7 @@ class VariantsRelationManager extends RelationManager
             ->headerActions([
                 CreateAction::make(),
                 AssociateAction::make()
-                    ->label('Attach')
+                    ->label('Pripojiť')
                     ->recordSelectSearchColumns(['name', 'sku'])
                     ->recordSelectOptionsQuery(fn (Builder $query) => $query
                         ->whereHas('product', fn (Builder $q) => $q->where('tenant_id', Filament::getTenant()->id))

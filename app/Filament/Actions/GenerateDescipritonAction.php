@@ -90,9 +90,9 @@ class GenerateDescipritonAction extends Action
                         ? "Si expert na e-commerce. Tu je návrh popisu pre {$this->context} '{$title}': '{$currentContent}'.{$extraContext} Vylepši ho, aby bol profesionálny a pútavý v slovenčine. Vráť VÝHRADNE platný HTML kód."
                         : "Si expert na e-commerce. Napíš pútavý popis pre {$this->context} '{$title}' v slovenčine.{$extraContext} Vráť VÝHRADNE platný HTML kód.";
 
-//                    if (config('app.debug')) {
-//                        $prompt .= ' Debug verzia, vloz len 100 znakov max. But use Headings tags etc for testing. And append DEBUG at the end.';
-//                    }
+                    //                    if (config('app.debug')) {
+                    //                        $prompt .= ' Debug verzia, vloz len 100 znakov max. But use Headings tags etc for testing. And append DEBUG at the end.';
+                    //                    }
 
                     $result = Gemini::generativeModel(model: 'gemini-2.5-flash')->generateContent($prompt);
                     $generatedHtml = $result->text();

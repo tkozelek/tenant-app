@@ -14,7 +14,7 @@ class ActivityLogInfolist
     {
         return $schema
             ->components([
-                Section::make('Event Details')
+                Section::make('Detail udalosti')
                     ->columns(3)
                     ->schema([
                         TextEntry::make('event')
@@ -27,22 +27,22 @@ class ActivityLogInfolist
                             }),
 
                         TextEntry::make('subject_type')
-                            ->label('Type')
+                            ->label('Typ')
                             ->formatStateUsing(fn (?string $state): string => $state ? class_basename($state) : '-'),
 
                         TextEntry::make('created_at')
-                            ->label('When')
+                            ->label('Kedy')
                             ->dateTime(),
 
                         TextEntry::make('subject_id')
                             ->label('Model ID'),
 
                         TextEntry::make('causer.full_name')
-                            ->label('By')
-                            ->placeholder('System'),
+                            ->label('Kým')
+                            ->placeholder('Systém'),
                     ]),
 
-                Section::make('New Values')
+                Section::make('Nové hodnoty')
                     ->visible(fn (Activity $record): bool => filled($record->properties->get('attributes')))
                     ->schema([
                         KeyValueEntry::make('properties.attributes')
@@ -50,7 +50,7 @@ class ActivityLogInfolist
                             ->columnSpanFull(),
                     ]),
 
-                Section::make('Previous Values')
+                Section::make('Staré hodnoty')
                     ->visible(fn (Activity $record): bool => filled($record->properties->get('old')))
                     ->schema([
                         KeyValueEntry::make('properties.old')

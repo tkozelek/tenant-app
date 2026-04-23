@@ -15,7 +15,7 @@ class TenantUserController extends Controller
     {
         Gate::authorize('assignRoles', $tenant);
         $roles = Cache::remember('user-roles', 60 * 60, function () {
-            return Role::where("scope", "tenant")->get();
+            return Role::where('scope', 'tenant')->get();
         });
 
         return view('tenant.tenantuser', [

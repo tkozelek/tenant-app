@@ -15,13 +15,13 @@ class ActivityLogsTable
         return $table
             ->columns([
                 TextColumn::make('created_at')
-                    ->label('When')
+                    ->label('Kedy')
                     ->dateTime()
                     ->sortable()
                     ->since(),
 
                 TextColumn::make('event')
-                    ->label('Event')
+                    ->label('Udalosť')
                     ->badge()
                     ->color(fn (?string $state): string => match ($state) {
                         'created' => 'success',
@@ -31,7 +31,7 @@ class ActivityLogsTable
                     }),
 
                 TextColumn::make('log_name')
-                    ->label('Type')
+                    ->label('Typ')
                     ->badge()
                     ->color('gray')
                     ->formatStateUsing(fn (string $state): string => str_replace('_', ' ', ucfirst($state))),
@@ -42,21 +42,21 @@ class ActivityLogsTable
                     ->sortable(),
 
                 TextColumn::make('causer.full_name')
-                    ->label('By')
-                    ->placeholder('System')
+                    ->label('Kým')
+                    ->placeholder('Systém')
                     ->searchable(['first_name', 'last_name']),
             ])
             ->defaultSort('created_at', 'desc')
             ->filters([
                 SelectFilter::make('event')
                     ->options([
-                        'created' => 'Created',
-                        'updated' => 'Updated',
-                        'deleted' => 'Deleted',
+                        'created' => 'Vytvorené',
+                        'updated' => 'Zmenené',
+                        'deleted' => 'Vymazané',
                     ]),
 
                 SelectFilter::make('causer_id')
-                    ->label('User')
+                    ->label('Používateľ')
                     ->options(fn (): array => User::query()->get()->pluck('full_name', 'id')->all())
                     ->searchable(),
             ])

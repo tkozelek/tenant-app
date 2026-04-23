@@ -21,6 +21,10 @@ class TenantProductVariantResource extends Resource
 {
     protected static ?string $model = TenantProductVariant::class;
 
+    protected static ?string $modelLabel = 'Variant';
+
+    protected static ?string $pluralModelLabel = 'Varianty';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
 
     protected static ?string $recordTitleAttribute = 'name';

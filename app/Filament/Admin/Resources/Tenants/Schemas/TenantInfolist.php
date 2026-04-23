@@ -13,7 +13,7 @@ class TenantInfolist
         return $schema
             ->components([
                 TextEntry::make('owner.id')
-                    ->label('Owner'),
+                    ->label('Vlastník'),
                 TextEntry::make('name'),
                 TextEntry::make('slug'),
                 TextEntry::make('description')

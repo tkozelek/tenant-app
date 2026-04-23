@@ -21,6 +21,10 @@ class ApiTokenResource extends Resource
 {
     protected static ?string $model = ApiToken::class;
 
+    protected static ?string $modelLabel = 'API token';
+
+    protected static ?string $pluralModelLabel = 'API tokeny';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::Key;
 
     protected static string|UnitEnum|null $navigationGroup = 'Použivatelia';

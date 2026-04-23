@@ -18,6 +18,10 @@ class BundleResource extends Resource
 {
     protected static ?string $model = Bundle::class;
 
+    protected static ?string $modelLabel = 'Balík';
+
+    protected static ?string $pluralModelLabel = 'Balíky';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedArchiveBox;
 
     protected static ?int $navigationSort = 60;

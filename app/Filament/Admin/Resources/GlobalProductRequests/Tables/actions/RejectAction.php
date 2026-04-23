@@ -35,7 +35,7 @@ class RejectAction extends Action
                 ]);
 
                 Cache::forget('global_product_requests_count');
-                Notification::make()->title('Request odmietnutý.')->danger()->send();
+                Notification::make()->title('Žiadosť odmietnutá.')->danger()->send();
             });
     }
 }

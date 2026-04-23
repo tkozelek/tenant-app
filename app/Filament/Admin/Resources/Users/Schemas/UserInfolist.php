@@ -14,7 +14,7 @@ class UserInfolist
                 TextEntry::make('first_name'),
                 TextEntry::make('last_name'),
                 TextEntry::make('email')
-                    ->label('Email address'),
+                    ->label('E-mail'),
                 TextEntry::make('created_at')
                     ->dateTime()
                     ->placeholder('-'),

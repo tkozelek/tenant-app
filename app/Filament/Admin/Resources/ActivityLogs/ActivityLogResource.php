@@ -20,6 +20,10 @@ class ActivityLogResource extends Resource
 
     protected static ?string $policy = ActivityLogPolicy::class;
 
+    protected static ?string $modelLabel = 'Záznam';
+
+    protected static ?string $pluralModelLabel = 'Záznamy';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedClipboardDocumentList;
 
     protected static ?int $navigationSort = 99;

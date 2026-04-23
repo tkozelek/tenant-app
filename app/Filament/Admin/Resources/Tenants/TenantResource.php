@@ -21,6 +21,10 @@ class TenantResource extends Resource
 {
     protected static ?string $model = Tenant::class;
 
+    protected static ?string $modelLabel = 'Prevádzka';
+
+    protected static ?string $pluralModelLabel = 'Prevádzky';
+
     protected static string|BackedEnum|null $navigationIcon = Heroicon::BuildingOffice;
 
     protected static ?int $navigationSort = 20;

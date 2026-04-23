@@ -41,6 +41,7 @@ enum StockHistoryType: string
                 $case->value => $case->label(),
             ];
         }
+
         return $arr;
     }
 }

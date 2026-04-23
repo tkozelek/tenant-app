@@ -18,6 +18,10 @@ class GlobalProductRequestResource extends Resource
 {
     protected static ?string $model = GlobalProductRequest::class;
 
+    protected static ?string $modelLabel = 'Žiadosť';
+
+    protected static ?string $pluralModelLabel = 'Žiadosti';
+
     protected static ?int $navigationSort = 35;
 
     protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedInboxArrowDown;
