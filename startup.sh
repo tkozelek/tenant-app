@@ -14,6 +14,6 @@ if [ -f artisan ]; then
     php artisan view:cache || true
 fi
 
-cp /home/site/wwwroot/default /etc/nginx/sites-available/default 2>/dev/null || true
+cp /home/site/wwwroot/nginx.conf /etc/nginx/sites-available/default 2>/dev/null || true
 
 service nginx reload || true
