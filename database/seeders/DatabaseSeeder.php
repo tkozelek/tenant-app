@@ -16,6 +16,7 @@ class DatabaseSeeder extends Seeder
             TenantRoleSeeder::class,
 
             TenantSeeder::class,
+            UserSeeder::class,
 
             CategorySeeder::class,
             AttributeSeeder::class,
