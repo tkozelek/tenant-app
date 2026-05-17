@@ -9,6 +9,7 @@
         "php": "^8.4.4",
         "akaunting/laravel-money": "^6.0",
         "dedoc/scramble": "^0.13.20",
+        "fakerphp/faker": "^1.24",
         "filament/filament": "^5.2",
         "filament/spatie-laravel-media-library-plugin": "^5.2",
         "google-gemini-php/laravel": "^2.0",
@@ -25,7 +26,6 @@
         "spatie/laravel-sluggable": "^3.7"
     },
     "require-dev": {
-        "fakerphp/faker": "^1.23",
         "fruitcake/laravel-debugbar": "^4.0",
         "larastan/larastan": "^3.9",
         "laravel/pail": "^1.2.2",
