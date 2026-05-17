@@ -105,13 +105,19 @@ class StaleProductsReport extends Page implements HasTable
                         '180' => '180 dni',
                     ])
                     ->default('30')
+                    ->selectablePlaceholder(false)
                     ->query(function (Builder $query, array $data): void {
                         $days = (int) ($data['value'] ?? 30);
-                        $query->havingRaw('GREATEST(
-                            COALESCE(MAX(ph.created_at), tenant_product_variants.updated_at),
-                            COALESCE(MAX(sh.created_at), tenant_product_variants.updated_at),
-                            tenant_product_variants.updated_at
-                        ) <= ?', [now()->subDays($days)]);
+
+                        $dateLimit = now()->subDays($days)->toDateTimeString();
+
+                        $query->whereRaw('
+            GREATEST(
+                COALESCE((SELECT MAX(created_at) FROM price_history ph WHERE ph.tenant_product_variant_id = tenant_product_variants.id), tenant_product_variants.updated_at),
+                COALESCE((SELECT MAX(created_at) FROM stock_history sh WHERE sh.product_variant_id = tenant_product_variants.id), tenant_product_variants.updated_at),
+                tenant_product_variants.updated_at
+            ) <= ?
+        ', [$dateLimit]);
                     }),
             ])
             ->defaultSort('last_activity', 'asc');
@@ -123,21 +129,20 @@ class StaleProductsReport extends Page implements HasTable
 
         return TenantProductVariant::query()
             ->select('tenant_product_variants.*')
-            ->selectRaw('
-                MAX(ph.created_at) as last_price_change,
-                MAX(sh.created_at) as last_stock_movement,
-                GREATEST(
-                    COALESCE(MAX(ph.created_at), tenant_product_variants.updated_at),
-                    COALESCE(MAX(sh.created_at), tenant_product_variants.updated_at),
-                    tenant_product_variants.updated_at
-                ) as last_activity
-            ')
-            ->leftJoin('price_history as ph', 'ph.tenant_product_variant_id', '=', 'tenant_product_variants.id')
-            ->leftJoin('stock_history as sh', 'sh.product_variant_id', '=', 'tenant_product_variants.id')
             ->join('tenant_products as tp', 'tp.id', '=', 'tenant_product_variants.tenant_product_id')
             ->where('tp.tenant_id', $tenantId)
             ->with('product')
-            ->groupBy('tenant_product_variants.id');
+            ->selectRaw('
+            (SELECT MAX(created_at) FROM price_history ph WHERE ph.tenant_product_variant_id = tenant_product_variants.id) as last_price_change,
+            (SELECT MAX(created_at) FROM stock_history sh WHERE sh.product_variant_id = tenant_product_variants.id) as last_stock_movement
+        ')
+            ->selectRaw('
+            GREATEST(
+                COALESCE((SELECT MAX(created_at) FROM price_history ph WHERE ph.tenant_product_variant_id = tenant_product_variants.id), tenant_product_variants.updated_at),
+                COALESCE((SELECT MAX(created_at) FROM stock_history sh WHERE sh.product_variant_id = tenant_product_variants.id), tenant_product_variants.updated_at),
+                tenant_product_variants.updated_at
+            ) as last_activity
+        ');
     }
 
     public function getView(): string
