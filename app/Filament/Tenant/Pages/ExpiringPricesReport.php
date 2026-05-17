@@ -115,12 +115,10 @@ class ExpiringPricesReport extends Page implements HasTable
                         '3' => 'Do 3 dni',
                         '7' => 'Do 7 dni',
                     ])
-                    ->query(function ($query, array $data) {
-                        if (! empty($data['value'])) {
-                            return $query->where('valid_to', '<=', now()->addDays((int) $data['value']));
-                        }
-                        return $query;
-                    }),
+                    ->query(fn ($query, array $data) => $data['value']
+                        ? $query->where('valid_to', '<=', now()->addDays((int) $data['value']))
+                        : $query
+                    ),
             ])
             ->defaultSort('valid_to');
     }

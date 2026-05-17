@@ -141,17 +141,12 @@ class StockHealthReport extends Page implements HasTable
                         'extra' => 'Extra (>100)',
                         'ok' => 'V poriadku',
                     ])
-                    ->query(function ($query, array $data) {
-                        if (empty($data['value'])) {
-                            return $query;
-                        }
-                        return match ($data['value']) {
-                            'out' => $query->where('stock_quantity', 0),
-                            'critical' => $query->where('stock_quantity', '>', 0)->where('stock_quantity', '<=', 5),
-                            'extra' => $query->where('stock_quantity', '>', 100),
-                            'ok' => $query->where('stock_quantity', '>', 5)->where('stock_quantity', '<=', 100),
-                            default => $query,
-                        };
+                    ->query(fn ($query, array $data) => match ($data['value'] ?? null) {
+                        'out' => $query->where('stock_quantity', 0),
+                        'critical' => $query->where('stock_quantity', '>', 0)->where('stock_quantity', '<=', 5),
+                        'extra' => $query->where('stock_quantity', '>', 100),
+                        'ok' => $query->where('stock_quantity', '>', 5)->where('stock_quantity', '<=', 100),
+                        default => $query,
                     }),
             ])
             ->defaultSort('stock_quantity');
