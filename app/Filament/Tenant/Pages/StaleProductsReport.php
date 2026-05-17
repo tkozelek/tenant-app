@@ -104,14 +104,15 @@ class StaleProductsReport extends Page implements HasTable
                         '90' => '90 dni',
                         '180' => '180 dni',
                     ])
-                    ->default('30')
                     ->query(function (Builder $query, array $data): void {
-                        $days = (int) ($data['value'] ?? 30);
-                        $query->havingRaw('GREATEST(
-                            COALESCE(MAX(ph.created_at), tenant_product_variants.updated_at),
-                            COALESCE(MAX(sh.created_at), tenant_product_variants.updated_at),
-                            tenant_product_variants.updated_at
-                        ) <= ?', [now()->subDays($days)]);
+                        if (! empty($data['value'])) {
+                            $days = (int) $data['value'];
+                            $query->havingRaw('GREATEST(
+                                COALESCE(MAX(ph.created_at), tenant_product_variants.updated_at),
+                                COALESCE(MAX(sh.created_at), tenant_product_variants.updated_at),
+                                tenant_product_variants.updated_at
+                            ) <= ?', [now()->subDays($days)]);
+                        }
                     }),
             ])
             ->defaultSort('last_activity', 'asc');
