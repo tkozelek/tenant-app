@@ -1,59 +1,79 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Tenant App: multi-tenant product and price management
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Master's thesis project (University of Žilina, Faculty of Management Science and Informatics, 2026):
+*Inteligentný systém pre správu cien tovaru* (An intelligent system for managing product prices).
 
-## About Laravel
+A multi-tenant web application where several sellers manage their products, prices and stock on one
+platform while their data stays isolated. Sellers attach their own products and variants to a shared
+central catalog, define pricing rules, and publish the data through a REST API and XML feeds.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Features
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+- **Multi-tenancy**: single database with a `tenant_id` on tenant data. Isolation is enforced by the
+  Filament tenant panel, access middleware, policies and tenant-scoped roles (spatie/laravel-permission with teams).
+- **Central catalog**: global products, categories and attributes managed by the platform admin.
+  Tenants can request new catalog products, and the admin approves them.
+- **Seller products and variants**: SKU, EAN, attributes, stock with full stock history.
+- **Pricing**
+  - price history with validity windows and flash sales
+  - quantity discounts (price tiers by quantity)
+  - coupons (fixed or percentage, minimum order, usage limit, validity period, product/category scope)
+  - product bundles with their own price history
+- **REST API** (`/api/v1/{tenant}/...`): products, variants, prices, stock, bundles, coupons, categories,
+  search and reports. Token auth per tenant with per-ability permissions and rate limiting.
+  OpenAPI documentation is generated with Scramble.
+- **XML feeds**: Heureka and generic format, served from a tokenized URL `/feed/{tenant}/{token}.xml`.
+- **Import and export** of catalog, products, variants and users (Filament importers and exporters).
+- **Extras**: price prediction and stock recommendations (php-ml), AI-generated product descriptions (Gemini),
+  activity log, public storefront with product comparison.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## Tech stack
 
-## Learning Laravel
+PHP 8.4, Laravel 12, Filament 5, Livewire 4, MySQL 8, Tailwind CSS 4, Alpine.js, Vite,
+Laravel Sanctum, spatie/laravel-permission, spatie/laravel-activitylog, spatie/laravel-medialibrary,
+dedoc/scramble, PHPUnit, Larastan (PHPStan). Deployed to Azure App Service through GitHub Actions.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## Database model
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+![ER diagram](ddb.png)
 
-## Laravel Sponsors
+## Running locally
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+Requirements: PHP 8.4, Composer, Node.js, MySQL 8 (or Docker).
 
-### Premium Partners
+```bash
+# create a MySQL database named "tenantapp" first, then:
+composer setup          # install, copy .env, generate key, migrate, build assets
+php artisan db:seed     # demo tenants, catalog, products, bundles, coupons
+composer dev            # app server, queue worker and Vite together
+```
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+With Docker (Laravel Sail), after `composer install`:
 
-## Contributing
+```bash
+./vendor/bin/sail up -d
+./vendor/bin/sail artisan migrate --seed
+```
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+`GEMINI_API_KEY` in `.env` is only needed for AI-generated descriptions.
 
-## Code of Conduct
+Demo accounts created by the seeder (local use only):
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+| Role | E-mail | Password |
+|------|--------|----------|
+| Platform admin | admin@admin.com | password |
+| Shop owner (several tenants) | test@test.com | password |
 
-## Security Vulnerabilities
+Admin panel: `/admin`, tenant panel: `/tenant`.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## Tests
 
-## License
+```bash
+composer test
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Around 110 tests: API endpoints (auth, products, stock, prices, coupons, bundles), XML feeds,
+policies and role access, and unit tests for pricing, coupons and the prediction services.
+Tests run against a MySQL database `tenantapp_test` (see `phpunit.xml`).
+
+Static analysis: `./vendor/bin/phpstan analyse` (level 5).
