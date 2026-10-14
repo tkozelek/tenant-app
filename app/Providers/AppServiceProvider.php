@@ -28,9 +28,7 @@ class AppServiceProvider extends ServiceProvider
         Sanctum::usePersonalAccessTokenModel(ApiToken::class);
 
         Gate::define('viewPulse', function (User $user) {
-            return in_array($user->email, config('app.pulse_emails', [
-                'tommyside@centrum.sk',
-            ]));
+            return $user->email === config('app.super_admin.email');
         });
 
         Scramble::configure()

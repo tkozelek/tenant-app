@@ -6,6 +6,7 @@ use App\Enums\PermissionScope;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Str;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\PermissionRegistrar;
@@ -270,14 +271,28 @@ class RoleSeeder extends Seeder
             $reportPermissions,
         ));
 
+        $email = config('app.super_admin.email');
+
+        if (blank($email)) {
+            $this->command?->warn('SUPER_ADMIN_EMAIL is not set, skipping the super admin account.');
+
+            return;
+        }
+
+        $password = config('app.super_admin.password') ?: Str::password(20);
+
         $user = User::firstOrCreate(
-            ['email' => 'tommyside@centrum.sk'],
+            ['email' => $email],
             [
-                'first_name' => 'Tomáš',
-                'last_name' => 'Kozelek',
-                'password' => Hash::make('password'),
+                'first_name' => 'Super',
+                'last_name' => 'Admin',
+                'password' => Hash::make($password),
             ]
         );
+
+        if ($user->wasRecentlyCreated && blank(config('app.super_admin.password'))) {
+            $this->command?->warn("Super admin {$email} created with password: {$password}");
+        }
 
         setPermissionsTeamId(null);
 
